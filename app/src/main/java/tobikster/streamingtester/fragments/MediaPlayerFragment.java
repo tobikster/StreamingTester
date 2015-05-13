@@ -1,9 +1,11 @@
 package tobikster.streamingtester.fragments;
 
 import android.app.Fragment;
+import android.graphics.Point;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,14 +16,17 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.MediaController;
+import android.widget.Toast;
 
 import java.io.IOException;
 
 import tobikster.streamingtester.R;
 import tobikster.streamingtester.dialogs.MediaInfoDialog;
 
-public class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPreparedListener, SurfaceHolder.Callback, MediaController.MediaPlayerControl, MediaPlayer.OnBufferingUpdateListener {
+public class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPreparedListener, SurfaceHolder.Callback, MediaController.MediaPlayerControl, MediaPlayer.OnBufferingUpdateListener, MediaPlayer.OnInfoListener, MediaPlayer.OnVideoSizeChangedListener {
 	public static final String TEST_VIDEO_URL = "https://archive.org/download/ksnn_compilation_master_the_internet/ksnn_compilation_master_the_internet_512kb.mp4";
+	public static final String LOGCAT_TAG = "MediaPlayerFragment";
+	public static final String ARG_NAME_VIDEO_URL = "video_url";
 
 	SurfaceView mSurfaceView;
 	MediaPlayer mMediaPlayer;
@@ -29,23 +34,44 @@ public class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPrepa
 	MediaInfoDialog mMediaInfoDialog;
 	MediaPlayer.TrackInfo[] mTrackInfos;
 
+	String mVideoUrl;
+
 	int mBufferPercentage;
 	boolean mMediaPlayerPrepared;
+
+	public MediaPlayerFragment() {
+		mVideoUrl = TEST_VIDEO_URL;
+		mMediaPlayerPrepared = false;
+		mBufferPercentage = 0;
+	}
+
+	public static MediaPlayerFragment newInstance(String videoUrl) {
+		MediaPlayerFragment instance = new MediaPlayerFragment();
+		Bundle args = new Bundle();
+		args.putString(ARG_NAME_VIDEO_URL, videoUrl);
+		instance.setArguments(args);
+		return instance;
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setHasOptionsMenu(true);
 
+		Bundle args = getArguments();
+		if(args != null) {
+			mVideoUrl = args.getString(ARG_NAME_VIDEO_URL, TEST_VIDEO_URL);
+		}
+
 		mMediaPlayer = new MediaPlayer();
 		mMediaPlayer.setOnPreparedListener(this);
 		mMediaPlayer.setOnBufferingUpdateListener(this);
+		mMediaPlayer.setOnInfoListener(this);
 
-		mBufferPercentage = 0;
-		mMediaPlayerPrepared = false;
+//		mVideoUrl = String.format("android.resource://tobikster.streamingtester/%d", R.raw.test_video_4);
 
 		try {
-			mMediaPlayer.setDataSource(getActivity(), Uri.parse(TEST_VIDEO_URL));
+			mMediaPlayer.setDataSource(getActivity(), Uri.parse(mVideoUrl));
 			mMediaPlayer.prepareAsync();
 		}
 		catch (IOException e) {
@@ -63,7 +89,7 @@ public class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPrepa
 
 		mMediaController = new MediaController(getActivity());
 		mMediaController.setMediaPlayer(this);
-		mMediaController.setAnchorView(mSurfaceView);
+		mMediaController.setAnchorView(view);
 
 		mSurfaceView.setOnTouchListener(new View.OnTouchListener() {
 			@Override
@@ -109,6 +135,26 @@ public class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPrepa
 
 	@Override
 	public void onPrepared(MediaPlayer mp) {
+		SurfaceHolder holder = mSurfaceView.getHolder();
+		int width = mSurfaceView.getWidth();
+		int height = mSurfaceView.getHeight();
+		float boxWidth = width;
+		float boxHeight = height;
+		float videoWidth = mp.getVideoWidth();
+		float videoHeight = mp.getVideoHeight();
+
+		float wr = boxWidth / videoWidth;
+		float hr = boxHeight / videoHeight;
+		float ar = videoWidth / videoHeight;
+
+		if(wr > hr) {
+			width = (int)(boxHeight * ar);
+		}
+		else {
+			height = (int)(boxWidth / ar);
+		}
+
+		holder.setFixedSize(width, height);
 		mp.start();
 		mTrackInfos = mp.getTrackInfo();
 		mMediaPlayerPrepared = true;
@@ -192,5 +238,18 @@ public class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPrepa
 	@Override
 	public void onBufferingUpdate(MediaPlayer mp, int percent) {
 		mBufferPercentage = percent;
+	}
+
+	@Override
+	public boolean onInfo(MediaPlayer mp, int what, int extra) {
+		Log.d(LOGCAT_TAG, String.format("New info: %d (%d)", what, extra));
+		if(MediaPlayer.MEDIA_INFO_METADATA_UPDATE == what) {
+			Toast.makeText(getActivity(), "Metadata update!", Toast.LENGTH_SHORT).show();
+		}
+		return false;
+	}
+
+	@Override
+	public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
 	}
 }

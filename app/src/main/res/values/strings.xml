@@ -6,4 +6,6 @@
     <string name="title_activity_web_view">WebViewActivity</string>
     <string name="action_ok">OK</string>
     <string name="action_show_media_info_dialog">Show media info</string>
+
+    <string name="hello_world">Hello world!</string>
 </resources>

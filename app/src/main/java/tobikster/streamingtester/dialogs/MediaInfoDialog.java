@@ -10,7 +10,7 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import tobikster.streamingtester.R;
 
@@ -19,8 +19,6 @@ import tobikster.streamingtester.R;
  */
 public class MediaInfoDialog extends DialogFragment {
 	private MediaInfoDialogListener mMediaInfoDialogListener;
-
-	private TextView mCodecValue;
 
 	public static MediaInfoDialog getInstance(MediaPlayer.TrackInfo[] infos) {
 		MediaInfoDialog dialog = new MediaInfoDialog();
@@ -38,6 +36,8 @@ public class MediaInfoDialog extends DialogFragment {
 					break;
 			}
 		}
+		args.putBoolean("video_format_null", videoFormat == null);
+		args.putBoolean("audio_format_null", audioFormat == null);
 		dialog.setArguments(args);
 		return dialog;
 	}
@@ -46,6 +46,13 @@ public class MediaInfoDialog extends DialogFragment {
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		Bundle args = getArguments();
+
+		if(args.getBoolean("video_format_null")) {
+			Toast.makeText(getActivity(), "Video format inaccessible", Toast.LENGTH_SHORT).show();
+		}
+		if(args.getBoolean("audio_format_null")) {
+			Toast.makeText(getActivity(), "Audio format inaccessible", Toast.LENGTH_SHORT).show();
+		}
 
 		LayoutInflater inflater = getActivity().getLayoutInflater();
 		View root = inflater.inflate(R.layout.dialog_media_info, null);
@@ -58,10 +65,6 @@ public class MediaInfoDialog extends DialogFragment {
 						}
 					}
 				});
-
-		mCodecValue = (TextView) (root.findViewById(R.id.codec_value));
-
-
 		return builder.create();
 	}
 

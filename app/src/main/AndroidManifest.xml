@@ -19,7 +19,8 @@
         </activity>
         <activity
             android:name=".activities.MediaPlayerActivity"
-            android:label="@string/title_activity_media_player" >
+            android:label="@string/title_activity_media_player"
+            android:screenOrientation="portrait">
         </activity>
         <activity
             android:name=".activities.WebViewActivity"
