@@ -7,17 +7,17 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.media.MediaFormat;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Toast;
 
 import tobikster.streamingtester.R;
 
-/**
- * Created by tobikster on 2015-05-08.
- */
 public class MediaInfoDialog extends DialogFragment {
+	public static final String LOGCAT_TAG = "MediaInfoDialog";
 	private MediaInfoDialogListener mMediaInfoDialogListener;
 
 	public static MediaInfoDialog getInstance(MediaPlayer.TrackInfo[] infos) {
@@ -28,11 +28,21 @@ public class MediaInfoDialog extends DialogFragment {
 		for (MediaPlayer.TrackInfo info : infos) {
 			switch (info.getTrackType()) {
 				case MediaPlayer.TrackInfo.MEDIA_TRACK_TYPE_VIDEO:
-					videoFormat = info.getFormat();
+					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+						Log.d(LOGCAT_TAG, String.format("Getting media format is not supported on API level %d (%s)", Build.VERSION.SDK_INT, Build.VERSION.CODENAME));
+					}
+					else {
+						videoFormat = info.getFormat();
+					}
 					break;
 
 				case MediaPlayer.TrackInfo.MEDIA_TRACK_TYPE_AUDIO:
-					audioFormat = info.getFormat();
+					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+						Log.d(LOGCAT_TAG, String.format("Getting media format is not supported on API level %d (%s)", Build.VERSION.SDK_INT, Build.VERSION.CODENAME));
+					}
+					else {
+						audioFormat = info.getFormat();
+					}
 					break;
 			}
 		}
@@ -47,10 +57,10 @@ public class MediaInfoDialog extends DialogFragment {
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		Bundle args = getArguments();
 
-		if(args.getBoolean("video_format_null")) {
+		if (args.getBoolean("video_format_null")) {
 			Toast.makeText(getActivity(), "Video format inaccessible", Toast.LENGTH_SHORT).show();
 		}
-		if(args.getBoolean("audio_format_null")) {
+		if (args.getBoolean("audio_format_null")) {
 			Toast.makeText(getActivity(), "Audio format inaccessible", Toast.LENGTH_SHORT).show();
 		}
 

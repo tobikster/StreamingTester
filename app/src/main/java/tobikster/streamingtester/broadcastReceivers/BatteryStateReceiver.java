@@ -1,5 +1,6 @@
 package tobikster.streamingtester.broadcastReceivers;
 
+import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -7,15 +8,18 @@ import android.os.BatteryManager;
 import android.os.Environment;
 import android.util.Log;
 
+import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.Calendar;
+import java.util.List;
 
 public class BatteryStateReceiver extends BroadcastReceiver {
+	@SuppressWarnings("unused")
 	public static final String LOGCAT_TAG = "BatteryStateReceiver";
+
 	public static final String LOG_FILE_NAME_BATTERY_LEVEL = "battery_level.csv";
 
 	@Override
@@ -23,23 +27,42 @@ public class BatteryStateReceiver extends BroadcastReceiver {
 		int batteryLevel = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
 		int batteryScale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
 
-		float currentBatteryLevel = batteryLevel / (float)(batteryScale);
+		float currentBatteryLevel = batteryLevel / (float) (batteryScale);
 
-		try(FileOutputStream outputStream = context.openFileOutput(LOG_FILE_NAME_BATTERY_LEVEL, Context.MODE_APPEND)) {
-			Calendar now = Calendar.getInstance();
-			outputStream.write(String.format("%s\t%f\n", now.getTime().toString(), currentBatteryLevel).getBytes());
-		}
-		catch(IOException e) {
-			e.printStackTrace();
-		}
+		ActivityManager activityManager = (ActivityManager) (context.getSystemService(Context.ACTIVITY_SERVICE));
+		List<ActivityManager.RunningTaskInfo> taskInfo = activityManager.getRunningTasks(1);
+		String currentActivity = taskInfo.get(0).topActivity.getShortClassName();
 
-//		try(FileWriter writer = new FileWriter(new File(context.getExternalFilesDir(null), LOG_FILE_NAME_BATTERY_LEVEL), true)) {
-//			Calendar now = Calendar.getInstance();
-//			String message = String.format("%s\t%f\n", now.getTime().toString(), currentBatteryLevel);
-//			writer.write(message);
-//		}
-//		catch (IOException e) {
-//			e.printStackTrace();
-//		}
+		if (!Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
+			Log.e(LOGCAT_TAG, "External storage is unavailable for writing!");
+		}
+		else {
+			File outputFileDir = context.getExternalFilesDir(null);
+			if (outputFileDir != null && !outputFileDir.isDirectory() && !outputFileDir.mkdirs()) {
+				Log.e(LOGCAT_TAG, "Output folder doesn't exist and cannot be created!");
+			}
+			else {
+				BufferedWriter writer = null;
+				try {
+					File outputFile = new File(outputFileDir, LOG_FILE_NAME_BATTERY_LEVEL);
+					writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFile, true), "utf-8"));
+					Calendar currentDate = Calendar.getInstance();
+					writer.write(String.format("%s\t%s\t%f\n", currentDate.getTime().toString(), currentActivity, currentBatteryLevel));
+				}
+				catch (IOException e) {
+					e.printStackTrace();
+				}
+				finally {
+					try {
+						if (writer != null) {
+							writer.close();
+						}
+					}
+					catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
 	}
 }

@@ -38,6 +38,5 @@ public class WebViewActivity extends Activity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		mWebView = null;
 	}
 }

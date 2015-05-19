@@ -1,7 +1,8 @@
 package tobikster.streamingtester.fragments;
 
 import android.app.Fragment;
-import android.graphics.Point;
+import android.content.res.AssetFileDescriptor;
+import android.content.res.AssetManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,15 +19,20 @@ import android.view.ViewGroup;
 import android.widget.MediaController;
 import android.widget.Toast;
 
+import java.io.FileDescriptor;
 import java.io.IOException;
 
 import tobikster.streamingtester.R;
 import tobikster.streamingtester.dialogs.MediaInfoDialog;
+import tobikster.streamingtester.model.VideoUri;
 
 public class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPreparedListener, SurfaceHolder.Callback, MediaController.MediaPlayerControl, MediaPlayer.OnBufferingUpdateListener, MediaPlayer.OnInfoListener, MediaPlayer.OnVideoSizeChangedListener {
-	public static final String TEST_VIDEO_URL = "https://archive.org/download/ksnn_compilation_master_the_internet/ksnn_compilation_master_the_internet_512kb.mp4";
 	public static final String LOGCAT_TAG = "MediaPlayerFragment";
-	public static final String ARG_NAME_VIDEO_URL = "video_url";
+	public static final String ARG_VIDEO_NAME = "video_name";
+	public static final String ARG_VIDEO_URI = "video_url";
+	public static final String ARG_VIDEO_REMOTE = "video_is_remote";
+
+	public static final String TEST_VIDEO_URL = "https://archive.org/download/ksnn_compilation_master_the_internet/ksnn_compilation_master_the_internet_512kb.mp4";
 
 	SurfaceView mSurfaceView;
 	MediaPlayer mMediaPlayer;
@@ -34,21 +40,23 @@ public class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPrepa
 	MediaInfoDialog mMediaInfoDialog;
 	MediaPlayer.TrackInfo[] mTrackInfos;
 
-	String mVideoUrl;
+	VideoUri mVideoUri;
 
 	int mBufferPercentage;
 	boolean mMediaPlayerPrepared;
 
 	public MediaPlayerFragment() {
-		mVideoUrl = TEST_VIDEO_URL;
+		mVideoUri = null;
 		mMediaPlayerPrepared = false;
 		mBufferPercentage = 0;
 	}
 
-	public static MediaPlayerFragment newInstance(String videoUrl) {
+	public static MediaPlayerFragment newInstance(VideoUri videoUri) {
 		MediaPlayerFragment instance = new MediaPlayerFragment();
 		Bundle args = new Bundle();
-		args.putString(ARG_NAME_VIDEO_URL, videoUrl);
+		args.putString(ARG_VIDEO_NAME, videoUri.getName());
+		args.putString(ARG_VIDEO_URI, videoUri.getUri());
+		args.putBoolean(ARG_VIDEO_REMOTE, videoUri.isRemote());
 		instance.setArguments(args);
 		return instance;
 	}
@@ -60,7 +68,10 @@ public class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPrepa
 
 		Bundle args = getArguments();
 		if(args != null) {
-			mVideoUrl = args.getString(ARG_NAME_VIDEO_URL, TEST_VIDEO_URL);
+			String videoName = args.getString(ARG_VIDEO_NAME, null);
+			String videoUri = args.getString(ARG_VIDEO_URI, TEST_VIDEO_URL);
+			boolean videoIsRemote = args.getBoolean(ARG_VIDEO_REMOTE, true);
+			mVideoUri = new VideoUri(videoName, videoUri, videoIsRemote);
 		}
 
 		mMediaPlayer = new MediaPlayer();
@@ -68,11 +79,16 @@ public class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPrepa
 		mMediaPlayer.setOnBufferingUpdateListener(this);
 		mMediaPlayer.setOnInfoListener(this);
 
-//		mVideoUrl = String.format("android.resource://tobikster.streamingtester/%d", R.raw.test_video_4);
-
 		try {
-			mMediaPlayer.setDataSource(getActivity(), Uri.parse(mVideoUrl));
-			mMediaPlayer.prepareAsync();
+			if(mVideoUri != null) {
+				if (mVideoUri.isRemote()) {
+					mMediaPlayer.setDataSource(mVideoUri.getUri());
+					mMediaPlayer.prepareAsync();
+				}
+				else {
+					Log.d(LOGCAT_TAG, "Playing local resources is not supported yet");
+				}
+			}
 		}
 		catch (IOException e) {
 			e.printStackTrace();
@@ -148,7 +164,7 @@ public class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPrepa
 		float ar = videoWidth / videoHeight;
 
 		if(wr > hr) {
-			width = (int)(boxHeight * ar);
+			width = (int) (boxHeight * ar);
 		}
 		else {
 			height = (int)(boxWidth / ar);
