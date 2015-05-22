@@ -81,13 +81,8 @@ public class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPrepa
 
 		try {
 			if(mVideoUri != null) {
-				if (mVideoUri.isRemote()) {
-					mMediaPlayer.setDataSource(mVideoUri.getUri());
-					mMediaPlayer.prepareAsync();
-				}
-				else {
-					Log.d(LOGCAT_TAG, "Playing local resources is not supported yet");
-				}
+				mMediaPlayer.setDataSource(mVideoUri.getUri());
+				mMediaPlayer.prepareAsync();
 			}
 		}
 		catch (IOException e) {

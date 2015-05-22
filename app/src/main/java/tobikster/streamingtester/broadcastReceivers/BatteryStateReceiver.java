@@ -30,10 +30,11 @@ public class BatteryStateReceiver extends BroadcastReceiver {
 		float currentBatteryLevel = batteryLevel / (float) (batteryScale);
 
 		ActivityManager activityManager = (ActivityManager) (context.getSystemService(Context.ACTIVITY_SERVICE));
+		@SuppressWarnings("deprecation")
 		List<ActivityManager.RunningTaskInfo> taskInfo = activityManager.getRunningTasks(1);
 		String currentActivity = taskInfo.get(0).topActivity.getShortClassName();
 
-		if (!Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
+		if (!isExternalStorageWritable()) {
 			Log.e(LOGCAT_TAG, "External storage is unavailable for writing!");
 		}
 		else {
@@ -64,5 +65,35 @@ public class BatteryStateReceiver extends BroadcastReceiver {
 				}
 			}
 		}
+	}
+
+	public static boolean removeBatteryLogFile(Context context) {
+		boolean result = false;
+		File outputFile = getOutputFile(context, null, LOG_FILE_NAME_BATTERY_LEVEL);
+		if (outputFile != null) {
+			result = !outputFile.exists() || outputFile.delete();
+		}
+		return result;
+	}
+
+	private static boolean isExternalStorageWritable() {
+		return Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState());
+	}
+
+	private static File getOutputFile(Context context, String directoryType, String name) {
+		File result = null;
+		if (!isExternalStorageWritable()) {
+			Log.e(LOGCAT_TAG, "External storage is unavailable for writing!");
+		}
+		else {
+			File outputDir = context.getExternalFilesDir(directoryType);
+			if (outputDir == null || (!outputDir.mkdirs() && !outputDir.isDirectory())) {
+				Log.e(LOGCAT_TAG, "Output folder doesn't exist and cannot be created!");
+			}
+			else {
+				result = new File(outputDir, name);
+			}
+		}
+		return result;
 	}
 }

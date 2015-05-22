@@ -3,12 +3,17 @@ package tobikster.streamingtester.fragments;
 import android.app.Activity;
 import android.app.ListFragment;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.Collections;
+
+import tobikster.streamingtester.R;
 
 /**
  * A fragment representing a list of Items.
@@ -41,6 +46,7 @@ public class TestVideoListFragment extends ListFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		setHasOptionsMenu(true);
 		Bundle args = getArguments();
 
 		ArrayList<String> videoList = args.getStringArrayList(ARG_VIDEO_URLS);
@@ -73,6 +79,27 @@ public class TestVideoListFragment extends ListFragment {
 		}
 	}
 
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		inflater.inflate(R.menu.video_list_fragment, menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		boolean result;
+		switch(item.getItemId()) {
+			case R.id.menu_item_open_local_video_file:
+				if(mListener != null) {
+					mListener.onOpenVideoRequest();
+				}
+				result = true;
+				break;
+			default:
+				result = super.onOptionsItemSelected(item);
+		}
+		return result;
+	}
+
 	/**
 	 * This interface must be implemented by activities that contain this
 	 * fragment to allow an interaction in this fragment to be communicated
@@ -85,6 +112,7 @@ public class TestVideoListFragment extends ListFragment {
 	 */
 	public interface OnFragmentInteractionListener {
 		void onListItemSelected(int position);
+		void onOpenVideoRequest();
 	}
 
 }

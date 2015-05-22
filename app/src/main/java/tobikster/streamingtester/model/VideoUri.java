@@ -1,8 +1,5 @@
 package tobikster.streamingtester.model;
 
-/**
- * Created by tobikster on 2015-05-19.
- */
 public class VideoUri
 {
 	String mName;
@@ -41,5 +38,10 @@ public class VideoUri
 
 	public void setRemote(boolean remote) {
 		mRemote = remote;
+	}
+
+	@Override
+	public String toString() {
+		return String.format("\"%s\": %s (%s)", mName, mUri, (mRemote ? "remote" : "local"));
 	}
 }
