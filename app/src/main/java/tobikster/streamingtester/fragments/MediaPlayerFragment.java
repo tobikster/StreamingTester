@@ -1,8 +1,7 @@
 package tobikster.streamingtester.fragments;
 
 import android.app.Fragment;
-import android.content.res.AssetFileDescriptor;
-import android.content.res.AssetManager;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -19,7 +18,6 @@ import android.view.ViewGroup;
 import android.widget.MediaController;
 import android.widget.Toast;
 
-import java.io.FileDescriptor;
 import java.io.IOException;
 
 import tobikster.streamingtester.R;
@@ -39,6 +37,7 @@ public class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPrepa
 	MediaController mMediaController;
 	MediaInfoDialog mMediaInfoDialog;
 	MediaPlayer.TrackInfo[] mTrackInfos;
+	MediaMetadataRetriever mMediaMetadataRetriever;
 
 	VideoUri mVideoUri;
 
@@ -79,9 +78,13 @@ public class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPrepa
 		mMediaPlayer.setOnBufferingUpdateListener(this);
 		mMediaPlayer.setOnInfoListener(this);
 
+		mMediaMetadataRetriever = new MediaMetadataRetriever();
+
 		try {
 			if(mVideoUri != null) {
-				mMediaPlayer.setDataSource(mVideoUri.getUri());
+				Log.d(LOGCAT_TAG, String.format("Trying to play from URI: %s", mVideoUri.getUri()));
+				Uri fileUri = Uri.parse(mVideoUri.getUri());
+				mMediaPlayer.setDataSource(getActivity(), fileUri);
 				mMediaPlayer.prepareAsync();
 			}
 		}
@@ -187,8 +190,6 @@ public class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPrepa
 	}
 
 	private void showMediaInfoDialog() {
-		mMediaInfoDialog = MediaInfoDialog.getInstance(mTrackInfos);
-		mMediaInfoDialog.show(getFragmentManager(), "MediaInfoDialog");
 	}
 
 	@Override

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.media.MediaFormat;
 import android.media.MediaPlayer;
@@ -17,10 +18,16 @@ import android.widget.Toast;
 import tobikster.streamingtester.R;
 
 public class MediaInfoDialog extends DialogFragment {
+	@SuppressWarnings("unused")
 	public static final String LOGCAT_TAG = "MediaInfoDialog";
-	private MediaInfoDialogListener mMediaInfoDialogListener;
 
-	public static MediaInfoDialog getInstance(MediaPlayer.TrackInfo[] infos) {
+	public static final String ARG_VIDEO_BITRATE = "video_bitrate";
+
+	Context mContext;
+	MediaInfoDialogListener mMediaInfoDialogListener;
+	int mVideoBitrate;
+
+	public static MediaInfoDialog newInstance(MediaPlayer.TrackInfo[] infos) {
 		MediaInfoDialog dialog = new MediaInfoDialog();
 		Bundle args = new Bundle();
 		MediaFormat videoFormat = null;
@@ -52,16 +59,25 @@ public class MediaInfoDialog extends DialogFragment {
 		return dialog;
 	}
 
+	public static MediaInfoDialog newInstance(int videoBitrate) {
+		MediaInfoDialog dialog = new MediaInfoDialog();
+		Bundle args = new Bundle();
+		args.putInt(ARG_VIDEO_BITRATE, videoBitrate);
+		dialog.setArguments(args);
+		return dialog;
+	}
+
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
-		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+		mContext = getActivity();
+		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 		Bundle args = getArguments();
 
 		if (args.getBoolean("video_format_null")) {
-			Toast.makeText(getActivity(), "Video format inaccessible", Toast.LENGTH_SHORT).show();
+			Toast.makeText(mContext, "Video format inaccessible", Toast.LENGTH_SHORT).show();
 		}
 		if (args.getBoolean("audio_format_null")) {
-			Toast.makeText(getActivity(), "Audio format inaccessible", Toast.LENGTH_SHORT).show();
+			Toast.makeText(mContext, "Audio format inaccessible", Toast.LENGTH_SHORT).show();
 		}
 
 		LayoutInflater inflater = getActivity().getLayoutInflater();
