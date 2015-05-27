@@ -18,42 +18,41 @@ package com.google.android.exoplayer.upstream;
 /**
  * A source of allocations.
  */
-public
-interface Allocator {
+public interface Allocator {
 
-	/**
-	 * Obtain an {@link Allocation}.
-	 * <p/>
-	 * When the caller has finished with the {@link Allocation}, it should be returned by calling
-	 * {@link #release(Allocation)}.
-	 *
-	 * @return The {@link Allocation}.
-	 */
-	Allocation allocate();
+  /**
+   * Obtain an {@link Allocation}.
+   * <p>
+   * When the caller has finished with the {@link Allocation}, it should be returned by calling
+   * {@link #release(Allocation)}.
+   *
+   * @return The {@link Allocation}.
+   */
+  Allocation allocate();
 
-	/**
-	 * Return an {@link Allocation}.
-	 *
-	 * @param allocation The {@link Allocation} being returned.
-	 */
-	void release(Allocation allocation);
+  /**
+   * Return an {@link Allocation}.
+   *
+   * @param allocation The {@link Allocation} being returned.
+   */
+  void release(Allocation allocation);
 
-	/**
-	 * Hints to the {@link Allocator} that it should make a best effort to release any memory that it
-	 * has allocated, beyond the specified target number of bytes.
-	 *
-	 * @param targetSize The target size in bytes.
-	 */
-	void trim(int targetSize);
+  /**
+   * Hints to the {@link Allocator} that it should make a best effort to release any memory that it
+   * has allocated, beyond the specified target number of bytes.
+   *
+   * @param targetSize The target size in bytes.
+   */
+  void trim(int targetSize);
 
-	/**
-	 * Returns the total number of bytes currently allocated.
-	 */
-	int getTotalBytesAllocated();
+  /**
+   * Returns the total number of bytes currently allocated.
+   */
+  int getTotalBytesAllocated();
 
-	/**
-	 * Returns the length of each individual {@link Allocation}.
-	 */
-	int getIndividualAllocationLength();
+  /**
+   * Returns the length of each individual {@link Allocation}.
+   */
+  int getIndividualAllocationLength();
 
 }

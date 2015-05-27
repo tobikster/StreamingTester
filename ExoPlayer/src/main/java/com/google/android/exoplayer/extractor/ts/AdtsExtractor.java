@@ -28,77 +28,69 @@ import java.io.IOException;
  * Facilitates the extraction of AAC samples from elementary audio files formatted as AAC with ADTS
  * headers.
  */
-public
-class AdtsExtractor implements Extractor, SeekMap {
+public class AdtsExtractor implements Extractor, SeekMap {
 
-	private static final int MAX_PACKET_SIZE = 200;
+  private static final int MAX_PACKET_SIZE = 200;
 
-	private final long firstSampleTimestampUs;
-	private final ParsableByteArray packetBuffer;
+  private final long firstSampleTimestampUs;
+  private final ParsableByteArray packetBuffer;
 
-	// Accessed only by the loading thread.
-	private AdtsReader adtsReader;
-	private boolean firstPacket;
+  // Accessed only by the loading thread.
+  private AdtsReader adtsReader;
+  private boolean firstPacket;
 
-	public
-	AdtsExtractor() {
-		this(0);
-	}
+  public AdtsExtractor() {
+    this(0);
+  }
 
-	public
-	AdtsExtractor(long firstSampleTimestampUs) {
-		this.firstSampleTimestampUs = firstSampleTimestampUs;
-		packetBuffer = new ParsableByteArray(MAX_PACKET_SIZE);
-		firstPacket = true;
-	}
+  public AdtsExtractor(long firstSampleTimestampUs) {
+    this.firstSampleTimestampUs = firstSampleTimestampUs;
+    packetBuffer = new ParsableByteArray(MAX_PACKET_SIZE);
+    firstPacket = true;
+  }
 
-	@Override
-	public
-	void init(ExtractorOutput output) {
-		adtsReader = new AdtsReader(output.track(0));
-		output.endTracks();
-		output.seekMap(this);
-	}
+  @Override
+  public void init(ExtractorOutput output) {
+    adtsReader = new AdtsReader(output.track(0));
+    output.endTracks();
+    output.seekMap(this);
+  }
 
-	@Override
-	public
-	void seek() {
-		firstPacket = true;
-		adtsReader.seek();
-	}
+  @Override
+  public void seek() {
+    firstPacket = true;
+    adtsReader.seek();
+  }
 
-	@Override
-	public
-	int read(ExtractorInput input, PositionHolder seekPosition)
-	throws IOException, InterruptedException {
-		int bytesRead = input.read(packetBuffer.data, 0, MAX_PACKET_SIZE);
-		if(bytesRead == -1) {
-			return RESULT_END_OF_INPUT;
-		}
+  @Override
+  public int read(ExtractorInput input, PositionHolder seekPosition)
+      throws IOException, InterruptedException {
+    int bytesRead = input.read(packetBuffer.data, 0, MAX_PACKET_SIZE);
+    if (bytesRead == -1) {
+      return RESULT_END_OF_INPUT;
+    }
 
-		// Feed whatever data we have to the reader, regardless of whether the read finished or not.
-		packetBuffer.setPosition(0);
-		packetBuffer.setLimit(bytesRead);
+    // Feed whatever data we have to the reader, regardless of whether the read finished or not.
+    packetBuffer.setPosition(0);
+    packetBuffer.setLimit(bytesRead);
 
-		// TODO: Make it possible for adtsReader to consume the dataSource directly, so that it becomes
-		// unnecessary to copy the data through packetBuffer.
-		adtsReader.consume(packetBuffer, firstSampleTimestampUs, firstPacket);
-		firstPacket = false;
-		return RESULT_CONTINUE;
-	}
+    // TODO: Make it possible for adtsReader to consume the dataSource directly, so that it becomes
+    // unnecessary to copy the data through packetBuffer.
+    adtsReader.consume(packetBuffer, firstSampleTimestampUs, firstPacket);
+    firstPacket = false;
+    return RESULT_CONTINUE;
+  }
 
-	// SeekMap implementation.
+  // SeekMap implementation.
 
-	@Override
-	public
-	boolean isSeekable() {
-		return false;
-	}
+  @Override
+  public boolean isSeekable() {
+    return false;
+  }
 
-	@Override
-	public
-	long getPosition(long timeUs) {
-		return 0;
-	}
+  @Override
+  public long getPosition(long timeUs) {
+    return 0;
+  }
 
 }

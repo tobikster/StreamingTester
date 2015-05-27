@@ -21,26 +21,23 @@ import android.os.Process;
 /**
  * A {@link HandlerThread} with a specified process priority.
  */
-public
-class PriorityHandlerThread extends HandlerThread {
+public class PriorityHandlerThread extends HandlerThread {
 
-	private final int priority;
+  private final int priority;
 
-	/**
-	 * @param name     The name of the thread.
-	 * @param priority The priority level. See {@link Process#setThreadPriority(int)} for details.
-	 */
-	public
-	PriorityHandlerThread(String name, int priority) {
-		super(name);
-		this.priority = priority;
-	}
+  /**
+   * @param name The name of the thread.
+   * @param priority The priority level. See {@link Process#setThreadPriority(int)} for details.
+   */
+  public PriorityHandlerThread(String name, int priority) {
+    super(name);
+    this.priority = priority;
+  }
 
-	@Override
-	public
-	void run() {
-		Process.setThreadPriority(priority);
-		super.run();
-	}
+  @Override
+  public void run() {
+    Process.setThreadPriority(priority);
+    super.run();
+  }
 
 }

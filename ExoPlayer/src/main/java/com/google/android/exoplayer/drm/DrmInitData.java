@@ -24,92 +24,80 @@ import java.util.UUID;
 /**
  * Encapsulates initialization data required by a {@link MediaDrm} instance.
  */
-public abstract
-class DrmInitData {
+public abstract class DrmInitData {
 
-	/**
-	 * The container mime type.
-	 */
-	public final String mimeType;
+  /**
+   * The container mime type.
+   */
+  public final String mimeType;
 
-	public
-	DrmInitData(String mimeType) {
-		this.mimeType = mimeType;
-	}
+  public DrmInitData(String mimeType) {
+    this.mimeType = mimeType;
+  }
 
-	/**
-	 * Retrieves initialization data for a given DRM scheme, specified by its UUID.
-	 *
-	 * @param schemeUuid The DRM scheme's UUID.
-	 *
-	 * @return The initialization data for the scheme, or null if the scheme is not supported.
-	 */
-	public abstract
-	byte[] get(UUID schemeUuid);
+  /**
+   * Retrieves initialization data for a given DRM scheme, specified by its UUID.
+   *
+   * @param schemeUuid The DRM scheme's UUID.
+   * @return The initialization data for the scheme, or null if the scheme is not supported.
+   */
+  public abstract byte[] get(UUID schemeUuid);
 
-	/**
-	 * A {@link DrmInitData} implementation that maps UUID onto scheme specific data.
-	 */
-	public static final
-	class Mapped extends DrmInitData {
+  /**
+   * A {@link DrmInitData} implementation that maps UUID onto scheme specific data.
+   */
+  public static final class Mapped extends DrmInitData {
 
-		private final Map<UUID, byte[]> schemeData;
+    private final Map<UUID, byte[]> schemeData;
 
-		public
-		Mapped(String mimeType) {
-			super(mimeType);
-			schemeData = new HashMap<UUID, byte[]>();
-		}
+    public Mapped(String mimeType) {
+      super(mimeType);
+      schemeData = new HashMap<UUID, byte[]>();
+    }
 
-		@Override
-		public
-		byte[] get(UUID schemeUuid) {
-			return schemeData.get(schemeUuid);
-		}
+    @Override
+    public byte[] get(UUID schemeUuid) {
+      return schemeData.get(schemeUuid);
+    }
 
-		/**
-		 * Inserts scheme specific initialization data.
-		 *
-		 * @param schemeUuid The scheme UUID.
-		 * @param data       The corresponding initialization data.
-		 */
-		public
-		void put(UUID schemeUuid, byte[] data) {
-			schemeData.put(schemeUuid, data);
-		}
+    /**
+     * Inserts scheme specific initialization data.
+     *
+     * @param schemeUuid The scheme UUID.
+     * @param data The corresponding initialization data.
+     */
+    public void put(UUID schemeUuid, byte[] data) {
+      schemeData.put(schemeUuid, data);
+    }
 
-		/**
-		 * Inserts scheme specific initialization data.
-		 *
-		 * @param data A mapping from scheme UUID to initialization data.
-		 */
-		public
-		void putAll(Map<UUID, byte[]> data) {
-			schemeData.putAll(data);
-		}
+    /**
+     * Inserts scheme specific initialization data.
+     *
+     * @param data A mapping from scheme UUID to initialization data.
+     */
+    public void putAll(Map<UUID, byte[]> data) {
+      schemeData.putAll(data);
+    }
 
-	}
+  }
 
-	/**
-	 * A {@link DrmInitData} implementation that returns the same initialization data for all schemes.
-	 */
-	public static final
-	class Universal extends DrmInitData {
+  /**
+   * A {@link DrmInitData} implementation that returns the same initialization data for all schemes.
+   */
+  public static final class Universal extends DrmInitData {
 
-		private byte[] data;
+    private byte[] data;
 
-		public
-		Universal(String mimeType, byte[] data) {
-			super(mimeType);
-			this.data = data;
-		}
+    public Universal(String mimeType, byte[] data) {
+      super(mimeType);
+      this.data = data;
+    }
 
-		@Override
-		public
-		byte[] get(UUID schemeUuid) {
-			return data;
-		}
+    @Override
+    public byte[] get(UUID schemeUuid) {
+      return data;
+    }
 
-	}
+  }
 
 }

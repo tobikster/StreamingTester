@@ -23,55 +23,49 @@ import java.io.IOException;
 /**
  * Tees data into a {@link DataSink} as the data is read.
  */
-public final
-class TeeDataSource implements DataSource {
+public final class TeeDataSource implements DataSource {
 
-	private final DataSource upstream;
-	private final DataSink dataSink;
+  private final DataSource upstream;
+  private final DataSink dataSink;
 
-	/**
-	 * @param upstream The upstream {@link DataSource}.
-	 * @param dataSink The {@link DataSink} into which data is written.
-	 */
-	public
-	TeeDataSource(DataSource upstream, DataSink dataSink) {
-		this.upstream = Assertions.checkNotNull(upstream);
-		this.dataSink = Assertions.checkNotNull(dataSink);
-	}
+  /**
+   * @param upstream The upstream {@link DataSource}.
+   * @param dataSink The {@link DataSink} into which data is written.
+   */
+  public TeeDataSource(DataSource upstream, DataSink dataSink) {
+    this.upstream = Assertions.checkNotNull(upstream);
+    this.dataSink = Assertions.checkNotNull(dataSink);
+  }
 
-	@Override
-	public
-	long open(DataSpec dataSpec) throws IOException {
-		long dataLength = upstream.open(dataSpec);
-		if(dataSpec.length == C.LENGTH_UNBOUNDED && dataLength != C.LENGTH_UNBOUNDED) {
-			// Reconstruct dataSpec in order to provide the resolved length to the sink.
-			dataSpec = new DataSpec(dataSpec.uri, dataSpec.absoluteStreamPosition, dataSpec.position,
-			                        dataLength, dataSpec.key, dataSpec.flags);
-		}
-		dataSink.open(dataSpec);
-		return dataLength;
-	}
+  @Override
+  public long open(DataSpec dataSpec) throws IOException {
+    long dataLength = upstream.open(dataSpec);
+    if (dataSpec.length == C.LENGTH_UNBOUNDED && dataLength != C.LENGTH_UNBOUNDED) {
+      // Reconstruct dataSpec in order to provide the resolved length to the sink.
+      dataSpec = new DataSpec(dataSpec.uri, dataSpec.absoluteStreamPosition, dataSpec.position,
+          dataLength, dataSpec.key, dataSpec.flags);
+    }
+    dataSink.open(dataSpec);
+    return dataLength;
+  }
 
-	@Override
-	public
-	int read(byte[] buffer, int offset, int max) throws IOException {
-		int num = upstream.read(buffer, offset, max);
-		if(num > 0) {
-			// TODO: Consider continuing even if disk writes fail.
-			dataSink.write(buffer, offset, num);
-		}
-		return num;
-	}
+  @Override
+  public int read(byte[] buffer, int offset, int max) throws IOException {
+    int num = upstream.read(buffer, offset, max);
+    if (num > 0) {
+      // TODO: Consider continuing even if disk writes fail.
+      dataSink.write(buffer, offset, num);
+    }
+    return num;
+  }
 
-	@Override
-	public
-	void close() throws IOException {
-		try {
-			upstream.close();
-		}
-		finally {
-			dataSink.close();
-		}
-	}
+  @Override
+  public void close() throws IOException {
+    try {
+      upstream.close();
+    } finally {
+      dataSink.close();
+    }
+  }
 
 }

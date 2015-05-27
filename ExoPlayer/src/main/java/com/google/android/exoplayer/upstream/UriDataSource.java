@@ -18,16 +18,15 @@ package com.google.android.exoplayer.upstream;
 /**
  * A component that provides media data from a URI.
  */
-public
-interface UriDataSource extends DataSource {
+public interface UriDataSource extends DataSource {
 
-	/**
-	 * When the source is open, returns the URI from which data is being read.
-	 * <p/>
-	 * If redirection occurred, the URI after redirection is the one returned.
-	 *
-	 * @return When the source is open, the URI from which data is being read. Null otherwise.
-	 */
-	String getUri();
+  /**
+   * When the source is open, returns the URI from which data is being read.
+   * <p>
+   * If redirection occurred, the URI after redirection is the one returned.
+   *
+   * @return When the source is open, the URI from which data is being read. Null otherwise.
+   */
+  String getUri();
 
 }

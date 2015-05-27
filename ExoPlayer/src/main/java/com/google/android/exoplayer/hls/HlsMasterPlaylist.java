@@ -20,17 +20,15 @@ import java.util.List;
 /**
  * Represents an HLS master playlist.
  */
-public final
-class HlsMasterPlaylist extends HlsPlaylist {
+public final class HlsMasterPlaylist extends HlsPlaylist {
 
-	public final List<Variant> variants;
-	public final List<Subtitle> subtitles;
+  public final List<Variant> variants;
+  public final List<Subtitle> subtitles;
 
-	public
-	HlsMasterPlaylist(String baseUri, List<Variant> variants, List<Subtitle> subtitles) {
-		super(baseUri, HlsPlaylist.TYPE_MASTER);
-		this.variants = variants;
-		this.subtitles = subtitles;
-	}
+  public HlsMasterPlaylist(String baseUri, List<Variant> variants, List<Subtitle> subtitles) {
+    super(baseUri, HlsPlaylist.TYPE_MASTER);
+    this.variants = variants;
+    this.subtitles = subtitles;
+  }
 
 }

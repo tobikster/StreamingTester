@@ -20,46 +20,40 @@ import com.google.android.exoplayer.C;
 /**
  * MP3 seeker that doesn't rely on metadata and seeks assuming the source has a constant bitrate.
  */
-/* package */ final
-              class ConstantBitrateSeeker implements Mp3Extractor.Seeker {
+/* package */ final class ConstantBitrateSeeker implements Mp3Extractor.Seeker {
 
-	private static final int MICROSECONDS_PER_SECOND = 1000000;
-	private static final int BITS_PER_BYTE = 8;
+  private static final int MICROSECONDS_PER_SECOND = 1000000;
+  private static final int BITS_PER_BYTE = 8;
 
-	private final long firstFramePosition;
-	private final int bitrate;
-	private final long durationUs;
+  private final long firstFramePosition;
+  private final int bitrate;
+  private final long durationUs;
 
-	public
-	ConstantBitrateSeeker(long firstFramePosition, int bitrate, long inputLength) {
-		this.firstFramePosition = firstFramePosition;
-		this.bitrate = bitrate;
-		durationUs = inputLength == C.LENGTH_UNBOUNDED ? C.UNKNOWN_TIME_US : getTimeUs(inputLength);
-	}
+  public ConstantBitrateSeeker(long firstFramePosition, int bitrate, long inputLength) {
+    this.firstFramePosition = firstFramePosition;
+    this.bitrate = bitrate;
+    durationUs = inputLength == C.LENGTH_UNBOUNDED ? C.UNKNOWN_TIME_US : getTimeUs(inputLength);
+  }
 
-	@Override
-	public
-	boolean isSeekable() {
-		return durationUs != C.UNKNOWN_TIME_US;
-	}
+  @Override
+  public boolean isSeekable() {
+    return durationUs != C.UNKNOWN_TIME_US;
+  }
 
-	@Override
-	public
-	long getPosition(long timeUs) {
-		return durationUs == C.UNKNOWN_TIME_US ? 0
-				       : firstFramePosition + (timeUs * bitrate) / (MICROSECONDS_PER_SECOND * BITS_PER_BYTE);
-	}
+  @Override
+  public long getPosition(long timeUs) {
+    return durationUs == C.UNKNOWN_TIME_US ? 0
+        : firstFramePosition + (timeUs * bitrate) / (MICROSECONDS_PER_SECOND * BITS_PER_BYTE);
+  }
 
-	@Override
-	public
-	long getTimeUs(long position) {
-		return ((position - firstFramePosition) * MICROSECONDS_PER_SECOND * BITS_PER_BYTE) / bitrate;
-	}
+  @Override
+  public long getTimeUs(long position) {
+    return ((position - firstFramePosition) * MICROSECONDS_PER_SECOND * BITS_PER_BYTE) / bitrate;
+  }
 
-	@Override
-	public
-	long getDurationUs() {
-		return durationUs;
-	}
+  @Override
+  public long getDurationUs() {
+    return durationUs;
+  }
 
 }

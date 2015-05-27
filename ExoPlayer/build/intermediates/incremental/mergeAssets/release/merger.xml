@@ -1,2 +1,2 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merger version="3"><dataSet config="main"><source path="E:\Dane\tobikster\Dokumenty\Politechnika\actual\Praca magisterska\ExoPlayer\library\src\main\assets"/></dataSet><dataSet config="release"><source path="E:\Dane\tobikster\Dokumenty\Politechnika\actual\Praca magisterska\ExoPlayer\library\src\release\assets"/></dataSet></merger>
+<merger version="3"><dataSet config="main"><source path="E:\Dane\tobikster\Dokumenty\Politechnika\actual\Praca magisterska\StreamingTester\ExoPlayer\src\main\assets"/></dataSet><dataSet config="release"><source path="E:\Dane\tobikster\Dokumenty\Politechnika\actual\Praca magisterska\StreamingTester\ExoPlayer\src\release\assets"/></dataSet></merger>

@@ -19,19 +19,17 @@ package com.google.android.exoplayer.hls;
 /**
  * Represents an HLS playlist.
  */
-public abstract
-class HlsPlaylist {
+public abstract class HlsPlaylist {
 
-	public final static int TYPE_MASTER = 0;
-	public final static int TYPE_MEDIA = 1;
+  public final static int TYPE_MASTER = 0;
+  public final static int TYPE_MEDIA = 1;
 
-	public final String baseUri;
-	public final int type;
+  public final String baseUri;
+  public final int type;
 
-	protected
-	HlsPlaylist(String baseUri, int type) {
-		this.baseUri = baseUri;
-		this.type = type;
-	}
+  protected HlsPlaylist(String baseUri, int type) {
+    this.baseUri = baseUri;
+    this.type = type;
+  }
 
 }

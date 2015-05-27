@@ -18,12 +18,11 @@ package com.google.android.exoplayer.chunk;
 /**
  * Represents an object that wraps a {@link Format}.
  */
-public
-interface FormatWrapper {
+public interface FormatWrapper {
 
-	/**
-	 * Returns the wrapped format.
-	 */
-	Format getFormat();
+  /**
+   * Returns the wrapped format.
+   */
+  Format getFormat();
 
 }

@@ -15,15 +15,13 @@
  */
 package com.google.android.exoplayer.text.eia608;
 
-/* package */ final
-              class ClosedCaptionText extends ClosedCaption {
+/* package */ final class ClosedCaptionText extends ClosedCaption {
 
-	public final String text;
+  public final String text;
 
-	public
-	ClosedCaptionText(String text) {
-		super(ClosedCaption.TYPE_TEXT);
-		this.text = text;
-	}
+  public ClosedCaptionText(String text) {
+    super(ClosedCaption.TYPE_TEXT);
+    this.text = text;
+  }
 
 }

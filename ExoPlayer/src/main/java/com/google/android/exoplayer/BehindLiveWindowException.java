@@ -20,17 +20,14 @@ import java.io.IOException;
 /**
  * Thrown when a live playback falls behind the available media window.
  */
-public
-class BehindLiveWindowException extends IOException {
+public class BehindLiveWindowException extends IOException {
 
-	public
-	BehindLiveWindowException() {
-		super();
-	}
+  public BehindLiveWindowException() {
+    super();
+  }
 
-	public
-	BehindLiveWindowException(String message) {
-		super(message);
-	}
+  public BehindLiveWindowException(String message) {
+    super(message);
+  }
 
 }

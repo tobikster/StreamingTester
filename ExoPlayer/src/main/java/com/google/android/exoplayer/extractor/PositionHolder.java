@@ -18,12 +18,11 @@ package com.google.android.exoplayer.extractor;
 /**
  * Holds a position in the stream.
  */
-public final
-class PositionHolder {
+public final class PositionHolder {
 
-	/**
-	 * The held position.
-	 */
-	public long position;
+  /**
+   * The held position.
+   */
+  public long position;
 
 }

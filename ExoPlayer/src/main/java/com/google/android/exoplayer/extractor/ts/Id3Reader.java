@@ -25,44 +25,40 @@ import com.google.android.exoplayer.util.ParsableByteArray;
  */
 /* package */ class Id3Reader extends ElementaryStreamReader {
 
-	// State that should be reset on seek.
-	private boolean writingSample;
+  // State that should be reset on seek.
+  private boolean writingSample;
 
-	// Per sample state that gets reset at the start of each sample.
-	private long sampleTimeUs;
-	private int sampleSize;
+  // Per sample state that gets reset at the start of each sample.
+  private long sampleTimeUs;
+  private int sampleSize;
 
-	public
-	Id3Reader(TrackOutput output) {
-		super(output);
-		output.format(MediaFormat.createId3Format());
-	}
+  public Id3Reader(TrackOutput output) {
+    super(output);
+    output.format(MediaFormat.createId3Format());
+  }
 
-	@Override
-	public
-	void seek() {
-		writingSample = false;
-	}
+  @Override
+  public void seek() {
+    writingSample = false;
+  }
 
-	@Override
-	public
-	void consume(ParsableByteArray data, long pesTimeUs, boolean startOfPacket) {
-		if(startOfPacket) {
-			writingSample = true;
-			sampleTimeUs = pesTimeUs;
-			sampleSize = 0;
-		}
-		if(writingSample) {
-			sampleSize += data.bytesLeft();
-			output.sampleData(data, data.bytesLeft());
-		}
-	}
+  @Override
+  public void consume(ParsableByteArray data, long pesTimeUs, boolean startOfPacket) {
+    if (startOfPacket) {
+      writingSample = true;
+      sampleTimeUs = pesTimeUs;
+      sampleSize = 0;
+    }
+    if (writingSample) {
+      sampleSize += data.bytesLeft();
+      output.sampleData(data, data.bytesLeft());
+    }
+  }
 
-	@Override
-	public
-	void packetFinished() {
-		output.sampleMetadata(sampleTimeUs, C.SAMPLE_FLAG_SYNC, sampleSize, 0, null);
-		writingSample = false;
-	}
+  @Override
+  public void packetFinished() {
+    output.sampleMetadata(sampleTimeUs, C.SAMPLE_FLAG_SYNC, sampleSize, 0, null);
+    writingSample = false;
+  }
 
 }

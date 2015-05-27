@@ -22,45 +22,43 @@ import com.google.android.exoplayer.util.Assertions;
 /**
  * An abstract base class for {@link Chunk}s that contain media samples.
  */
-public abstract
-class MediaChunk extends Chunk {
+public abstract class MediaChunk extends Chunk {
 
-	/**
-	 * The start time of the media contained by the chunk.
-	 */
-	public final long startTimeUs;
-	/**
-	 * The end time of the media contained by the chunk.
-	 */
-	public final long endTimeUs;
-	/**
-	 * The chunk index.
-	 */
-	public final int chunkIndex;
-	/**
-	 * True if this is the last chunk in the media. False otherwise.
-	 */
-	public final boolean isLastChunk;
+  /**
+   * The start time of the media contained by the chunk.
+   */
+  public final long startTimeUs;
+  /**
+   * The end time of the media contained by the chunk.
+   */
+  public final long endTimeUs;
+  /**
+   * The chunk index.
+   */
+  public final int chunkIndex;
+  /**
+   * True if this is the last chunk in the media. False otherwise.
+   */
+  public final boolean isLastChunk;
 
-	/**
-	 * @param dataSource  A {@link DataSource} for loading the data.
-	 * @param dataSpec    Defines the data to be loaded.
-	 * @param trigger     The reason for this chunk being selected.
-	 * @param format      The format of the stream to which this chunk belongs.
-	 * @param startTimeUs The start time of the media contained by the chunk, in microseconds.
-	 * @param endTimeUs   The end time of the media contained by the chunk, in microseconds.
-	 * @param chunkIndex  The index of the chunk.
-	 * @param isLastChunk True if this is the last chunk in the media. False otherwise.
-	 */
-	public
-	MediaChunk(DataSource dataSource, DataSpec dataSpec, int trigger, Format format,
-	           long startTimeUs, long endTimeUs, int chunkIndex, boolean isLastChunk) {
-		super(dataSource, dataSpec, Chunk.TYPE_MEDIA, trigger, format);
-		Assertions.checkNotNull(format);
-		this.startTimeUs = startTimeUs;
-		this.endTimeUs = endTimeUs;
-		this.chunkIndex = chunkIndex;
-		this.isLastChunk = isLastChunk;
-	}
+  /**
+   * @param dataSource A {@link DataSource} for loading the data.
+   * @param dataSpec Defines the data to be loaded.
+   * @param trigger The reason for this chunk being selected.
+   * @param format The format of the stream to which this chunk belongs.
+   * @param startTimeUs The start time of the media contained by the chunk, in microseconds.
+   * @param endTimeUs The end time of the media contained by the chunk, in microseconds.
+   * @param chunkIndex The index of the chunk.
+   * @param isLastChunk True if this is the last chunk in the media. False otherwise.
+   */
+  public MediaChunk(DataSource dataSource, DataSpec dataSpec, int trigger, Format format,
+      long startTimeUs, long endTimeUs, int chunkIndex, boolean isLastChunk) {
+    super(dataSource, dataSpec, Chunk.TYPE_MEDIA, trigger, format);
+    Assertions.checkNotNull(format);
+    this.startTimeUs = startTimeUs;
+    this.endTimeUs = endTimeUs;
+    this.chunkIndex = chunkIndex;
+    this.isLastChunk = isLastChunk;
+  }
 
 }

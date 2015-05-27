@@ -20,73 +20,67 @@ import com.google.android.exoplayer.util.Util;
 /**
  * Defines chunks of samples within a media stream.
  */
-public final
-class ChunkIndex implements SeekMap {
+public final class ChunkIndex implements SeekMap {
 
-	/**
-	 * The number of chunks.
-	 */
-	public final int length;
+  /**
+   * The number of chunks.
+   */
+  public final int length;
 
-	/**
-	 * The chunk sizes, in bytes.
-	 */
-	public final int[] sizes;
+  /**
+   * The chunk sizes, in bytes.
+   */
+  public final int[] sizes;
 
-	/**
-	 * The chunk byte offsets.
-	 */
-	public final long[] offsets;
+  /**
+   * The chunk byte offsets.
+   */
+  public final long[] offsets;
 
-	/**
-	 * The chunk durations, in microseconds.
-	 */
-	public final long[] durationsUs;
+  /**
+   * The chunk durations, in microseconds.
+   */
+  public final long[] durationsUs;
 
-	/**
-	 * The start time of each chunk, in microseconds.
-	 */
-	public final long[] timesUs;
+  /**
+   * The start time of each chunk, in microseconds.
+   */
+  public final long[] timesUs;
 
-	/**
-	 * @param sizes       The chunk sizes, in bytes.
-	 * @param offsets     The chunk byte offsets.
-	 * @param durationsUs The chunk durations, in microseconds.
-	 * @param timesUs     The start time of each chunk, in microseconds.
-	 */
-	public
-	ChunkIndex(int[] sizes, long[] offsets, long[] durationsUs, long[] timesUs) {
-		this.length = sizes.length;
-		this.sizes = sizes;
-		this.offsets = offsets;
-		this.durationsUs = durationsUs;
-		this.timesUs = timesUs;
-	}
+  /**
+   * @param sizes The chunk sizes, in bytes.
+   * @param offsets The chunk byte offsets.
+   * @param durationsUs The chunk durations, in microseconds.
+   * @param timesUs The start time of each chunk, in microseconds.
+   */
+  public ChunkIndex(int[] sizes, long[] offsets, long[] durationsUs, long[] timesUs) {
+    this.length = sizes.length;
+    this.sizes = sizes;
+    this.offsets = offsets;
+    this.durationsUs = durationsUs;
+    this.timesUs = timesUs;
+  }
 
-	/**
-	 * Obtains the index of the chunk corresponding to a given time.
-	 *
-	 * @param timeUs The time, in microseconds.
-	 *
-	 * @return The index of the corresponding chunk.
-	 */
-	public
-	int getChunkIndex(long timeUs) {
-		return Util.binarySearchFloor(timesUs, timeUs, true, true);
-	}
+  /**
+   * Obtains the index of the chunk corresponding to a given time.
+   *
+   * @param timeUs The time, in microseconds.
+   * @return The index of the corresponding chunk.
+   */
+  public int getChunkIndex(long timeUs) {
+    return Util.binarySearchFloor(timesUs, timeUs, true, true);
+  }
 
-	// SeekMap implementation.
+  // SeekMap implementation.
 
-	@Override
-	public
-	boolean isSeekable() {
-		return true;
-	}
+  @Override
+  public boolean isSeekable() {
+    return true;
+  }
 
-	@Override
-	public
-	long getPosition(long timeUs) {
-		return offsets[getChunkIndex(timeUs)];
-	}
+  @Override
+  public long getPosition(long timeUs) {
+    return offsets[getChunkIndex(timeUs)];
+  }
 
 }

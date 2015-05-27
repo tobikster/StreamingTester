@@ -15,28 +15,25 @@
  */
 package com.google.android.exoplayer.text.eia608;
 
-/* package */ final
-              class ClosedCaptionList implements Comparable<ClosedCaptionList> {
+/* package */ final class ClosedCaptionList implements Comparable<ClosedCaptionList> {
 
-	public final long timeUs;
-	public final boolean decodeOnly;
-	public final ClosedCaption[] captions;
+  public final long timeUs;
+  public final boolean decodeOnly;
+  public final ClosedCaption[] captions;
 
-	public
-	ClosedCaptionList(long timeUs, boolean decodeOnly, ClosedCaption[] captions) {
-		this.timeUs = timeUs;
-		this.decodeOnly = decodeOnly;
-		this.captions = captions;
-	}
+  public ClosedCaptionList(long timeUs, boolean decodeOnly, ClosedCaption[] captions) {
+    this.timeUs = timeUs;
+    this.decodeOnly = decodeOnly;
+    this.captions = captions;
+  }
 
-	@Override
-	public
-	int compareTo(ClosedCaptionList other) {
-		long delta = timeUs - other.timeUs;
-		if(delta == 0) {
-			return 0;
-		}
-		return delta > 0 ? 1 : -1;
-	}
+  @Override
+  public int compareTo(ClosedCaptionList other) {
+    long delta = timeUs - other.timeUs;
+    if (delta == 0) {
+      return 0;
+    }
+    return delta > 0 ? 1 : -1;
+  }
 
 }

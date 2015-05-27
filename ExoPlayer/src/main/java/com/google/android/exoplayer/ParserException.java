@@ -20,22 +20,18 @@ import java.io.IOException;
 /**
  * Thrown when an error occurs parsing media data.
  */
-public
-class ParserException extends IOException {
+public class ParserException extends IOException {
 
-	public
-	ParserException(String message) {
-		super(message);
-	}
+  public ParserException(String message) {
+    super(message);
+  }
 
-	public
-	ParserException(Throwable cause) {
-		super(cause);
-	}
+  public ParserException(Throwable cause) {
+    super(cause);
+  }
 
-	public
-	ParserException(String message, Throwable cause) {
-		super(message, cause);
-	}
+  public ParserException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
 }

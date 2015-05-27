@@ -22,23 +22,20 @@ import com.google.android.exoplayer.util.MimeTypes;
 /**
  * Variant stream reference.
  */
-public final
-class Variant implements FormatWrapper {
+public final class Variant implements FormatWrapper {
 
-	public final String url;
-	public final Format format;
+  public final String url;
+  public final Format format;
 
-	public
-	Variant(int index, String url, int bitrate, String codecs, int width, int height) {
-		this.url = url;
-		format = new Format(Integer.toString(index), MimeTypes.APPLICATION_M3U8, width, height, -1, -1,
-		                    -1, bitrate, null, codecs);
-	}
+  public Variant(int index, String url, int bitrate, String codecs, int width, int height) {
+    this.url = url;
+    format = new Format(Integer.toString(index), MimeTypes.APPLICATION_M3U8, width, height, -1, -1,
+        -1, bitrate, null, codecs);
+  }
 
-	@Override
-	public
-	Format getFormat() {
-		return format;
-	}
+  @Override
+  public Format getFormat() {
+    return format;
+  }
 
 }

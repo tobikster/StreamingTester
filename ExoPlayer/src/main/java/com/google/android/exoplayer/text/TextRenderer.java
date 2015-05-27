@@ -18,14 +18,13 @@ package com.google.android.exoplayer.text;
 /**
  * An interface for components that render text.
  */
-public
-interface TextRenderer {
+public interface TextRenderer {
 
-	/**
-	 * Invoked each time there is a change in the text to be rendered.
-	 *
-	 * @param text The text to render, or null if no text is to be rendered.
-	 */
-	void onText(String text);
+  /**
+   * Invoked each time there is a change in the text to be rendered.
+   *
+   * @param text The text to render, or null if no text is to be rendered.
+   */
+  void onText(String text);
 
 }

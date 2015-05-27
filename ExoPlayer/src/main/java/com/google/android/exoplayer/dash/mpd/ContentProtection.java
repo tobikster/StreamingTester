@@ -24,65 +24,61 @@ import java.util.UUID;
 /**
  * Represents a ContentProtection tag in an AdaptationSet.
  */
-public
-class ContentProtection {
+public class ContentProtection {
 
-	/**
-	 * Identifies the content protection scheme.
-	 */
-	public final String schemeUriId;
+  /**
+   * Identifies the content protection scheme.
+   */
+  public final String schemeUriId;
 
-	/**
-	 * The UUID of the protection scheme. May be null.
-	 */
-	public final UUID uuid;
+  /**
+   * The UUID of the protection scheme. May be null.
+   */
+  public final UUID uuid;
 
-	/**
-	 * Protection scheme specific data. May be null.
-	 */
-	public final byte[] data;
+  /**
+   * Protection scheme specific data. May be null.
+   */
+  public final byte[] data;
 
-	/**
-	 * @param schemeUriId Identifies the content protection scheme.
-	 * @param uuid        The UUID of the protection scheme, if known. May be null.
-	 * @param data        Protection scheme specific initialization data. May be null.
-	 */
-	public
-	ContentProtection(String schemeUriId, UUID uuid, byte[] data) {
-		this.schemeUriId = Assertions.checkNotNull(schemeUriId);
-		this.uuid = uuid;
-		this.data = data;
-	}
+  /**
+   * @param schemeUriId Identifies the content protection scheme.
+   * @param uuid The UUID of the protection scheme, if known. May be null.
+   * @param data Protection scheme specific initialization data. May be null.
+   */
+  public ContentProtection(String schemeUriId, UUID uuid, byte[] data) {
+    this.schemeUriId = Assertions.checkNotNull(schemeUriId);
+    this.uuid = uuid;
+    this.data = data;
+  }
 
-	@Override
-	public
-	boolean equals(Object obj) {
-		if(!(obj instanceof ContentProtection)) {
-			return false;
-		}
-		if(obj == this) {
-			return true;
-		}
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof ContentProtection)) {
+      return false;
+    }
+    if (obj == this) {
+      return true;
+    }
 
-		ContentProtection other = (ContentProtection)obj;
-		return schemeUriId.equals(other.schemeUriId)
-				       && Util.areEqual(uuid, other.uuid)
-				       && Arrays.equals(data, other.data);
-	}
+    ContentProtection other = (ContentProtection) obj;
+    return schemeUriId.equals(other.schemeUriId)
+        && Util.areEqual(uuid, other.uuid)
+        && Arrays.equals(data, other.data);
+  }
 
-	@Override
-	public
-	int hashCode() {
-		int hashCode = 1;
+  @Override
+  public int hashCode() {
+    int hashCode = 1;
 
-		hashCode = hashCode * 37 + schemeUriId.hashCode();
-		if(uuid != null) {
-			hashCode = hashCode * 37 + uuid.hashCode();
-		}
-		if(data != null) {
-			hashCode = hashCode * 37 + Arrays.hashCode(data);
-		}
-		return hashCode;
-	}
+    hashCode = hashCode * 37 + schemeUriId.hashCode();
+    if (uuid != null) {
+      hashCode = hashCode * 37 + uuid.hashCode();
+    }
+    if (data != null) {
+      hashCode = hashCode * 37 + Arrays.hashCode(data);
+    }
+    return hashCode;
+  }
 
 }

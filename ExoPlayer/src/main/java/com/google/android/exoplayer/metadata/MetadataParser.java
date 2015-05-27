@@ -22,30 +22,24 @@ import java.io.IOException;
  *
  * @param <T> The type of the metadata.
  */
-public
-interface MetadataParser<T> {
+public interface MetadataParser<T> {
 
-	/**
-	 * Checks whether the parser supports a given mime type.
-	 *
-	 * @param mimeType A metadata mime type.
-	 *
-	 * @return Whether the mime type is supported.
-	 */
-	public
-	boolean canParse(String mimeType);
+  /**
+   * Checks whether the parser supports a given mime type.
+   *
+   * @param mimeType A metadata mime type.
+   * @return Whether the mime type is supported.
+   */
+  public boolean canParse(String mimeType);
 
-	/**
-	 * Parses metadata objects of type <T> from the provided binary data.
-	 *
-	 * @param data The raw binary data from which to parse the metadata.
-	 * @param size The size of the input data.
-	 *
-	 * @return @return A parsed metadata object of type <T>.
-	 *
-	 * @throws IOException If a problem occurred parsing the data.
-	 */
-	public
-	T parse(byte[] data, int size) throws IOException;
+  /**
+   * Parses metadata objects of type <T> from the provided binary data.
+   *
+   * @param data The raw binary data from which to parse the metadata.
+   * @param size The size of the input data.
+   * @return @return A parsed metadata object of type <T>.
+   * @throws IOException If a problem occurred parsing the data.
+   */
+  public T parse(byte[] data, int size) throws IOException;
 
 }

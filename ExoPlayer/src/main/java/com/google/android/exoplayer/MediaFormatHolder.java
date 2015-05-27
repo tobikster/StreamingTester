@@ -20,16 +20,15 @@ import com.google.android.exoplayer.drm.DrmInitData;
 /**
  * Holds a {@link MediaFormat} and corresponding drm scheme initialization data.
  */
-public final
-class MediaFormatHolder {
+public final class MediaFormatHolder {
 
-	/**
-	 * The format of the media.
-	 */
-	public MediaFormat format;
-	/**
-	 * Initialization data for drm schemes supported by the media. Null if the media is not encrypted.
-	 */
-	public DrmInitData drmInitData;
+  /**
+   * The format of the media.
+   */
+  public MediaFormat format;
+  /**
+   * Initialization data for drm schemes supported by the media. Null if the media is not encrypted.
+   */
+  public DrmInitData drmInitData;
 
 }

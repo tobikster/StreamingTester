@@ -22,74 +22,68 @@ import java.util.List;
 /**
  * Represents an HLS media playlist.
  */
-public final
-class HlsMediaPlaylist extends HlsPlaylist {
+public final class HlsMediaPlaylist extends HlsPlaylist {
 
-	/**
-	 * Media segment reference.
-	 */
-	public static final
-	class Segment implements Comparable<Long> {
+  /**
+   * Media segment reference.
+   */
+  public static final class Segment implements Comparable<Long> {
 
-		public final boolean discontinuity;
-		public final double durationSecs;
-		public final String url;
-		public final long startTimeUs;
-		public final boolean isEncrypted;
-		public final String encryptionKeyUri;
-		public final String encryptionIV;
-		public final int byterangeOffset;
-		public final int byterangeLength;
+    public final boolean discontinuity;
+    public final double durationSecs;
+    public final String url;
+    public final long startTimeUs;
+    public final boolean isEncrypted;
+    public final String encryptionKeyUri;
+    public final String encryptionIV;
+    public final int byterangeOffset;
+    public final int byterangeLength;
 
-		public
-		Segment(String uri, double durationSecs, boolean discontinuity, long startTimeUs,
-		        boolean isEncrypted, String encryptionKeyUri, String encryptionIV, int byterangeOffset,
-		        int byterangeLength) {
-			this.url = uri;
-			this.durationSecs = durationSecs;
-			this.discontinuity = discontinuity;
-			this.startTimeUs = startTimeUs;
-			this.isEncrypted = isEncrypted;
-			this.encryptionKeyUri = encryptionKeyUri;
-			this.encryptionIV = encryptionIV;
-			this.byterangeOffset = byterangeOffset;
-			this.byterangeLength = byterangeLength;
-		}
+    public Segment(String uri, double durationSecs, boolean discontinuity, long startTimeUs,
+        boolean isEncrypted, String encryptionKeyUri, String encryptionIV, int byterangeOffset,
+        int byterangeLength) {
+      this.url = uri;
+      this.durationSecs = durationSecs;
+      this.discontinuity = discontinuity;
+      this.startTimeUs = startTimeUs;
+      this.isEncrypted = isEncrypted;
+      this.encryptionKeyUri = encryptionKeyUri;
+      this.encryptionIV = encryptionIV;
+      this.byterangeOffset = byterangeOffset;
+      this.byterangeLength = byterangeLength;
+    }
 
-		@Override
-		public
-		int compareTo(Long startTimeUs) {
-			return this.startTimeUs > startTimeUs ? 1 : (this.startTimeUs < startTimeUs ? -1 : 0);
-		}
-	}
+    @Override
+    public int compareTo(Long startTimeUs) {
+      return this.startTimeUs > startTimeUs ? 1 : (this.startTimeUs < startTimeUs ? -1 : 0);
+    }
+  }
 
-	public static final String ENCRYPTION_METHOD_NONE = "NONE";
-	public static final String ENCRYPTION_METHOD_AES_128 = "AES-128";
+  public static final String ENCRYPTION_METHOD_NONE = "NONE";
+  public static final String ENCRYPTION_METHOD_AES_128 = "AES-128";
 
-	public final int mediaSequence;
-	public final int targetDurationSecs;
-	public final int version;
-	public final List<Segment> segments;
-	public final boolean live;
-	public final long durationUs;
+  public final int mediaSequence;
+  public final int targetDurationSecs;
+  public final int version;
+  public final List<Segment> segments;
+  public final boolean live;
+  public final long durationUs;
 
-	public
-	HlsMediaPlaylist(String baseUri, int mediaSequence, int targetDurationSecs, int version,
-	                 boolean live, List<Segment> segments) {
-		super(baseUri, HlsPlaylist.TYPE_MEDIA);
-		this.mediaSequence = mediaSequence;
-		this.targetDurationSecs = targetDurationSecs;
-		this.version = version;
-		this.live = live;
-		this.segments = segments;
+  public HlsMediaPlaylist(String baseUri, int mediaSequence, int targetDurationSecs, int version,
+      boolean live, List<Segment> segments) {
+    super(baseUri, HlsPlaylist.TYPE_MEDIA);
+    this.mediaSequence = mediaSequence;
+    this.targetDurationSecs = targetDurationSecs;
+    this.version = version;
+    this.live = live;
+    this.segments = segments;
 
-		if(!segments.isEmpty()) {
-			Segment last = segments.get(segments.size() - 1);
-			durationUs = last.startTimeUs + (long)(last.durationSecs * C.MICROS_PER_SECOND);
-		}
-		else {
-			durationUs = 0;
-		}
-	}
+    if (!segments.isEmpty()) {
+      Segment last = segments.get(segments.size() - 1);
+      durationUs = last.startTimeUs + (long) (last.durationSecs * C.MICROS_PER_SECOND);
+    } else {
+      durationUs = 0;
+    }
+  }
 
 }

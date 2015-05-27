@@ -22,62 +22,53 @@ import com.google.android.exoplayer.extractor.ChunkIndex;
  * An implementation of {@link DashSegmentIndex} that wraps a {@link ChunkIndex} parsed from a
  * media stream.
  */
-public
-class DashWrappingSegmentIndex implements DashSegmentIndex {
+public class DashWrappingSegmentIndex implements DashSegmentIndex {
 
-	private final ChunkIndex chunkIndex;
-	private final String uri;
+  private final ChunkIndex chunkIndex;
+  private final String uri;
 
-	/**
-	 * @param chunkIndex The {@link ChunkIndex} to wrap.
-	 * @param uri        The URI where the data is located.
-	 */
-	public
-	DashWrappingSegmentIndex(ChunkIndex chunkIndex, String uri) {
-		this.chunkIndex = chunkIndex;
-		this.uri = uri;
-	}
+  /**
+   * @param chunkIndex The {@link ChunkIndex} to wrap.
+   * @param uri The URI where the data is located.
+   */
+  public DashWrappingSegmentIndex(ChunkIndex chunkIndex, String uri) {
+    this.chunkIndex = chunkIndex;
+    this.uri = uri;
+  }
 
-	@Override
-	public
-	int getFirstSegmentNum() {
-		return 0;
-	}
+  @Override
+  public int getFirstSegmentNum() {
+    return 0;
+  }
 
-	@Override
-	public
-	int getLastSegmentNum() {
-		return chunkIndex.length - 1;
-	}
+  @Override
+  public int getLastSegmentNum() {
+    return chunkIndex.length - 1;
+  }
 
-	@Override
-	public
-	long getTimeUs(int segmentNum) {
-		return chunkIndex.timesUs[segmentNum];
-	}
+  @Override
+  public long getTimeUs(int segmentNum) {
+    return chunkIndex.timesUs[segmentNum];
+  }
 
-	@Override
-	public
-	long getDurationUs(int segmentNum) {
-		return chunkIndex.durationsUs[segmentNum];
-	}
+  @Override
+  public long getDurationUs(int segmentNum) {
+    return chunkIndex.durationsUs[segmentNum];
+  }
 
-	@Override
-	public
-	RangedUri getSegmentUrl(int segmentNum) {
-		return new RangedUri(uri, null, chunkIndex.offsets[segmentNum], chunkIndex.sizes[segmentNum]);
-	}
+  @Override
+  public RangedUri getSegmentUrl(int segmentNum) {
+    return new RangedUri(uri, null, chunkIndex.offsets[segmentNum], chunkIndex.sizes[segmentNum]);
+  }
 
-	@Override
-	public
-	int getSegmentNum(long timeUs) {
-		return chunkIndex.getChunkIndex(timeUs);
-	}
+  @Override
+  public int getSegmentNum(long timeUs) {
+    return chunkIndex.getChunkIndex(timeUs);
+  }
 
-	@Override
-	public
-	boolean isExplicit() {
-		return true;
-	}
+  @Override
+  public boolean isExplicit() {
+    return true;
+  }
 
 }

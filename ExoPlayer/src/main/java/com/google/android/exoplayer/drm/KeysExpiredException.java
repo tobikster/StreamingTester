@@ -18,6 +18,5 @@ package com.google.android.exoplayer.drm;
 /**
  * Thrown when the drm keys loaded into an open session expire.
  */
-public final
-class KeysExpiredException extends Exception {
+public final class KeysExpiredException extends Exception {
 }

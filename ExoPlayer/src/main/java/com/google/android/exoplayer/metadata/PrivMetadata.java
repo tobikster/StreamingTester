@@ -19,18 +19,16 @@ package com.google.android.exoplayer.metadata;
  * A metadata that contains parsed ID3 PRIV (Private) frame data associated
  * with time indices.
  */
-public
-class PrivMetadata {
+public class PrivMetadata {
 
-	public static final String TYPE = "PRIV";
+  public static final String TYPE = "PRIV";
 
-	public final String owner;
-	public final byte[] privateData;
+  public final String owner;
+  public final byte[] privateData;
 
-	public
-	PrivMetadata(String owner, byte[] privateData) {
-		this.owner = owner;
-		this.privateData = privateData;
-	}
+  public PrivMetadata(String owner, byte[] privateData) {
+    this.owner = owner;
+    this.privateData = privateData;
+  }
 
 }

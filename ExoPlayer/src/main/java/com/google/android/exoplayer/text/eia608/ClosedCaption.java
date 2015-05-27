@@ -18,26 +18,24 @@ package com.google.android.exoplayer.text.eia608;
 /**
  * A Closed Caption that contains textual data associated with time indices.
  */
-/* package */ abstract
-              class ClosedCaption {
+/* package */ abstract class ClosedCaption {
 
-	/**
-	 * Identifies closed captions with control characters.
-	 */
-	public static final int TYPE_CTRL = 0;
-	/**
-	 * Identifies closed captions with textual information.
-	 */
-	public static final int TYPE_TEXT = 1;
+  /**
+   * Identifies closed captions with control characters.
+   */
+  public static final int TYPE_CTRL = 0;
+  /**
+   * Identifies closed captions with textual information.
+   */
+  public static final int TYPE_TEXT = 1;
 
-	/**
-	 * The type of the closed caption data.
-	 */
-	public final int type;
+  /**
+   * The type of the closed caption data.
+   */
+  public final int type;
 
-	protected
-	ClosedCaption(int type) {
-		this.type = type;
-	}
+  protected ClosedCaption(int type) {
+    this.type = type;
+  }
 
 }
