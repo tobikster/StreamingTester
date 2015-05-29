@@ -25,4 +25,5 @@
     <string name="drm_error_unsupported_scheme">This device does not support the required DRM scheme</string>
     <string name="drm_error_unknown">An unknown DRM error occurred</string>
     <string name="failed">Playback failed</string>
+    <string name="title_activity_exo_player_fragment">ExoPlayerFragmentActivity</string>
 </resources>

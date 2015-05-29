@@ -96,7 +96,7 @@ class SmoothStreamingRendererBuilder implements DemoPlayer.RendererBuilder, Mani
 			manifestUrl += "/Manifest";
 		}
 		SmoothStreamingManifestParser parser = new SmoothStreamingManifestParser();
-		manifestFetcher = new ManifestFetcher<SmoothStreamingManifest>(manifestUrl, new DefaultHttpDataSource(userAgent, null), parser);
+		manifestFetcher = new ManifestFetcher<>(manifestUrl, new DefaultHttpDataSource(userAgent, null), parser);
 		manifestFetcher.singleLoad(player.getMainHandler().getLooper(), this);
 	}
 
@@ -169,7 +169,7 @@ class SmoothStreamingRendererBuilder implements DemoPlayer.RendererBuilder, Mani
 			ChunkSource videoChunkSource = new SmoothStreamingChunkSource(manifestFetcher, videoStreamElementIndex, videoTrackIndices, videoDataSource, new AdaptiveEvaluator(bandwidthMeter), LIVE_EDGE_LATENCY_MS);
 			ChunkSampleSource videoSampleSource = new ChunkSampleSource(videoChunkSource, loadControl, VIDEO_BUFFER_SEGMENTS * BUFFER_SEGMENT_SIZE, true, mainHandler, player, DemoPlayer.TYPE_VIDEO);
 			videoRenderer = new MediaCodecVideoTrackRenderer(videoSampleSource, drmSessionManager, true, MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT, 5000, null, mainHandler, player, 50);
-			debugRenderer = debugTextView != null ? new DebugTrackRenderer(debugTextView, player, videoRenderer) : null;
+			debugRenderer = debugTextView != null ? new DebugTrackRenderer(context, debugTextView, player, videoRenderer) : null;
 		}
 
 		// Build the audio renderer.

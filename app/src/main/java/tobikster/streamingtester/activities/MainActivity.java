@@ -11,8 +11,6 @@ import android.widget.Toast;
 
 import tobikster.streamingtester.R;
 import tobikster.streamingtester.broadcastReceivers.BatteryStateReceiver;
-import tobikster.streamingtester.demoplayer.PlayerActivity;
-import tobikster.streamingtester.demoplayer.SampleChooserActivity;
 
 public
 class MainActivity extends Activity implements View.OnClickListener {
@@ -91,7 +89,7 @@ class MainActivity extends Activity implements View.OnClickListener {
 			startActivity(startWebViewActivityIntent);
 		}
 		else if(v == mButton3) {
-			Intent startExoPlayerActivityIntent = new Intent(MainActivity.this, SampleChooserActivity.class);
+			Intent startExoPlayerActivityIntent = new Intent(MainActivity.this, ExoPlayerFragmentActivity.class);
 			startActivity(startExoPlayerActivityIntent);
 		}
 

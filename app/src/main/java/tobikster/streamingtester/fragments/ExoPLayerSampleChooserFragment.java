@@ -1,23 +1,8 @@
-/*
- * Copyright (C) 2014 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package tobikster.streamingtester.demoplayer;
+package tobikster.streamingtester.fragments;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.Context;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,33 +10,54 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.android.exoplayer.MediaCodecUtil;
-import com.google.android.exoplayer.MediaCodecUtil.DecoderQueryException;
 import com.google.android.exoplayer.util.MimeTypes;
 
 import tobikster.streamingtester.R;
+import tobikster.streamingtester.demoplayer.Samples;
 
-/**
- * An activity for selecting from a number of samples.
- */
 public
-class SampleChooserActivity extends Activity {
+class ExoPLayerSampleChooserFragment extends Fragment {
+	@SuppressWarnings("unused")
+	public static final String LOGCAT_TAG = "ExoPlayer";
 
-	private static final String TAG = "SampleChooserActivity";
+	private InteractionListener mListener;
+
+	public static
+	ExoPLayerSampleChooserFragment newInstance() {
+		ExoPLayerSampleChooserFragment fragment = new ExoPLayerSampleChooserFragment();
+		Bundle args = new Bundle();
+		fragment.setArguments(args);
+		return fragment;
+	}
+
+	public
+	ExoPLayerSampleChooserFragment() {
+	}
 
 	@Override
 	public
 	void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.sample_chooser_activity);
+	}
 
-		ListView sampleList = (ListView)findViewById(R.id.sample_list);
-		final SampleAdapter sampleAdapter = new SampleAdapter(this);
+	@Override
+	public
+	View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		return inflater.inflate(R.layout.fragment_exo_player_sample_chooser, container, false);
+	}
+
+	@Override
+	public
+	void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+
+		ListView sampleList = (ListView)(view.findViewById(R.id.sample_list));
+		final SampleAdapter sampleAdapter = new SampleAdapter(getActivity());
 
 		sampleAdapter.add(new Header("YouTube DASH"));
 		sampleAdapter.addAll((Object[])Samples.YOUTUBE_DASH_MP4);
@@ -71,27 +77,41 @@ class SampleChooserActivity extends Activity {
 				sampleAdapter.addAll((Object[])Samples.YOUTUBE_DASH_WEBM);
 			}
 		}
-		catch(DecoderQueryException e) {
-			Log.e(TAG, "Failed to query vp9 decoder", e);
+		catch(MediaCodecUtil.DecoderQueryException e) {
+			Log.e(LOGCAT_TAG, "Failed to query vp9 decoder", e);
 		}
 
 		sampleList.setAdapter(sampleAdapter);
-		sampleList.setOnItemClickListener(new OnItemClickListener() {
+		sampleList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public
 			void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				Object item = sampleAdapter.getItem(position);
 				if(item instanceof Samples.Sample) {
-					onSampleSelected((Samples.Sample)item);
+					Samples.Sample selectedSample = (Samples.Sample)(item);
+					mListener.onSampleSelected(selectedSample.uri, selectedSample.contentId, selectedSample.type);
 				}
 			}
 		});
 	}
 
-	private
-	void onSampleSelected(Samples.Sample sample) {
-		Intent mpdIntent = new Intent(this, PlayerActivity.class).setData(Uri.parse(sample.uri)).putExtra(PlayerActivity.CONTENT_ID_EXTRA, sample.contentId).putExtra(PlayerActivity.CONTENT_TYPE_EXTRA, sample.type);
-		startActivity(mpdIntent);
+	@Override
+	public
+	void onAttach(Activity activity) {
+		super.onAttach(activity);
+		if(activity instanceof InteractionListener) {
+			mListener = (InteractionListener)(activity);
+		}
+		else {
+			throw new ClassCastException(String.format("Activity %s must implement %s interface!", ExoPLayerSampleChooserFragment.this.getClass().getSimpleName(), InteractionListener.class.getSimpleName()));
+		}
+	}
+
+	@Override
+	public
+	void onDetach() {
+		super.onDetach();
+		mListener = null;
 	}
 
 	private static
@@ -148,4 +168,8 @@ class SampleChooserActivity extends Activity {
 
 	}
 
+	public
+	interface InteractionListener {
+		void onSampleSelected(String contentUri, String contentId, int type);
+	}
 }

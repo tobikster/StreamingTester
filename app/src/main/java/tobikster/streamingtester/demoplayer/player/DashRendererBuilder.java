@@ -128,7 +128,7 @@ class DashRendererBuilder implements DemoPlayer.RendererBuilder, ManifestCallbac
 		this.callback = callback;
 		MediaPresentationDescriptionParser parser = new MediaPresentationDescriptionParser();
 		manifestDataSource = new DefaultUriDataSource(context, userAgent);
-		manifestFetcher = new ManifestFetcher<MediaPresentationDescription>(url, manifestDataSource, parser);
+		manifestFetcher = new ManifestFetcher<>(url, manifestDataSource, parser);
 		manifestFetcher.singleLoad(player.getMainHandler().getLooper(), this);
 	}
 
@@ -179,7 +179,7 @@ class DashRendererBuilder implements DemoPlayer.RendererBuilder, ManifestCallbac
 		AdaptationSet audioAdaptationSet = null;
 		if(videoAdaptationSetIndex != -1) {
 			videoAdaptationSet = period.adaptationSets.get(videoAdaptationSetIndex);
-			hasContentProtection |= videoAdaptationSet.hasContentProtection();
+			hasContentProtection = videoAdaptationSet.hasContentProtection();
 		}
 		if(audioAdaptationSetIndex != -1) {
 			audioAdaptationSet = period.adaptationSets.get(audioAdaptationSetIndex);
@@ -236,17 +236,17 @@ class DashRendererBuilder implements DemoPlayer.RendererBuilder, ManifestCallbac
 			ChunkSource videoChunkSource = new DashChunkSource(manifestFetcher, videoAdaptationSetIndex, videoRepresentationIndices, videoDataSource, new AdaptiveEvaluator(bandwidthMeter), LIVE_EDGE_LATENCY_MS, elapsedRealtimeOffset);
 			ChunkSampleSource videoSampleSource = new ChunkSampleSource(videoChunkSource, loadControl, VIDEO_BUFFER_SEGMENTS * BUFFER_SEGMENT_SIZE, true, mainHandler, player, DemoPlayer.TYPE_VIDEO);
 			videoRenderer = new MediaCodecVideoTrackRenderer(videoSampleSource, drmSessionManager, true, MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT, 5000, null, mainHandler, player, 50);
-			debugRenderer = debugTextView != null ? new DebugTrackRenderer(debugTextView, player, videoRenderer) : null;
+			debugRenderer = debugTextView != null ? new DebugTrackRenderer(context, debugTextView, player, videoRenderer) : null;
 		}
 
 		// Build the audio chunk sources.
-		List<ChunkSource> audioChunkSourceList = new ArrayList<ChunkSource>();
-		List<String> audioTrackNameList = new ArrayList<String>();
+		List<ChunkSource> audioChunkSourceList = new ArrayList<>();
+		List<String> audioTrackNameList = new ArrayList<>();
 		if(audioAdaptationSet != null) {
 			DataSource audioDataSource = new DefaultUriDataSource(context, bandwidthMeter, userAgent);
 			FormatEvaluator audioEvaluator = new FormatEvaluator.FixedEvaluator();
 			List<Representation> audioRepresentations = audioAdaptationSet.representations;
-			List<String> codecs = new ArrayList<String>();
+			List<String> codecs = new ArrayList<>();
 			for(int i = 0; i < audioRepresentations.size(); i++) {
 				Format format = audioRepresentations.get(i).format;
 				audioTrackNameList.add(format.id + " (" + format.numChannels + "ch, " +
@@ -296,8 +296,8 @@ class DashRendererBuilder implements DemoPlayer.RendererBuilder, ManifestCallbac
 		// Build the text chunk sources.
 		DataSource textDataSource = new DefaultUriDataSource(context, bandwidthMeter, userAgent);
 		FormatEvaluator textEvaluator = new FormatEvaluator.FixedEvaluator();
-		List<ChunkSource> textChunkSourceList = new ArrayList<ChunkSource>();
-		List<String> textTrackNameList = new ArrayList<String>();
+		List<ChunkSource> textChunkSourceList = new ArrayList<>();
+		List<String> textTrackNameList = new ArrayList<>();
 		for(int i = 0; i < period.adaptationSets.size(); i++) {
 			AdaptationSet adaptationSet = period.adaptationSets.get(i);
 			if(adaptationSet.type == AdaptationSet.TYPE_TEXT) {

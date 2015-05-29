@@ -76,7 +76,7 @@ class HlsRendererBuilder implements DemoPlayer.RendererBuilder, ManifestCallback
 		this.player = player;
 		this.callback = callback;
 		HlsPlaylistParser parser = new HlsPlaylistParser();
-		ManifestFetcher<HlsPlaylist> playlistFetcher = new ManifestFetcher<HlsPlaylist>(url, new DefaultUriDataSource(context, userAgent), parser);
+		ManifestFetcher<HlsPlaylist> playlistFetcher = new ManifestFetcher<>(url, new DefaultUriDataSource(context, userAgent), parser);
 		playlistFetcher.singleLoad(player.getMainHandler().getLooper(), this);
 	}
 
@@ -110,12 +110,12 @@ class HlsRendererBuilder implements DemoPlayer.RendererBuilder, ManifestCallback
 		MediaCodecVideoTrackRenderer videoRenderer = new MediaCodecVideoTrackRenderer(sampleSource, MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT, 5000, mainHandler, player, 50);
 		MediaCodecAudioTrackRenderer audioRenderer = new MediaCodecAudioTrackRenderer(sampleSource);
 
-		MetadataTrackRenderer<Map<String, Object>> id3Renderer = new MetadataTrackRenderer<Map<String, Object>>(sampleSource, new Id3Parser(), player.getId3MetadataRenderer(), mainHandler.getLooper());
+		MetadataTrackRenderer<Map<String, Object>> id3Renderer = new MetadataTrackRenderer<>(sampleSource, new Id3Parser(), player.getId3MetadataRenderer(), mainHandler.getLooper());
 
 		Eia608TrackRenderer closedCaptionRenderer = new Eia608TrackRenderer(sampleSource, player, mainHandler.getLooper());
 
 		// Build the debug renderer.
-		TrackRenderer debugRenderer = debugTextView != null ? new DebugTrackRenderer(debugTextView, player, videoRenderer) : null;
+		TrackRenderer debugRenderer = debugTextView != null ? new DebugTrackRenderer(context, debugTextView, player, videoRenderer) : null;
 
 		TrackRenderer[] renderers = new TrackRenderer[DemoPlayer.RENDERER_COUNT];
 		renderers[DemoPlayer.TYPE_VIDEO] = videoRenderer;

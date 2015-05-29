@@ -1,24 +1,9 @@
-/*
- * Copyright (C) 2014 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package tobikster.streamingtester.demoplayer;
+package tobikster.streamingtester.fragments;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
+import android.app.Fragment;
 import android.content.Context;
-import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
@@ -26,20 +11,18 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Display;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.View.OnKeyListener;
-import android.view.View.OnTouchListener;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.accessibility.CaptioningManager;
 import android.widget.Button;
 import android.widget.MediaController;
 import android.widget.PopupMenu;
-import android.widget.PopupMenu.OnMenuItemClickListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -63,6 +46,11 @@ import com.google.android.exoplayer.util.VerboseLogUtil;
 import java.util.Map;
 
 import tobikster.streamingtester.R;
+import tobikster.streamingtester.broadcastReceivers.MediaParametersReceiver;
+import tobikster.streamingtester.demoplayer.DemoUtil;
+import tobikster.streamingtester.demoplayer.EventLogger;
+import tobikster.streamingtester.demoplayer.SmoothStreamingTestMediaDrmCallback;
+import tobikster.streamingtester.demoplayer.WidevineTestMediaDrmCallback;
 import tobikster.streamingtester.demoplayer.player.DashRendererBuilder;
 import tobikster.streamingtester.demoplayer.player.DemoPlayer;
 import tobikster.streamingtester.demoplayer.player.ExtractorRendererBuilder;
@@ -71,13 +59,14 @@ import tobikster.streamingtester.demoplayer.player.SmoothStreamingRendererBuilde
 import tobikster.streamingtester.demoplayer.player.UnsupportedDrmException;
 
 /**
- * An activity that plays media using {@link DemoPlayer}.
+ * A placeholder fragment containing a simple view.
  */
 public
-class PlayerActivity extends Activity implements SurfaceHolder.Callback, OnClickListener, DemoPlayer.Listener, DemoPlayer.TextListener, DemoPlayer.Id3MetadataListener, AudioCapabilitiesReceiver.Listener {
+class ExoPlayerFragment extends Fragment implements SurfaceHolder.Callback, View.OnClickListener, DemoPlayer.Listener, DemoPlayer.TextListener, DemoPlayer.Id3MetadataListener, AudioCapabilitiesReceiver.Listener {
 
-	public static final String CONTENT_TYPE_EXTRA = "content_type";
-	public static final String CONTENT_ID_EXTRA = "content_id";
+	public static final String EXTRA_CONTENT_URI = "content_uri";
+	public static final String EXTRA_CONTENT_TYPE = "content_type";
+	public static final String EXTRA_CONTENT_ID = "content_id";
 
 	private static final String TAG = "PlayerActivity";
 
@@ -111,21 +100,42 @@ class PlayerActivity extends Activity implements SurfaceHolder.Callback, OnClick
 	private AudioCapabilitiesReceiver audioCapabilitiesReceiver;
 	private AudioCapabilities audioCapabilities;
 
-	// Activity lifecycle
+	private MediaParametersReceiver mMediaParametersReceiver;
+
+	public
+	ExoPlayerFragment() {
+	}
+
+	public static ExoPlayerFragment newInstance(String contentUri, String contentId, int contentType) {
+		ExoPlayerFragment instance = new ExoPlayerFragment();
+		Bundle args = new Bundle();
+		args.putString(EXTRA_CONTENT_URI, contentUri);
+		args.putString(EXTRA_CONTENT_ID, contentId);
+		args.putInt(EXTRA_CONTENT_TYPE, contentType);
+		instance.setArguments(args);
+		return instance;
+	}
 
 	@Override
 	public
-	void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+	View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		return inflater.inflate(R.layout.fragment_exo_player, container, false);
+	}
 
-		Intent intent = getIntent();
-		contentUri = intent.getData();
-		contentType = intent.getIntExtra(CONTENT_TYPE_EXTRA, -1);
-		contentId = intent.getStringExtra(CONTENT_ID_EXTRA);
+	@Override
+	public
+	void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
 
-		setContentView(R.layout.player_activity);
-		View root = findViewById(R.id.root);
-		root.setOnTouchListener(new OnTouchListener() {
+		Bundle args = getArguments();
+		if(args != null) {
+			contentUri = Uri.parse(args.getString(EXTRA_CONTENT_URI));
+			contentId = args.getString(EXTRA_CONTENT_ID);
+			contentType = args.getInt(EXTRA_CONTENT_TYPE, -1);
+		}
+
+		View root = view.findViewById(R.id.root);
+		root.setOnTouchListener(new View.OnTouchListener() {
 			@Override
 			public
 			boolean onTouch(View view, MotionEvent motionEvent) {
@@ -138,32 +148,33 @@ class PlayerActivity extends Activity implements SurfaceHolder.Callback, OnClick
 				return true;
 			}
 		});
-		root.setOnKeyListener(new OnKeyListener() {
+		root.setOnKeyListener(new View.OnKeyListener() {
 			@Override
 			public
 			boolean onKey(View v, int keyCode, KeyEvent event) {
 				return keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE && mediaController.dispatchKeyEvent(event);
 			}
 		});
-		audioCapabilitiesReceiver = new AudioCapabilitiesReceiver(getApplicationContext(), this);
+		audioCapabilitiesReceiver = new AudioCapabilitiesReceiver(getActivity().getApplicationContext(), this);
+		mMediaParametersReceiver = new MediaParametersReceiver();
 
-		shutterView = findViewById(R.id.shutter);
-		debugRootView = findViewById(R.id.controls_root);
+		shutterView = view.findViewById(R.id.shutter);
+		debugRootView = view.findViewById(R.id.controls_root);
 
-		surfaceView = (VideoSurfaceView)findViewById(R.id.surface_view);
+		surfaceView = (VideoSurfaceView)view.findViewById(R.id.surface_view);
 		surfaceView.getHolder().addCallback(this);
-		debugTextView = (TextView)findViewById(R.id.debug_text_view);
+		debugTextView = (TextView)view.findViewById(R.id.debug_text_view);
 
-		playerStateTextView = (TextView)findViewById(R.id.player_state_view);
-		subtitleView = (SubtitleView)findViewById(R.id.subtitles);
+		playerStateTextView = (TextView)view.findViewById(R.id.player_state_view);
+		subtitleView = (SubtitleView)view.findViewById(R.id.subtitles);
 
-		mediaController = new MediaController(this);
+		mediaController = new MediaController(getActivity());
 		mediaController.setAnchorView(root);
-		retryButton = (Button)findViewById(R.id.retry_button);
+		retryButton = (Button)view.findViewById(R.id.retry_button);
 		retryButton.setOnClickListener(this);
-		videoButton = (Button)findViewById(R.id.video_controls);
-		audioButton = (Button)findViewById(R.id.audio_controls);
-		textButton = (Button)findViewById(R.id.text_controls);
+		videoButton = (Button)view.findViewById(R.id.video_controls);
+		audioButton = (Button)view.findViewById(R.id.audio_controls);
+		textButton = (Button)view.findViewById(R.id.text_controls);
 
 		DemoUtil.setDefaultCookieManager();
 	}
@@ -176,6 +187,8 @@ class PlayerActivity extends Activity implements SurfaceHolder.Callback, OnClick
 
 		// The player will be prepared on receiving audio capabilities.
 		audioCapabilitiesReceiver.register();
+		IntentFilter mediaParametersIntentFilter = new IntentFilter(MediaParametersReceiver.ACTION_MEDIA_PARAMETER_CHANGED);
+		getActivity().registerReceiver(mMediaParametersReceiver, mediaParametersIntentFilter);
 	}
 
 	@Override
@@ -190,6 +203,7 @@ class PlayerActivity extends Activity implements SurfaceHolder.Callback, OnClick
 		}
 		audioCapabilitiesReceiver.unregister();
 		shutterView.setVisibility(View.VISIBLE);
+		getActivity().unregisterReceiver(mMediaParametersReceiver);
 	}
 
 	@Override
@@ -199,17 +213,31 @@ class PlayerActivity extends Activity implements SurfaceHolder.Callback, OnClick
 		releasePlayer();
 	}
 
-	// OnClickListener methods
-
 	@Override
 	public
 	void onClick(View view) {
-		if(view == retryButton) {
-			preparePlayer();
+		switch(view.getId()) {
+			case R.id.retry_button:
+				preparePlayer();
+				break;
+
+			case R.id.video_controls:
+				showVideoPopup(view);
+				break;
+
+			case R.id.audio_controls:
+				showAudioPopup(view);
+				break;
+
+			case R.id.text_controls:
+				showTextPopup(view);
+				break;
+
+			case R.id.verbose_log_controls:
+				showVerboseLogPopup(view);
+				break;
 		}
 	}
-
-	// AudioCapabilitiesReceiver.Listener methods
 
 	@Override
 	public
@@ -225,29 +253,27 @@ class PlayerActivity extends Activity implements SurfaceHolder.Callback, OnClick
 		}
 	}
 
-	// Internal methods
-
 	private
 	DemoPlayer.RendererBuilder getRendererBuilder() {
-		String userAgent = Util.getUserAgent(this, "ExoPlayerDemo");
+		String userAgent = Util.getUserAgent(getActivity(), "ExoPlayerDemo");
 		switch(contentType) {
 			case DemoUtil.TYPE_SS:
-				return new SmoothStreamingRendererBuilder(this, userAgent, contentUri.toString(), new SmoothStreamingTestMediaDrmCallback(), debugTextView);
+				return new SmoothStreamingRendererBuilder(getActivity(), userAgent, contentUri.toString(), new SmoothStreamingTestMediaDrmCallback(), debugTextView);
 			case DemoUtil.TYPE_DASH:
-				return new DashRendererBuilder(this, userAgent, contentUri.toString(), new WidevineTestMediaDrmCallback(contentId), debugTextView, audioCapabilities);
+				return new DashRendererBuilder(getActivity(), userAgent, contentUri.toString(), new WidevineTestMediaDrmCallback(contentId), debugTextView, audioCapabilities);
 			case DemoUtil.TYPE_HLS:
-				return new HlsRendererBuilder(this, userAgent, contentUri.toString(), debugTextView, audioCapabilities);
+				return new HlsRendererBuilder(getActivity(), userAgent, contentUri.toString(), debugTextView, audioCapabilities);
 			case DemoUtil.TYPE_M4A: // There are no file format differences between M4A and MP4.
 			case DemoUtil.TYPE_MP4:
-				return new ExtractorRendererBuilder(this, userAgent, contentUri, debugTextView, new Mp4Extractor());
+				return new ExtractorRendererBuilder(getActivity(), userAgent, contentUri, debugTextView, new Mp4Extractor());
 			case DemoUtil.TYPE_MP3:
-				return new ExtractorRendererBuilder(this, userAgent, contentUri, debugTextView, new Mp3Extractor());
+				return new ExtractorRendererBuilder(getActivity(), userAgent, contentUri, debugTextView, new Mp3Extractor());
 			case DemoUtil.TYPE_TS:
-				return new ExtractorRendererBuilder(this, userAgent, contentUri, debugTextView, new TsExtractor(0, audioCapabilities));
+				return new ExtractorRendererBuilder(getActivity(), userAgent, contentUri, debugTextView, new TsExtractor(0, audioCapabilities));
 			case DemoUtil.TYPE_AAC:
-				return new ExtractorRendererBuilder(this, userAgent, contentUri, debugTextView, new AdtsExtractor());
+				return new ExtractorRendererBuilder(getActivity(), userAgent, contentUri, debugTextView, new AdtsExtractor());
 			case DemoUtil.TYPE_WEBM:
-				return new ExtractorRendererBuilder(this, userAgent, contentUri, debugTextView, new WebmExtractor());
+				return new ExtractorRendererBuilder(getActivity(), userAgent, contentUri, debugTextView, new WebmExtractor());
 			default:
 				throw new IllegalStateException("Unsupported type: " + contentType);
 		}
@@ -330,7 +356,7 @@ class PlayerActivity extends Activity implements SurfaceHolder.Callback, OnClick
 			// Special case DRM failures.
 			UnsupportedDrmException unsupportedDrmException = (UnsupportedDrmException)e;
 			int stringId = unsupportedDrmException.reason == UnsupportedDrmException.REASON_NO_DRM ? R.string.drm_error_not_supported : unsupportedDrmException.reason == UnsupportedDrmException.REASON_UNSUPPORTED_SCHEME ? R.string.drm_error_unsupported_scheme : R.string.drm_error_unknown;
-			Toast.makeText(getApplicationContext(), stringId, Toast.LENGTH_LONG).show();
+			Toast.makeText(getActivity().getApplicationContext(), stringId, Toast.LENGTH_LONG).show();
 		}
 		playerNeedsPrepare = true;
 		updateButtonVisibilities();
@@ -361,20 +387,20 @@ class PlayerActivity extends Activity implements SurfaceHolder.Callback, OnClick
 
 	public
 	void showVideoPopup(View v) {
-		PopupMenu popup = new PopupMenu(this, v);
+		PopupMenu popup = new PopupMenu(getActivity(), v);
 		configurePopupWithTracks(popup, null, DemoPlayer.TYPE_VIDEO);
 		popup.show();
 	}
 
 	public
 	void showAudioPopup(View v) {
-		PopupMenu popup = new PopupMenu(this, v);
+		PopupMenu popup = new PopupMenu(getActivity(), v);
 		Menu menu = popup.getMenu();
 		menu.add(Menu.NONE, Menu.NONE, Menu.NONE, R.string.enable_background_audio);
 		final MenuItem backgroundAudioItem = menu.findItem(0);
 		backgroundAudioItem.setCheckable(true);
 		backgroundAudioItem.setChecked(enableBackgroundAudio);
-		OnMenuItemClickListener clickListener = new OnMenuItemClickListener() {
+		PopupMenu.OnMenuItemClickListener clickListener = new PopupMenu.OnMenuItemClickListener() {
 			@Override
 			public
 			boolean onMenuItemClick(MenuItem item) {
@@ -391,20 +417,20 @@ class PlayerActivity extends Activity implements SurfaceHolder.Callback, OnClick
 
 	public
 	void showTextPopup(View v) {
-		PopupMenu popup = new PopupMenu(this, v);
+		PopupMenu popup = new PopupMenu(getActivity(), v);
 		configurePopupWithTracks(popup, null, DemoPlayer.TYPE_TEXT);
 		popup.show();
 	}
 
 	public
 	void showVerboseLogPopup(View v) {
-		PopupMenu popup = new PopupMenu(this, v);
+		PopupMenu popup = new PopupMenu(getActivity(), v);
 		Menu menu = popup.getMenu();
 		menu.add(Menu.NONE, 0, Menu.NONE, R.string.logging_normal);
 		menu.add(Menu.NONE, 1, Menu.NONE, R.string.logging_verbose);
 		menu.setGroupCheckable(Menu.NONE, true, true);
 		menu.findItem((VerboseLogUtil.areAllTagsEnabled()) ? 1 : 0).setChecked(true);
-		popup.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+		popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
 			@Override
 			public
 			boolean onMenuItemClick(MenuItem item) {
@@ -421,7 +447,7 @@ class PlayerActivity extends Activity implements SurfaceHolder.Callback, OnClick
 	}
 
 	private
-	void configurePopupWithTracks(PopupMenu popup, final OnMenuItemClickListener customActionClickListener, final int trackType) {
+	void configurePopupWithTracks(PopupMenu popup, final PopupMenu.OnMenuItemClickListener customActionClickListener, final int trackType) {
 		if(player == null) {
 			return;
 		}
@@ -429,7 +455,7 @@ class PlayerActivity extends Activity implements SurfaceHolder.Callback, OnClick
 		if(tracks == null) {
 			return;
 		}
-		popup.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+		popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
 			@Override
 			public
 			boolean onMenuItemClick(MenuItem item) {
@@ -556,7 +582,7 @@ class PlayerActivity extends Activity implements SurfaceHolder.Callback, OnClick
 
 	private
 	float getCaptionFontSize() {
-		Display display = ((WindowManager)getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+		Display display = ((WindowManager)getActivity().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
 		Point displaySize = new Point();
 		display.getSize(displaySize);
 		return Math.max(getResources().getDimension(R.dimen.subtitle_minimum_font_size), CAPTION_LINE_HEIGHT_RATIO * Math.min(displaySize.x, displaySize.y));
@@ -565,15 +591,14 @@ class PlayerActivity extends Activity implements SurfaceHolder.Callback, OnClick
 	@TargetApi(19)
 	private
 	float getUserCaptionFontScaleV19() {
-		CaptioningManager captioningManager = (CaptioningManager)getSystemService(Context.CAPTIONING_SERVICE);
+		CaptioningManager captioningManager = (CaptioningManager)getActivity().getSystemService(Context.CAPTIONING_SERVICE);
 		return captioningManager.getFontScale();
 	}
 
 	@TargetApi(19)
 	private
 	CaptionStyleCompat getUserCaptionStyleV19() {
-		CaptioningManager captioningManager = (CaptioningManager)getSystemService(Context.CAPTIONING_SERVICE);
+		CaptioningManager captioningManager = (CaptioningManager)getActivity().getSystemService(Context.CAPTIONING_SERVICE);
 		return CaptionStyleCompat.createFromCaptionStyle(captioningManager.getUserStyle());
 	}
-
 }

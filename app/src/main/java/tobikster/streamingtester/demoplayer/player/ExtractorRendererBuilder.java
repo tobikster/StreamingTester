@@ -61,7 +61,7 @@ class ExtractorRendererBuilder implements DemoPlayer.RendererBuilder {
 		MediaCodecAudioTrackRenderer audioRenderer = new MediaCodecAudioTrackRenderer(sampleSource, null, true, player.getMainHandler(), player);
 
 		// Build the debug renderer.
-		TrackRenderer debugRenderer = debugTextView != null ? new DebugTrackRenderer(debugTextView, player, videoRenderer) : null;
+		TrackRenderer debugRenderer = debugTextView != null ? new DebugTrackRenderer(context, debugTextView, player, videoRenderer) : null;
 
 		// Invoke the callback.
 		TrackRenderer[] renderers = new TrackRenderer[DemoPlayer.RENDERER_COUNT];

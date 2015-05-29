@@ -15,12 +15,16 @@
  */
 package tobikster.streamingtester.demoplayer.player;
 
+import android.content.Context;
+import android.content.Intent;
 import android.widget.TextView;
 
 import com.google.android.exoplayer.ExoPlaybackException;
 import com.google.android.exoplayer.MediaCodecTrackRenderer;
 import com.google.android.exoplayer.TrackRenderer;
 import com.google.android.exoplayer.chunk.Format;
+
+import tobikster.streamingtester.broadcastReceivers.MediaParametersReceiver;
 
 /**
  * A {@link TrackRenderer} that periodically updates debugging information displayed by a
@@ -29,6 +33,7 @@ import com.google.android.exoplayer.chunk.Format;
 /* package */
 class DebugTrackRenderer extends TrackRenderer implements Runnable {
 
+	private final Context context;
 	private final TextView textView;
 	private final DemoPlayer player;
 	private final MediaCodecTrackRenderer renderer;
@@ -37,7 +42,8 @@ class DebugTrackRenderer extends TrackRenderer implements Runnable {
 	private volatile long currentPositionUs;
 
 	public
-	DebugTrackRenderer(TextView textView, DemoPlayer player, MediaCodecTrackRenderer renderer) {
+	DebugTrackRenderer(Context context, TextView textView, DemoPlayer player, MediaCodecTrackRenderer renderer) {
+		this.context = context;
 		this.textView = textView;
 		this.player = player;
 		this.renderer = renderer;
@@ -81,6 +87,8 @@ class DebugTrackRenderer extends TrackRenderer implements Runnable {
 	public
 	void run() {
 		textView.setText(getRenderString());
+		Intent intent = new Intent(MediaParametersReceiver.ACTION_MEDIA_PARAMETER_CHANGED);
+		context.sendBroadcast(intent);
 	}
 
 	private
