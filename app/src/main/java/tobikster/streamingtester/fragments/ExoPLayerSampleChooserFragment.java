@@ -27,16 +27,16 @@ class ExoPLayerSampleChooserFragment extends Fragment {
 
 	private InteractionListener mListener;
 
+	public
+	ExoPLayerSampleChooserFragment() {
+	}
+
 	public static
 	ExoPLayerSampleChooserFragment newInstance() {
 		ExoPLayerSampleChooserFragment fragment = new ExoPLayerSampleChooserFragment();
 		Bundle args = new Bundle();
 		fragment.setArguments(args);
 		return fragment;
-	}
-
-	public
-	ExoPLayerSampleChooserFragment() {
 	}
 
 	@Override
@@ -103,7 +103,7 @@ class ExoPLayerSampleChooserFragment extends Fragment {
 			mListener = (InteractionListener)(activity);
 		}
 		else {
-			throw new ClassCastException(String.format("Activity %s must implement %s interface!", ExoPLayerSampleChooserFragment.this.getClass().getSimpleName(), InteractionListener.class.getSimpleName()));
+			throw new ClassCastException(String.format("Activity %s must implement %s interface!", activity.getClass().getSimpleName(), InteractionListener.class.getCanonicalName()));
 		}
 	}
 

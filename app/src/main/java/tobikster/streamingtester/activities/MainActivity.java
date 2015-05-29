@@ -80,18 +80,21 @@ class MainActivity extends Activity implements View.OnClickListener {
 	@Override
 	public
 	void onClick(View v) {
-		if(v == mButton1) {
-			Intent startMediaPlayerActivityIntent = new Intent(MainActivity.this, MediaPlayerActivity.class);
-			startActivity(startMediaPlayerActivityIntent);
+		Intent startTestActivityIntent = new Intent(this, StreamingTestActivity.class);
+		switch(v.getId()) {
+			case R.id.button1:
+				startTestActivityIntent.putExtra(StreamingTestActivity.EXTRA_TEST_TYPE, StreamingTestActivity.TEST_TYPE_MEDIA_PLAYER);
+				break;
+
+			case R.id.button2:
+				startTestActivityIntent.putExtra(StreamingTestActivity.EXTRA_TEST_TYPE, StreamingTestActivity.TEST_TYPE_WEB_VIEW);
+				break;
+
+			case R.id.button3:
+				startTestActivityIntent.putExtra(StreamingTestActivity.EXTRA_TEST_TYPE, StreamingTestActivity.TEST_TYPE_EXO_PLAYER);
+				break;
 		}
-		else if(v == mButton2) {
-			Intent startWebViewActivityIntent = new Intent(MainActivity.this, WebViewActivity.class);
-			startActivity(startWebViewActivityIntent);
-		}
-		else if(v == mButton3) {
-			Intent startExoPlayerActivityIntent = new Intent(MainActivity.this, ExoPlayerFragmentActivity.class);
-			startActivity(startExoPlayerActivityIntent);
-		}
+		startActivity(startTestActivityIntent);
 
 	}
 }
