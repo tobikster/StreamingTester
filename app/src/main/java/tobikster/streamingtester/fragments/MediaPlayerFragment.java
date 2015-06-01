@@ -63,6 +63,16 @@ class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPreparedList
 		return instance;
 	}
 
+	public static
+	MediaPlayerFragment newInstance(String uri) {
+		MediaPlayerFragment instance = new MediaPlayerFragment();
+		Bundle args = new Bundle();
+		args.putString(ARG_VIDEO_URI, uri);
+		args.putBoolean(ARG_VIDEO_REMOTE, true);
+		instance.setArguments(args);
+		return instance;
+	}
+
 	@Override
 	public
 	void onCreate(Bundle savedInstanceState) {

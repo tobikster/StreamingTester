@@ -37,7 +37,7 @@ import tobikster.streamingtester.demoplayer.player.DemoPlayer;
 public
 class EventLogger implements DemoPlayer.Listener, DemoPlayer.InfoListener, DemoPlayer.InternalErrorListener {
 
-	private static final String TAG = "EventLogger";
+	private static final String LOGCAT_TAG = "EventLogger";
 	private static final NumberFormat TIME_FORMAT;
 
 	static {
@@ -57,12 +57,12 @@ class EventLogger implements DemoPlayer.Listener, DemoPlayer.InfoListener, DemoP
 	public
 	void startSession() {
 		sessionStartTimeMs = SystemClock.elapsedRealtime();
-		Log.d(TAG, "start [0]");
+		Log.d(LOGCAT_TAG, "start [0]");
 	}
 
 	public
 	void endSession() {
-		Log.d(TAG, "end [" + getSessionTimeString() + "]");
+		Log.d(LOGCAT_TAG, "end [" + getSessionTimeString() + "]");
 	}
 
 	// DemoPlayer.Listener
@@ -70,19 +70,19 @@ class EventLogger implements DemoPlayer.Listener, DemoPlayer.InfoListener, DemoP
 	@Override
 	public
 	void onStateChanged(boolean playWhenReady, int state) {
-		Log.d(TAG, "state [" + getSessionTimeString() + ", " + playWhenReady + ", " + getStateString(state) + "]");
+		Log.d(LOGCAT_TAG, "state [" + getSessionTimeString() + ", " + playWhenReady + ", " + getStateString(state) + "]");
 	}
 
 	@Override
 	public
 	void onError(Exception e) {
-		Log.e(TAG, "playerFailed [" + getSessionTimeString() + "]", e);
+		Log.e(LOGCAT_TAG, "playerFailed [" + getSessionTimeString() + "]", e);
 	}
 
 	@Override
 	public
 	void onVideoSizeChanged(int width, int height, float pixelWidthHeightRatio) {
-		Log.d(TAG, "videoSizeChanged [" + width + ", " + height + ", " + pixelWidthHeightRatio + "]");
+		Log.d(LOGCAT_TAG, "videoSizeChanged [" + width + ", " + height + ", " + pixelWidthHeightRatio + "]");
 	}
 
 	// DemoPlayer.InfoListener
@@ -90,43 +90,43 @@ class EventLogger implements DemoPlayer.Listener, DemoPlayer.InfoListener, DemoP
 	@Override
 	public
 	void onBandwidthSample(int elapsedMs, long bytes, long bitrateEstimate) {
-		Log.d(TAG, "bandwidth [" + getSessionTimeString() + ", " + bytes + ", " + getTimeString(elapsedMs) + ", " + bitrateEstimate + "]");
+		Log.d(LOGCAT_TAG, "bandwidth [" + getSessionTimeString() + ", " + bytes + ", " + getTimeString(elapsedMs) + ", " + bitrateEstimate + "]");
 	}
 
 	@Override
 	public
 	void onDroppedFrames(int count, long elapsed) {
-		Log.d(TAG, "droppedFrames [" + getSessionTimeString() + ", " + count + "]");
+		Log.d(LOGCAT_TAG, "droppedFrames [" + getSessionTimeString() + ", " + count + "]");
 	}
 
 	@Override
 	public
 	void onLoadStarted(int sourceId, long length, int type, int trigger, Format format, int mediaStartTimeMs, int mediaEndTimeMs) {
 		loadStartTimeMs[sourceId] = SystemClock.elapsedRealtime();
-		if(VerboseLogUtil.isTagEnabled(TAG)) {
-			Log.v(TAG, "loadStart [" + getSessionTimeString() + ", " + sourceId + ", " + type + ", " + mediaStartTimeMs + ", " + mediaEndTimeMs + "]");
+		if(VerboseLogUtil.isTagEnabled(LOGCAT_TAG)) {
+			Log.v(LOGCAT_TAG, "loadStart [" + getSessionTimeString() + ", " + sourceId + ", " + type + ", " + mediaStartTimeMs + ", " + mediaEndTimeMs + "]");
 		}
 	}
 
 	@Override
 	public
 	void onLoadCompleted(int sourceId, long bytesLoaded, int type, int trigger, Format format, int mediaStartTimeMs, int mediaEndTimeMs, long elapsedRealtimeMs, long loadDurationMs) {
-		if(VerboseLogUtil.isTagEnabled(TAG)) {
+		if(VerboseLogUtil.isTagEnabled(LOGCAT_TAG)) {
 			long downloadTime = SystemClock.elapsedRealtime() - loadStartTimeMs[sourceId];
-			Log.v(TAG, "loadEnd [" + getSessionTimeString() + ", " + sourceId + ", " + downloadTime + "]");
+			Log.v(LOGCAT_TAG, "loadEnd [" + getSessionTimeString() + ", " + sourceId + ", " + downloadTime + "]");
 		}
 	}
 
 	@Override
 	public
 	void onVideoFormatEnabled(Format format, int trigger, int mediaTimeMs) {
-		Log.d(TAG, String.format("videoFormat [time: %s, id: %s, trigger: %d, codecs: %s, bitrate: %d", getSessionTimeString(), format.id, trigger, format.codecs, format.bitrate));
+		Log.d(LOGCAT_TAG, String.format("videoFormat [time: %s, id: %s, trigger: %d, codecs: %s, bitrate: %d", getSessionTimeString(), format.id, trigger, format.codecs, format.bitrate));
 	}
 
 	@Override
 	public
 	void onAudioFormatEnabled(Format format, int trigger, int mediaTimeMs) {
-		Log.d(TAG, "audioFormat [" + getSessionTimeString() + ", " + format.id + ", " + Integer.toString(trigger) + "]");
+		Log.d(LOGCAT_TAG, "audioFormat [" + getSessionTimeString() + ", " + format.id + ", " + Integer.toString(trigger) + "]");
 	}
 
 	// DemoPlayer.InternalErrorListener
@@ -176,27 +176,27 @@ class EventLogger implements DemoPlayer.Listener, DemoPlayer.InfoListener, DemoP
 	@Override
 	public
 	void onDecoderInitialized(String decoderName, long elapsedRealtimeMs, long initializationDurationMs) {
-		Log.d(TAG, "decoderInitialized [" + getSessionTimeString() + "]");
+		Log.d(LOGCAT_TAG, "decoderInitialized [" + getSessionTimeString() + "]");
 	}
 
 	private
 	void printInternalError(String type, Exception e) {
-		Log.e(TAG, "internalError [" + getSessionTimeString() + ", " + type + "]", e);
+		Log.e(LOGCAT_TAG, "internalError [" + getSessionTimeString() + ", " + type + "]", e);
 	}
 
 	private
 	String getStateString(int state) {
 		switch(state) {
 			case ExoPlayer.STATE_BUFFERING:
-				return "B";
+				return "Buffering";
 			case ExoPlayer.STATE_ENDED:
-				return "E";
+				return "Ended";
 			case ExoPlayer.STATE_IDLE:
-				return "I";
+				return "Idle";
 			case ExoPlayer.STATE_PREPARING:
-				return "P";
+				return "Preparing";
 			case ExoPlayer.STATE_READY:
-				return "R";
+				return "Ready";
 			default:
 				return "?";
 		}

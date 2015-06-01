@@ -106,7 +106,8 @@ class ExoPlayerFragment extends Fragment implements SurfaceHolder.Callback, View
 	ExoPlayerFragment() {
 	}
 
-	public static ExoPlayerFragment newInstance(String contentUri, String contentId, int contentType) {
+	public static
+	ExoPlayerFragment newInstance(String contentUri, String contentId, int contentType) {
 		ExoPlayerFragment instance = new ExoPlayerFragment();
 		Bundle args = new Bundle();
 		args.putString(EXTRA_CONTENT_URI, contentUri);
@@ -175,6 +176,12 @@ class ExoPlayerFragment extends Fragment implements SurfaceHolder.Callback, View
 		videoButton = (Button)view.findViewById(R.id.video_controls);
 		audioButton = (Button)view.findViewById(R.id.audio_controls);
 		textButton = (Button)view.findViewById(R.id.text_controls);
+		Button verboseLogControlsButton = (Button)view.findViewById(R.id.verbose_log_controls);
+
+		videoButton.setOnClickListener(this);
+		audioButton.setOnClickListener(this);
+		textButton.setOnClickListener(this);
+		verboseLogControlsButton.setOnClickListener(this);
 
 		DemoUtil.setDefaultCookieManager();
 	}
@@ -209,8 +216,8 @@ class ExoPlayerFragment extends Fragment implements SurfaceHolder.Callback, View
 	@Override
 	public
 	void onDestroy() {
-		super.onDestroy();
 		releasePlayer();
+		super.onDestroy();
 	}
 
 	@Override

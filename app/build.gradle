@@ -21,7 +21,7 @@ android {
 }
 
 dependencies {
-	compile 'com.android.support:support-v4:22.1.1'
+	compile 'com.android.support:support-v4:22.2.0'
 	compile 'com.android.support:support-v13:22.1.1'
-	compile project(':ExoPlayer')
+	compile 'com.google.android.exoplayer:exoplayer:r1.3.3'
 }

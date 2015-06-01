@@ -17,9 +17,9 @@ class MainActivity extends Activity implements View.OnClickListener {
 	@SuppressWarnings("unused")
 	public static final String LOGCAT_TAG = "MainActivity";
 
-	private Button mButton1;
-	private Button mButton2;
-	Button mButton3;
+	Button mMediaPlayerTestButton;
+	Button mWebViewTestButton;
+	Button mExoPlayerYestButton;
 
 	@Override
 	protected
@@ -27,22 +27,22 @@ class MainActivity extends Activity implements View.OnClickListener {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		mButton1 = (Button)(findViewById(R.id.button1));
-		mButton2 = (Button)(findViewById(R.id.button2));
-		mButton3 = (Button)(findViewById(R.id.button3));
+		mMediaPlayerTestButton = (Button)(findViewById(R.id.media_player_test_button));
+		mWebViewTestButton = (Button)(findViewById(R.id.web_view_test_button));
+		mExoPlayerYestButton = (Button)(findViewById(R.id.exo_player_test_button));
 
-		mButton1.setOnClickListener(this);
-		mButton2.setOnClickListener(this);
-		mButton3.setOnClickListener(this);
+		mMediaPlayerTestButton.setOnClickListener(this);
+		mWebViewTestButton.setOnClickListener(this);
+		mExoPlayerYestButton.setOnClickListener(this);
 	}
 
 	@Override
 	protected
 	void onDestroy() {
 		super.onDestroy();
-		mButton1.setOnClickListener(null);
-		mButton2.setOnClickListener(null);
-		mButton3.setOnClickListener(null);
+		mMediaPlayerTestButton.setOnClickListener(null);
+		mWebViewTestButton.setOnClickListener(null);
+		mExoPlayerYestButton.setOnClickListener(null);
 	}
 
 	@Override
@@ -82,19 +82,18 @@ class MainActivity extends Activity implements View.OnClickListener {
 	void onClick(View v) {
 		Intent startTestActivityIntent = new Intent(this, StreamingTestActivity.class);
 		switch(v.getId()) {
-			case R.id.button1:
+			case R.id.media_player_test_button:
 				startTestActivityIntent.putExtra(StreamingTestActivity.EXTRA_TEST_TYPE, StreamingTestActivity.TEST_TYPE_MEDIA_PLAYER);
 				break;
 
-			case R.id.button2:
+			case R.id.web_view_test_button:
 				startTestActivityIntent.putExtra(StreamingTestActivity.EXTRA_TEST_TYPE, StreamingTestActivity.TEST_TYPE_WEB_VIEW);
 				break;
 
-			case R.id.button3:
+			case R.id.exo_player_test_button:
 				startTestActivityIntent.putExtra(StreamingTestActivity.EXTRA_TEST_TYPE, StreamingTestActivity.TEST_TYPE_EXO_PLAYER);
 				break;
 		}
 		startActivity(startTestActivityIntent);
-
 	}
 }

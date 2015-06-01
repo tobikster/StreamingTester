@@ -13,18 +13,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="MediaPlayer test"
-        android:id="@+id/button1"/>
+        android:id="@+id/media_player_test_button"/>
 
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="WebView test"
-        android:id="@+id/button2"/>
+        android:id="@+id/web_view_test_button"/>
 
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="ExoPlayer"
-        android:id="@+id/button3"/>
+        android:id="@+id/exo_player_test_button"/>
 </LinearLayout>
 
