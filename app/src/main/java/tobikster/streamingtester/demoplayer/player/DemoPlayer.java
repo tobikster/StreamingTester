@@ -56,6 +56,7 @@ class DemoPlayer implements ExoPlayer.Listener, ChunkSampleSource.EventListener,
 	 */
 	public
 	interface RendererBuilder {
+
 		/**
 		 * Constructs the necessary components for playback.
 		 *
@@ -64,12 +65,12 @@ class DemoPlayer implements ExoPlayer.Listener, ChunkSampleSource.EventListener,
 		 */
 		void buildRenderers(DemoPlayer player, RendererBuilderCallback callback);
 	}
-
 	/**
 	 * A callback invoked by a {@link RendererBuilder}.
 	 */
 	public
 	interface RendererBuilderCallback {
+
 		/**
 		 * Invoked with the results from a {@link RendererBuilder}.
 		 *
@@ -83,27 +84,26 @@ class DemoPlayer implements ExoPlayer.Listener, ChunkSampleSource.EventListener,
 		 *                          element may be null if there do not exist tracks of the corresponding type.
 		 */
 		void onRenderers(String[][] trackNames, MultiTrackChunkSource[] multiTrackSources, TrackRenderer[] renderers);
-
 		/**
 		 * Invoked if a {@link RendererBuilder} encounters an error.
 		 *
 		 * @param e Describes the error.
 		 */
 		void onRenderersError(Exception e);
-	}
 
+	}
 	/**
 	 * A listener for core events.
 	 */
 	public
 	interface Listener {
-		void onStateChanged(boolean playWhenReady, int playbackState);
 
+		void onStateChanged(boolean playWhenReady, int playbackState);
 		void onError(Exception e);
 
 		void onVideoSizeChanged(int width, int height, float pixelWidthHeightRatio);
-	}
 
+	}
 	/**
 	 * A listener for internal errors.
 	 * <p/>
@@ -114,8 +114,8 @@ class DemoPlayer implements ExoPlayer.Listener, ChunkSampleSource.EventListener,
 	 */
 	public
 	interface InternalErrorListener {
-		void onRendererInitializationError(Exception e);
 
+		void onRendererInitializationError(Exception e);
 		void onAudioTrackInitializationError(AudioTrack.InitializationException e);
 
 		void onAudioTrackWriteError(AudioTrack.WriteException e);
@@ -127,15 +127,15 @@ class DemoPlayer implements ExoPlayer.Listener, ChunkSampleSource.EventListener,
 		void onLoadError(int sourceId, IOException e);
 
 		void onDrmSessionManagerError(Exception e);
-	}
 
+	}
 	/**
 	 * A listener for debugging information.
 	 */
 	public
 	interface InfoListener {
-		void onVideoFormatEnabled(Format format, int trigger, int mediaTimeMs);
 
+		void onVideoFormatEnabled(Format format, int trigger, int mediaTimeMs);
 		void onAudioFormatEnabled(Format format, int trigger, int mediaTimeMs);
 
 		void onDroppedFrames(int count, long elapsed);
@@ -147,63 +147,66 @@ class DemoPlayer implements ExoPlayer.Listener, ChunkSampleSource.EventListener,
 		void onLoadCompleted(int sourceId, long bytesLoaded, int type, int trigger, Format format, int mediaStartTimeMs, int mediaEndTimeMs, long elapsedRealtimeMs, long loadDurationMs);
 
 		void onDecoderInitialized(String decoderName, long elapsedRealtimeMs, long initializationDurationMs);
-	}
 
+	}
 	/**
 	 * A listener for receiving notifications of timed text.
 	 */
 	public
 	interface TextListener {
+
 		void onText(String text);
 	}
-
 	/**
 	 * A listener for receiving ID3 metadata parsed from the media stream.
 	 */
 	public
 	interface Id3MetadataListener {
+
 		void onId3Metadata(Map<String, Object> metadata);
 	}
-
 	public static final int DISABLED_TRACK = -1;
-	public static final int PRIMARY_TRACK = 0;
 
+	public static final int PRIMARY_TRACK = 0;
 	public static final int RENDERER_COUNT = 5;
+
 	public static final int TYPE_VIDEO = 0;
 	public static final int TYPE_AUDIO = 1;
 	public static final int TYPE_TEXT = 2;
 	public static final int TYPE_TIMED_METADATA = 3;
 	public static final int TYPE_DEBUG = 4;
-
 	private static final int RENDERER_BUILDING_STATE_IDLE = 1;
+
 	private static final int RENDERER_BUILDING_STATE_BUILDING = 2;
 	private static final int RENDERER_BUILDING_STATE_BUILT = 3;
-
 	private final RendererBuilder rendererBuilder;
+
 	private final ExoPlayer player;
 	private final PlayerControl playerControl;
 	private final Handler mainHandler;
 	private final CopyOnWriteArrayList<Listener> listeners;
-
 	private int rendererBuildingState;
+
 	private int lastReportedPlaybackState;
 	private boolean lastReportedPlayWhenReady;
-
 	private Surface surface;
+
 	private InternalRendererBuilderCallback builderCallback;
 	private TrackRenderer videoRenderer;
 	private Format videoFormat;
 	private int videoTrackToRestore;
-
 	private MultiTrackChunkSource[] multiTrackSources;
+
 	private String[][] trackNames;
 	private int[] selectedTracks;
 	private boolean backgrounded;
-
 	private TextListener textListener;
+
 	private Id3MetadataListener id3MetadataListener;
 	private InternalErrorListener internalErrorListener;
 	private InfoListener infoListener;
+
+	private boolean mLoopModeEnabled;
 
 	public
 	DemoPlayer(RendererBuilder rendererBuilder) {
@@ -218,6 +221,7 @@ class DemoPlayer implements ExoPlayer.Listener, ChunkSampleSource.EventListener,
 		selectedTracks = new int[RENDERER_COUNT];
 		// Disable text initially.
 		selectedTracks[TYPE_TEXT] = DISABLED_TRACK;
+		mLoopModeEnabled = true;
 	}
 
 	public
@@ -313,6 +317,16 @@ class DemoPlayer implements ExoPlayer.Listener, ChunkSampleSource.EventListener,
 		else {
 			selectTrack(TYPE_VIDEO, videoTrackToRestore);
 		}
+	}
+
+	public
+	boolean isLoopModeEnabled() {
+		return mLoopModeEnabled;
+	}
+
+	public
+	void setLoopModeEnabled(boolean loopModeEnabled) {
+		mLoopModeEnabled = loopModeEnabled;
 	}
 
 	public
@@ -437,6 +451,13 @@ class DemoPlayer implements ExoPlayer.Listener, ChunkSampleSource.EventListener,
 	@Override
 	public
 	void onPlayerStateChanged(boolean playWhenReady, int state) {
+		switch(state) {
+			case ExoPlayer.STATE_ENDED:
+				if(mLoopModeEnabled) {
+					player.seekTo(0);
+				}
+				break;
+		}
 		maybeReportPlayerState();
 	}
 

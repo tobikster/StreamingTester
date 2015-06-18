@@ -67,15 +67,21 @@ class StreamingTestActivity extends Activity implements SampleChooserFragment.In
 	void onStart() {
 		super.onStart();
 		mBatteryStateReceiver = new BatteryStateReceiver();
+	}
+
+	@Override
+	protected
+	void onResume() {
+		super.onResume();
 		IntentFilter batteryStateIntentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
 		registerReceiver(mBatteryStateReceiver, batteryStateIntentFilter);
 	}
 
 	@Override
 	protected
-	void onStop() {
+	void onPause() {
 		unregisterReceiver(mBatteryStateReceiver);
-		super.onStop();
+		super.onPause();
 	}
 
 	@Override

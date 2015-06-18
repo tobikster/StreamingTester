@@ -13,6 +13,7 @@ import android.view.Display;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -57,22 +58,25 @@ import tobikster.streamingtester.demoplayer.player.ExtractorRendererBuilder;
 import tobikster.streamingtester.demoplayer.player.HlsRendererBuilder;
 import tobikster.streamingtester.demoplayer.player.SmoothStreamingRendererBuilder;
 import tobikster.streamingtester.demoplayer.player.UnsupportedDrmException;
+import tobikster.streamingtester.utils.FileUtils;
 
 /**
  * A placeholder fragment containing a simple view.
  */
 public
 class ExoPlayerFragment extends Fragment implements SurfaceHolder.Callback, View.OnClickListener, DemoPlayer.Listener, DemoPlayer.TextListener, DemoPlayer.Id3MetadataListener, AudioCapabilitiesReceiver.Listener {
+	@SuppressWarnings("unused")
+	private static final String LOGCAT_TAG = "PlayerActivity";
 
 	public static final String EXTRA_CONTENT_URI = "content_uri";
 	public static final String EXTRA_CONTENT_TYPE = "content_type";
 	public static final String EXTRA_CONTENT_ID = "content_id";
 
-	private static final String TAG = "PlayerActivity";
-
 	private static final float CAPTION_LINE_HEIGHT_RATIO = 0.0533f;
 	private static final int MENU_GROUP_TRACKS = 1;
 	private static final int ID_OFFSET = 2;
+
+	private static final String EVENT_LOGGER_FILE_NAME = "eventLogger.log";
 
 	private EventLogger eventLogger;
 	private MediaController mediaController;
@@ -120,6 +124,7 @@ class ExoPlayerFragment extends Fragment implements SurfaceHolder.Callback, View
 	@Override
 	public
 	View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		setHasOptionsMenu(true);
 		return inflater.inflate(R.layout.fragment_exo_player, container, false);
 	}
 
@@ -222,6 +227,29 @@ class ExoPlayerFragment extends Fragment implements SurfaceHolder.Callback, View
 
 	@Override
 	public
+	void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		inflater.inflate(R.menu.fragment_exo_player, menu);
+	}
+
+	@Override
+	public
+	boolean onOptionsItemSelected(MenuItem item) {
+		boolean consumeEvent;
+		switch(item.getItemId()) {
+			case R.id.menu_item_loop_mode:
+				item.setChecked(!item.isChecked());
+				player.setLoopModeEnabled(item.isChecked());
+				consumeEvent = true;
+				break;
+
+			default:
+				consumeEvent = super.onOptionsItemSelected(item);
+		}
+		return consumeEvent;
+	}
+
+	@Override
+	public
 	void onClick(View view) {
 		switch(view.getId()) {
 			case R.id.retry_button:
@@ -298,6 +326,8 @@ class ExoPlayerFragment extends Fragment implements SurfaceHolder.Callback, View
 			mediaController.setMediaPlayer(player.getPlayerControl());
 			mediaController.setEnabled(true);
 			eventLogger = new EventLogger();
+			eventLogger.setOutputFile(FileUtils.getExternalStorageFile(getActivity(), null,
+			                                                           EVENT_LOGGER_FILE_NAME));
 			eventLogger.startSession();
 			player.addListener(eventLogger);
 			player.setInfoListener(eventLogger);
@@ -328,7 +358,7 @@ class ExoPlayerFragment extends Fragment implements SurfaceHolder.Callback, View
 	@Override
 	public
 	void onStateChanged(boolean playWhenReady, int playbackState) {
-		if(playbackState == ExoPlayer.STATE_ENDED) {
+		if(playbackState == ExoPlayer.STATE_ENDED && !player.isLoopModeEnabled()) {
 			showControls();
 		}
 		String text = "playWhenReady=" + playWhenReady + ", playbackState=";
@@ -532,18 +562,18 @@ class ExoPlayerFragment extends Fragment implements SurfaceHolder.Callback, View
 		for(Map.Entry<String, Object> entry : metadata.entrySet()) {
 			if(TxxxMetadata.TYPE.equals(entry.getKey())) {
 				TxxxMetadata txxxMetadata = (TxxxMetadata)entry.getValue();
-				Log.i(TAG, String.format("ID3 TimedMetadata %s: description=%s, value=%s", TxxxMetadata.TYPE, txxxMetadata.description, txxxMetadata.value));
+				Log.i(LOGCAT_TAG, String.format("ID3 TimedMetadata %s: description=%s, value=%s", TxxxMetadata.TYPE, txxxMetadata.description, txxxMetadata.value));
 			}
 			else if(PrivMetadata.TYPE.equals(entry.getKey())) {
 				PrivMetadata privMetadata = (PrivMetadata)entry.getValue();
-				Log.i(TAG, String.format("ID3 TimedMetadata %s: owner=%s", PrivMetadata.TYPE, privMetadata.owner));
+				Log.i(LOGCAT_TAG, String.format("ID3 TimedMetadata %s: owner=%s", PrivMetadata.TYPE, privMetadata.owner));
 			}
 			else if(GeobMetadata.TYPE.equals(entry.getKey())) {
 				GeobMetadata geobMetadata = (GeobMetadata)entry.getValue();
-				Log.i(TAG, String.format("ID3 TimedMetadata %s: mimeType=%s, filename=%s, description=%s", GeobMetadata.TYPE, geobMetadata.mimeType, geobMetadata.filename, geobMetadata.description));
+				Log.i(LOGCAT_TAG, String.format("ID3 TimedMetadata %s: mimeType=%s, filename=%s, description=%s", GeobMetadata.TYPE, geobMetadata.mimeType, geobMetadata.filename, geobMetadata.description));
 			}
 			else {
-				Log.i(TAG, String.format("ID3 TimedMetadata %s", entry.getKey()));
+				Log.i(LOGCAT_TAG, String.format("ID3 TimedMetadata %s", entry.getKey()));
 			}
 		}
 	}

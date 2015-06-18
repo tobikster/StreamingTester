@@ -25,11 +25,13 @@ import com.google.android.exoplayer.audio.AudioTrack;
 import com.google.android.exoplayer.chunk.Format;
 import com.google.android.exoplayer.util.VerboseLogUtil;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.Locale;
 
 import tobikster.streamingtester.demoplayer.player.DemoPlayer;
+import tobikster.streamingtester.utils.Counter;
 
 /**
  * Logs player events using {@link Log}.
@@ -48,10 +50,12 @@ class EventLogger implements DemoPlayer.Listener, DemoPlayer.InfoListener, DemoP
 
 	private long sessionStartTimeMs;
 	private long[] loadStartTimeMs;
+	File mOutputFile;
 
 	public
 	EventLogger() {
 		loadStartTimeMs = new long[DemoPlayer.RENDERER_COUNT];
+		mOutputFile = null;
 	}
 
 	public
@@ -184,6 +188,12 @@ class EventLogger implements DemoPlayer.Listener, DemoPlayer.InfoListener, DemoP
 		Log.e(LOGCAT_TAG, "internalError [" + getSessionTimeString() + ", " + type + "]", e);
 	}
 
+	public
+	void setOutputFile(File file) {
+		mOutputFile = file;
+		Log.d(LOGCAT_TAG, String.format("Output file set to %s", file.getAbsolutePath()));
+	}
+
 	private
 	String getStateString(int state) {
 		switch(state) {
@@ -211,5 +221,4 @@ class EventLogger implements DemoPlayer.Listener, DemoPlayer.InfoListener, DemoP
 	String getTimeString(long timeMs) {
 		return TIME_FORMAT.format((timeMs) / 1000f);
 	}
-
 }

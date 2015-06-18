@@ -18,4 +18,8 @@
     <string name="menu_entry_show_media_info_dialog">Show media info</string>
     <string name="menu_item_clear_battery_log">Remove battery log file</string>
     <string name="menu_item_open_local_video_file">Open file from local disk</string>
+    <string name="menu_item_loop_mode">Enable loop mode</string>
+    <string name="info_battery_log_file_removed_successfully">Battery log file removed!</string>
+    <string name="err_problem_with_removing_battery_log_file">There is a problem with removing battery log file!</string>
+    <string name="menu_item_settings">Settings</string>
 </resources>

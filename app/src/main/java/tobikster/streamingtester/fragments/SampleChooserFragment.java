@@ -3,6 +3,7 @@ package tobikster.streamingtester.fragments;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.res.XmlResourceParser;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,6 +16,11 @@ import android.widget.TextView;
 
 import com.google.android.exoplayer.MediaCodecUtil;
 import com.google.android.exoplayer.util.MimeTypes;
+
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.IOException;
 
 import tobikster.streamingtester.R;
 import tobikster.streamingtester.demoplayer.Samples;
@@ -88,7 +94,9 @@ class SampleChooserFragment extends Fragment {
 				Object item = sampleAdapter.getItem(position);
 				if(item instanceof Samples.Sample) {
 					Samples.Sample selectedSample = (Samples.Sample)(item);
-					mListener.onSampleSelected(selectedSample.uri, selectedSample.contentId, selectedSample.type);
+					mListener.onSampleSelected(selectedSample.uri,
+					                           selectedSample.contentId,
+					                           selectedSample.type);
 				}
 			}
 		});
@@ -102,7 +110,9 @@ class SampleChooserFragment extends Fragment {
 			mListener = (InteractionListener)(activity);
 		}
 		else {
-			throw new ClassCastException(String.format("Activity %s must implement %s interface!", activity.getClass().getSimpleName(), InteractionListener.class.getCanonicalName()));
+			throw new ClassCastException(String.format("Activity %s must implement %s interface!",
+			                                           activity.getClass().getSimpleName(),
+			                                           InteractionListener.class.getCanonicalName()));
 		}
 	}
 

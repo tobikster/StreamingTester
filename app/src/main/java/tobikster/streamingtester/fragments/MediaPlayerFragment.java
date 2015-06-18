@@ -21,7 +21,6 @@ import android.widget.Toast;
 import java.io.IOException;
 
 import tobikster.streamingtester.R;
-import tobikster.streamingtester.dialogs.MediaInfoDialog;
 import tobikster.streamingtester.model.VideoUri;
 
 public
@@ -36,7 +35,6 @@ class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPreparedList
 	SurfaceView mSurfaceView;
 	MediaPlayer mMediaPlayer;
 	MediaController mMediaController;
-	MediaInfoDialog mMediaInfoDialog;
 	MediaPlayer.TrackInfo[] mTrackInfos;
 	MediaMetadataRetriever mMediaMetadataRetriever;
 
@@ -147,29 +145,37 @@ class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPreparedList
 	@Override
 	public
 	void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		inflater.inflate(R.menu.media_player_fragment, menu);
+		super.onCreateOptionsMenu(menu, inflater);
+		inflater.inflate(R.menu.fragment_media_player, menu);
 	}
 
 	@Override
 	public
 	void onPrepareOptionsMenu(Menu menu) {
-		menu.findItem(R.id.action_show_media_info_dialog).setEnabled(mMediaPlayerPrepared);
+		super.onPrepareOptionsMenu(menu);
+		// menu.findItem(R.id.action_show_media_info_dialog).setEnabled(mMediaPlayerPrepared);
 	}
 
 	@Override
 	public
 	boolean onOptionsItemSelected(MenuItem item) {
-		boolean result;
+		boolean consume_event;
 		switch(item.getItemId()) {
 			case R.id.action_show_media_info_dialog:
 				showMediaInfoDialog();
-				result = true;
+				consume_event = true;
+				break;
+
+			case R.id.menu_item_loop_mode:
+				item.setChecked(!item.isChecked());
+				mMediaPlayer.setLooping(item.isChecked());
+				consume_event = true;
 				break;
 
 			default:
-				result = super.onOptionsItemSelected(item);
+				consume_event = super.onOptionsItemSelected(item);
 		}
-		return result;
+		return consume_event;
 	}
 
 	@Override
@@ -197,6 +203,7 @@ class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPreparedList
 		holder.setFixedSize(width, height);
 		mp.start();
 		mTrackInfos = mp.getTrackInfo();
+		mMediaPlayer.setLooping(true);
 		mMediaPlayerPrepared = true;
 	}
 

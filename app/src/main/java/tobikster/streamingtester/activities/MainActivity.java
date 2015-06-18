@@ -48,14 +48,14 @@ class MainActivity extends Activity implements View.OnClickListener {
 	@Override
 	public
 	boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.main_activity, menu);
+		getMenuInflater().inflate(R.menu.activity_main, menu);
 		return true;
 	}
 
 	@Override
 	public
 	boolean onOptionsItemSelected(MenuItem item) {
-		boolean result;
+		boolean consumeEvent;
 		switch(item.getItemId()) {
 			case R.id.menu_item_clear_battery_log:
 				if(removeBatteryLogFile()) {
@@ -64,12 +64,17 @@ class MainActivity extends Activity implements View.OnClickListener {
 				else {
 					Toast.makeText(this, "There is a problem with removing battery log file!", Toast.LENGTH_SHORT).show();
 				}
-				result = true;
+				consumeEvent = true;
+				break;
+
+			case R.id.menu_item_settings:
+				startActivity(new Intent(this, SettingsActivity.class));
+				consumeEvent = true;
 				break;
 			default:
-				result = super.onOptionsItemSelected(item);
+				consumeEvent = super.onOptionsItemSelected(item);
 		}
-		return result;
+		return consumeEvent;
 	}
 
 	private

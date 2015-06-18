@@ -99,7 +99,7 @@ class DebugTrackRenderer extends TrackRenderer implements Runnable {
 	private
 	String getQualityString() {
 		Format format = player.getVideoFormat();
-		return format == null ? "format unavailable" : String.format("fr: %.2f, br: %d, w: %d, h: %d", format.frameRate, format.bitrate, format.width, format.height);
+		return format == null ? "format unavailable" : String.format("%s, fr: %.2f, br: %d, w: %d, h: %d", format.codecs, format.frameRate, format.bitrate, format.width, format.height);
 	}
 
 	@Override

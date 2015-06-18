@@ -90,7 +90,7 @@ class HlsRendererBuilder implements DemoPlayer.RendererBuilder, ManifestCallback
 	public
 	void onSingleManifest(HlsPlaylist manifest) {
 		Handler mainHandler = player.getMainHandler();
-		DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+		DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter(mainHandler, player);
 
 		int[] variantIndices = null;
 		if(manifest instanceof HlsMasterPlaylist) {
