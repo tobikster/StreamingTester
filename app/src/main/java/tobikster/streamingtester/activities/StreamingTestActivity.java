@@ -8,7 +8,7 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 
 import tobikster.streamingtester.R;
-import tobikster.streamingtester.broadcastReceivers.BatteryStateReceiver;
+import tobikster.streamingtester.broadcastreceivers.BatteryStateReceiver;
 import tobikster.streamingtester.fragments.ExoPlayerFragment;
 import tobikster.streamingtester.fragments.MediaPlayerFragment;
 import tobikster.streamingtester.fragments.SampleChooserFragment;

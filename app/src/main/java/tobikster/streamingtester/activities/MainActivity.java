@@ -10,7 +10,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import tobikster.streamingtester.R;
-import tobikster.streamingtester.broadcastReceivers.BatteryStateReceiver;
+import tobikster.streamingtester.broadcastreceivers.BatteryStateReceiver;
 
 public
 class MainActivity extends Activity implements View.OnClickListener {

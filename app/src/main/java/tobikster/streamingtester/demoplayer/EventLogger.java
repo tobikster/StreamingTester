@@ -21,6 +21,7 @@ import android.util.Log;
 
 import com.google.android.exoplayer.ExoPlayer;
 import com.google.android.exoplayer.MediaCodecTrackRenderer.DecoderInitializationException;
+import com.google.android.exoplayer.TimeRange;
 import com.google.android.exoplayer.audio.AudioTrack;
 import com.google.android.exoplayer.chunk.Format;
 import com.google.android.exoplayer.util.VerboseLogUtil;
@@ -31,7 +32,6 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 import tobikster.streamingtester.demoplayer.player.DemoPlayer;
-import tobikster.streamingtester.utils.Counter;
 
 /**
  * Logs player events using {@link Log}.
@@ -50,6 +50,7 @@ class EventLogger implements DemoPlayer.Listener, DemoPlayer.InfoListener, DemoP
 
 	private long sessionStartTimeMs;
 	private long[] loadStartTimeMs;
+	private long[] seekRangeValuesUs;
 	File mOutputFile;
 
 	public
@@ -181,6 +182,14 @@ class EventLogger implements DemoPlayer.Listener, DemoPlayer.InfoListener, DemoP
 	public
 	void onDecoderInitialized(String decoderName, long elapsedRealtimeMs, long initializationDurationMs) {
 		Log.d(LOGCAT_TAG, "decoderInitialized [" + getSessionTimeString() + "]");
+	}
+
+	@Override
+	public
+	void onSeekRangeChanged(TimeRange seekRange) {
+		seekRangeValuesUs = seekRange.getCurrentBoundsUs(seekRangeValuesUs);
+		Log.d(LOGCAT_TAG, "seekRange [ " + seekRange.type + ", " + seekRangeValuesUs[0] + ", "
+				                  + seekRangeValuesUs[1] + "]");
 	}
 
 	private

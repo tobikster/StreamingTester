@@ -1,10 +1,7 @@
 package tobikster.streamingtester.utils;
 
 import android.content.Context;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.util.Log;
 
 import java.io.File;
@@ -21,12 +18,12 @@ class FileUtils {
 	public static
 	File getExternalStorageFile(Context context, String directoryType, String fileName) {
 		File result = null;
-		if (!isExternalStorageWritable()) {
+		if(!isExternalStorageWritable()) {
 			Log.e(LOGCAT_TAG, "External storage is unavailable for writing!");
 		}
 		else {
 			File outputDir = context.getExternalFilesDir(directoryType);
-			if (outputDir == null || (!outputDir.mkdirs() && !outputDir.isDirectory())) {
+			if(outputDir == null || (!outputDir.mkdirs() && !outputDir.isDirectory())) {
 				Log.e(LOGCAT_TAG, "Output folder doesn't exist and cannot be created!");
 			}
 			else {
