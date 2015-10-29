@@ -1,9 +1,8 @@
 package tobikster.streamingtester.fragments;
 
-import android.app.Activity;
-import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,21 +16,18 @@ import com.google.android.exoplayer.MediaCodecUtil;
 import com.google.android.exoplayer.util.MimeTypes;
 
 import tobikster.streamingtester.R;
-import tobikster.streamingtester.demoplayer.Samples;
+import tobikster.streamingtester.utils.Samples;
 
-public
-class SampleChooserFragment extends Fragment {
+public class SampleChooserFragment extends Fragment {
 	@SuppressWarnings("unused")
 	public static final String LOGCAT_TAG = "ExoPlayer";
 
 	private InteractionListener mListener;
 
-	public
-	SampleChooserFragment() {
+	public SampleChooserFragment() {
 	}
 
-	public static
-	SampleChooserFragment newInstance() {
+	public static SampleChooserFragment newInstance() {
 		SampleChooserFragment fragment = new SampleChooserFragment();
 		Bundle args = new Bundle();
 		fragment.setArguments(args);
@@ -39,20 +35,17 @@ class SampleChooserFragment extends Fragment {
 	}
 
 	@Override
-	public
-	void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 	}
 
 	@Override
-	public
-	View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		return inflater.inflate(R.layout.fragment_sample_chooser, container, false);
 	}
 
 	@Override
-	public
-	void onViewCreated(View view, Bundle savedInstanceState) {
+	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
 		ListView sampleList = (ListView)(view.findViewById(R.id.sample_list));
@@ -83,51 +76,41 @@ class SampleChooserFragment extends Fragment {
 		sampleList.setAdapter(sampleAdapter);
 		sampleList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
-			public
-			void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				Object item = sampleAdapter.getItem(position);
 				if(item instanceof Samples.Sample) {
 					Samples.Sample selectedSample = (Samples.Sample)(item);
-					mListener.onSampleSelected(selectedSample.uri,
-					                           selectedSample.contentId,
-					                           selectedSample.type);
+					mListener.onSampleSelected(selectedSample.uri, selectedSample.contentId, selectedSample.type);
 				}
 			}
 		});
 	}
 
 	@Override
-	public
-	void onAttach(Activity activity) {
-		super.onAttach(activity);
-		if(activity instanceof InteractionListener) {
-			mListener = (InteractionListener)(activity);
+	public void onAttach(Context context) {
+		super.onAttach(context);
+		if(context instanceof InteractionListener) {
+			mListener = (InteractionListener)(context);
 		}
 		else {
-			throw new ClassCastException(String.format("Activity %s must implement %s interface!",
-			                                           activity.getClass().getSimpleName(),
-			                                           InteractionListener.class.getCanonicalName()));
+			throw new ClassCastException(String.format("Activity %s must implement %s interface!", context.getClass().getSimpleName(), InteractionListener.class.getCanonicalName()));
 		}
 	}
 
 	@Override
-	public
-	void onDetach() {
+	public void onDetach() {
 		super.onDetach();
 		mListener = null;
 	}
 
-	private static
-	class SampleAdapter extends ArrayAdapter<Object> {
+	private static class SampleAdapter extends ArrayAdapter<Object> {
 
-		public
-		SampleAdapter(Context context) {
+		public SampleAdapter(Context context) {
 			super(context, 0);
 		}
 
 		@Override
-		public
-		View getView(int position, View convertView, ViewGroup parent) {
+		public View getView(int position, View convertView, ViewGroup parent) {
 			View view = convertView;
 			if(view == null) {
 				int layoutId = getItemViewType(position) == 1 ? android.R.layout.simple_list_item_1 : R.layout.sample_chooser_inline_header;
@@ -146,33 +129,28 @@ class SampleChooserFragment extends Fragment {
 		}
 
 		@Override
-		public
-		int getItemViewType(int position) {
+		public int getItemViewType(int position) {
 			return (getItem(position) instanceof Samples.Sample) ? 1 : 0;
 		}
 
 		@Override
-		public
-		int getViewTypeCount() {
+		public int getViewTypeCount() {
 			return 2;
 		}
 
 	}
 
-	private static
-	class Header {
+	private static class Header {
 
 		public final String name;
 
-		public
-		Header(String name) {
+		public Header(String name) {
 			this.name = name;
 		}
 
 	}
 
-	public
-	interface InteractionListener {
+	public interface InteractionListener {
 		void onSampleSelected(String contentUri, String contentId, int type);
 	}
 }

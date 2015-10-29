@@ -22,4 +22,5 @@
     <string name="info_battery_log_file_removed_successfully">Battery log file removed!</string>
     <string name="err_problem_with_removing_battery_log_file">There is a problem with removing battery log file!</string>
     <string name="menu_item_settings">Settings</string>
+    <string name="action_show_cpu_usage">Show CPU usage</string>
 </resources>

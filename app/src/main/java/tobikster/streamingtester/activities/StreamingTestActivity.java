@@ -1,11 +1,11 @@
 package tobikster.streamingtester.activities;
 
-import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 
 import tobikster.streamingtester.R;
 import tobikster.streamingtester.broadcastreceivers.BatteryStateReceiver;
@@ -14,8 +14,7 @@ import tobikster.streamingtester.fragments.MediaPlayerFragment;
 import tobikster.streamingtester.fragments.SampleChooserFragment;
 import tobikster.streamingtester.fragments.WebViewFragment;
 
-public
-class StreamingTestActivity extends Activity implements SampleChooserFragment.InteractionListener {
+public class StreamingTestActivity extends FragmentActivity implements SampleChooserFragment.InteractionListener {
 	@SuppressWarnings("unused")
 	public static final String LOGCAT_TAG = "StreamingTest";
 
@@ -30,8 +29,7 @@ class StreamingTestActivity extends Activity implements SampleChooserFragment.In
 	BatteryStateReceiver mBatteryStateReceiver;
 
 	@Override
-	protected
-	void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_streaming_test);
 
@@ -63,30 +61,26 @@ class StreamingTestActivity extends Activity implements SampleChooserFragment.In
 	}
 
 	@Override
-	protected
-	void onStart() {
+	protected void onStart() {
 		super.onStart();
 		mBatteryStateReceiver = new BatteryStateReceiver();
 	}
 
 	@Override
-	protected
-	void onResume() {
+	protected void onResume() {
 		super.onResume();
 		IntentFilter batteryStateIntentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
 		registerReceiver(mBatteryStateReceiver, batteryStateIntentFilter);
 	}
 
 	@Override
-	protected
-	void onPause() {
+	protected void onPause() {
 		unregisterReceiver(mBatteryStateReceiver);
 		super.onPause();
 	}
 
 	@Override
-	public
-	void onSampleSelected(String contentUri, String contentId, int type) {
+	public void onSampleSelected(String contentUri, String contentId, int type) {
 		switch(mTestType) {
 			case TEST_TYPE_EXO_PLAYER:
 				Fragment exoPlayerFragment = ExoPlayerFragment.newInstance(contentUri, contentId, type);
@@ -100,14 +94,12 @@ class StreamingTestActivity extends Activity implements SampleChooserFragment.In
 		}
 	}
 
-	private
-	void replaceFragment(Fragment fragment) {
+	private void replaceFragment(Fragment fragment) {
 		replaceFragment(fragment, true);
 	}
 
-	private
-	void replaceFragment(Fragment fragment, boolean addToBackStack) {
-		FragmentTransaction transaction = getFragmentManager().beginTransaction();
+	private void replaceFragment(Fragment fragment, boolean addToBackStack) {
+		final FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 		transaction.replace(R.id.fragment_container, fragment);
 		if(addToBackStack) {
 			transaction.addToBackStack(null);

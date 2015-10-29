@@ -17,8 +17,7 @@ import android.widget.Toast;
 
 import tobikster.streamingtester.R;
 
-public
-class MediaInfoDialog extends DialogFragment {
+public class MediaInfoDialog extends DialogFragment {
 	@SuppressWarnings("unused")
 	public static final String LOGCAT_TAG = "MediaInfoDialog";
 
@@ -28,8 +27,7 @@ class MediaInfoDialog extends DialogFragment {
 	MediaInfoDialogListener mMediaInfoDialogListener;
 	int mVideoBitrate;
 
-	public static
-	MediaInfoDialog newInstance(MediaPlayer.TrackInfo[] infos) {
+	public static MediaInfoDialog newInstance(MediaPlayer.TrackInfo[] infos) {
 		MediaInfoDialog dialog = new MediaInfoDialog();
 		Bundle args = new Bundle();
 		MediaFormat videoFormat = null;
@@ -61,8 +59,7 @@ class MediaInfoDialog extends DialogFragment {
 		return dialog;
 	}
 
-	public static
-	MediaInfoDialog newInstance(int videoBitrate) {
+	public static MediaInfoDialog newInstance(int videoBitrate) {
 		MediaInfoDialog dialog = new MediaInfoDialog();
 		Bundle args = new Bundle();
 		args.putInt(ARG_VIDEO_BITRATE, videoBitrate);
@@ -71,8 +68,7 @@ class MediaInfoDialog extends DialogFragment {
 	}
 
 	@Override
-	public
-	Dialog onCreateDialog(Bundle savedInstanceState) {
+	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		mContext = getActivity();
 		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 		Bundle args = getArguments();
@@ -86,22 +82,19 @@ class MediaInfoDialog extends DialogFragment {
 
 		LayoutInflater inflater = getActivity().getLayoutInflater();
 		View root = inflater.inflate(R.layout.dialog_media_info, null);
-		builder.setView(root)
-		       .setPositiveButton(R.string.action_ok, new DialogInterface.OnClickListener() {
-			       @Override
-			       public
-			       void onClick(DialogInterface dialog, int which) {
-				       if(mMediaInfoDialogListener != null) {
-					       mMediaInfoDialogListener.onOKButtonClicked();
-				       }
-			       }
-		       });
+		builder.setView(root).setPositiveButton(R.string.action_ok, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				if(mMediaInfoDialogListener != null) {
+					mMediaInfoDialogListener.onOKButtonClicked();
+				}
+			}
+		});
 		return builder.create();
 	}
 
 	@Override
-	public
-	void onAttach(Activity activity) {
+	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		try {
 			mMediaInfoDialogListener = (MediaInfoDialogListener)(activity);
@@ -112,14 +105,12 @@ class MediaInfoDialog extends DialogFragment {
 	}
 
 	@Override
-	public
-	void onDetach() {
+	public void onDetach() {
 		super.onDetach();
 		mMediaInfoDialogListener = null;
 	}
 
-	public
-	interface MediaInfoDialogListener {
+	public interface MediaInfoDialogListener {
 		void onOKButtonClicked();
 	}
 }
