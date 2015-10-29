@@ -1,8 +1,8 @@
 package tobikster.streamingtester.activities;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,8 +12,7 @@ import android.widget.Toast;
 import tobikster.streamingtester.R;
 import tobikster.streamingtester.broadcastreceivers.BatteryStateReceiver;
 
-public
-class MainActivity extends Activity implements View.OnClickListener {
+public class MainActivity extends FragmentActivity implements View.OnClickListener {
 	@SuppressWarnings("unused")
 	public static final String LOGCAT_TAG = "MainActivity";
 
@@ -22,8 +21,7 @@ class MainActivity extends Activity implements View.OnClickListener {
 	Button mExoPlayerYestButton;
 
 	@Override
-	protected
-	void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
@@ -37,8 +35,7 @@ class MainActivity extends Activity implements View.OnClickListener {
 	}
 
 	@Override
-	protected
-	void onDestroy() {
+	protected void onDestroy() {
 		super.onDestroy();
 		mMediaPlayerTestButton.setOnClickListener(null);
 		mWebViewTestButton.setOnClickListener(null);
@@ -46,15 +43,13 @@ class MainActivity extends Activity implements View.OnClickListener {
 	}
 
 	@Override
-	public
-	boolean onCreateOptionsMenu(Menu menu) {
+	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.activity_main, menu);
 		return true;
 	}
 
 	@Override
-	public
-	boolean onOptionsItemSelected(MenuItem item) {
+	public boolean onOptionsItemSelected(MenuItem item) {
 		boolean consumeEvent;
 		switch(item.getItemId()) {
 			case R.id.menu_item_clear_battery_log:
@@ -66,25 +61,18 @@ class MainActivity extends Activity implements View.OnClickListener {
 				}
 				consumeEvent = true;
 				break;
-
-			case R.id.menu_item_settings:
-				startActivity(new Intent(this, SettingsActivity.class));
-				consumeEvent = true;
-				break;
 			default:
 				consumeEvent = super.onOptionsItemSelected(item);
 		}
 		return consumeEvent;
 	}
 
-	private
-	boolean removeBatteryLogFile() {
+	private boolean removeBatteryLogFile() {
 		return BatteryStateReceiver.removeBatteryLogFile(this);
 	}
 
 	@Override
-	public
-	void onClick(View v) {
+	public void onClick(View v) {
 		Intent startTestActivityIntent = new Intent(this, StreamingTestActivity.class);
 		switch(v.getId()) {
 			case R.id.media_player_test_button:

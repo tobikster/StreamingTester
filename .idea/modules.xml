@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/ExoPlayer/ExoPlayer.iml" filepath="$PROJECT_DIR$/ExoPlayer/ExoPlayer.iml" />
       <module fileurl="file://$PROJECT_DIR$/StreamingTester.iml" filepath="$PROJECT_DIR$/StreamingTester.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
