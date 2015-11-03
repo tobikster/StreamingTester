@@ -26,6 +26,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -153,6 +154,7 @@ public class ExoPlayerFragment extends Fragment implements SurfaceHolder.Callbac
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		setHasOptionsMenu(true);
 		super.onCreate(savedInstanceState);
 		Bundle args = getArguments();
 		if(args != null) {
@@ -165,7 +167,6 @@ public class ExoPlayerFragment extends Fragment implements SurfaceHolder.Callbac
 	@Nullable
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		setHasOptionsMenu(true);
 		return inflater.inflate(R.layout.fragment_exo_player, container, false);
 	}
 
@@ -260,6 +261,28 @@ public class ExoPlayerFragment extends Fragment implements SurfaceHolder.Callbac
 
 	// OnClickListener methods
 
+
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		inflater.inflate(R.menu.fragment_exo_player, menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		boolean eventConsumed;
+		switch(item.getItemId()) {
+			case R.id.menu_item_loop_mode:
+				item.setChecked(!item.isChecked());
+				mPlayer.setLoopModeEnabled(item.isChecked());
+				eventConsumed = true;
+				break;
+
+			default:
+				eventConsumed = super.onOptionsItemSelected(item);
+		}
+		return eventConsumed;
+	}
+
 	@Override
 	public void onClick(View view) {
 		if(view == mRetryButton) {
@@ -336,6 +359,7 @@ public class ExoPlayerFragment extends Fragment implements SurfaceHolder.Callbac
 		}
 		mPlayer.setSurface(mSurfaceView.getHolder().getSurface());
 		mPlayer.setPlayWhenReady(playWhenReady);
+		mPlayer.setLoopModeEnabled(true);
 	}
 
 	private void releasePlayer() {
@@ -354,7 +378,7 @@ public class ExoPlayerFragment extends Fragment implements SurfaceHolder.Callbac
 
 	@Override
 	public void onStateChanged(boolean playWhenReady, int playbackState) {
-		if(playbackState == ExoPlayer.STATE_ENDED) {
+		if(playbackState == ExoPlayer.STATE_ENDED && !mPlayer.isLoopModeEnabled()) {
 			showControls();
 		}
 		String text = "playWhenReady=" + playWhenReady + ", playbackState=";

@@ -2,10 +2,17 @@ package tobikster.streamingtester.activities;
 
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
+import android.view.Menu;
+import android.view.MenuItem;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 import tobikster.streamingtester.R;
 import tobikster.streamingtester.broadcastreceivers.BatteryStateReceiver;
@@ -40,7 +47,7 @@ public class StreamingTestActivity extends FragmentActivity implements SampleCho
 		mTestType = intent.getIntExtra(EXTRA_TEST_TYPE, -1);
 
 		if(mTestType != -1) {
-			Fragment fragment;
+			Fragment fragment = null;
 			switch(mTestType) {
 				case TEST_TYPE_EXO_PLAYER:
 				case TEST_TYPE_MEDIA_PLAYER:
@@ -50,9 +57,6 @@ public class StreamingTestActivity extends FragmentActivity implements SampleCho
 				case TEST_TYPE_WEB_VIEW:
 					fragment = WebViewFragment.newInstance();
 					break;
-
-				default:
-					fragment = null;
 			}
 			if(fragment != null) {
 				replaceFragment(fragment, false);
@@ -77,6 +81,26 @@ public class StreamingTestActivity extends FragmentActivity implements SampleCho
 	protected void onPause() {
 		unregisterReceiver(mBatteryStateReceiver);
 		super.onPause();
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.activity_streaming_tester, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		boolean eventConsumed;
+		switch(item.getItemId()) {
+			case R.id.menu_item_toggle_cpu_monitoring:
+				eventConsumed = true;
+				break;
+
+			default:
+				eventConsumed = super.onOptionsItemSelected(item);
+		}
+		return eventConsumed;
 	}
 
 	@Override
@@ -105,5 +129,21 @@ public class StreamingTestActivity extends FragmentActivity implements SampleCho
 			transaction.addToBackStack(null);
 		}
 		transaction.commit();
+	}
+
+	private static class CPUMonitoringTask extends AsyncTask<Integer, Void, Void> {
+
+		@Override
+		protected Void doInBackground(Integer... params) {
+			int refreshInterval = params[0];
+			try {
+				Process process = Runtime.getRuntime().exec(String.format("top -d %d", refreshInterval));
+				BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+			}
+			catch(IOException e) {
+				e.printStackTrace();
+			}
+			return null;
+		}
 	}
 }
