@@ -50,8 +50,10 @@ public class StreamingTestActivity extends FragmentActivity implements SampleCho
 			Fragment fragment = null;
 			switch(mTestType) {
 				case TEST_TYPE_EXO_PLAYER:
+					fragment = SampleChooserFragment.newInstance(SampleChooserFragment.TEST_TYPE_EXO_PLAYER);
+					break;
 				case TEST_TYPE_MEDIA_PLAYER:
-					fragment = SampleChooserFragment.newInstance();
+					fragment = SampleChooserFragment.newInstance(SampleChooserFragment.TEST_TYPE_MEDIA_PLAYER);
 					break;
 
 				case TEST_TYPE_WEB_VIEW:

@@ -21,15 +21,21 @@ import tobikster.streamingtester.utils.Samples;
 public class SampleChooserFragment extends Fragment {
 	@SuppressWarnings("unused")
 	public static final String LOGCAT_TAG = "ExoPlayer";
+	public static final int TEST_TYPE_EXO_PLAYER = 1;
+	public static final int TEST_TYPE_MEDIA_PLAYER = 2;
+
+	private static final String ARG_TEST_TYPE = "test_type";
 
 	private InteractionListener mListener;
+	private int mTestType;
 
 	public SampleChooserFragment() {
 	}
 
-	public static SampleChooserFragment newInstance() {
+	public static SampleChooserFragment newInstance(int testType) {
 		SampleChooserFragment fragment = new SampleChooserFragment();
 		Bundle args = new Bundle();
+		args.putInt(ARG_TEST_TYPE, testType);
 		fragment.setArguments(args);
 		return fragment;
 	}
@@ -37,6 +43,10 @@ public class SampleChooserFragment extends Fragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Bundle args = getArguments();
+		if(args != null) {
+			mTestType = args.getInt(ARG_TEST_TYPE, 0);
+		}
 	}
 
 	@Override
@@ -51,20 +61,24 @@ public class SampleChooserFragment extends Fragment {
 		ListView sampleList = (ListView)(view.findViewById(R.id.sample_list));
 		final SampleAdapter sampleAdapter = new SampleAdapter(getActivity());
 
-		sampleAdapter.add(new Header("YouTube DASH"));
-		sampleAdapter.addAll((Object[])Samples.YOUTUBE_DASH_MP4);
-		sampleAdapter.add(new Header("Widevine GTS DASH"));
-		sampleAdapter.addAll((Object[])Samples.WIDEVINE_GTS);
-		sampleAdapter.add(new Header("SmoothStreaming"));
-		sampleAdapter.addAll((Object[])Samples.SMOOTHSTREAMING);
-		sampleAdapter.add(new Header("HLS"));
-		sampleAdapter.addAll((Object[])Samples.HLS);
-		sampleAdapter.add(new Header("Misc"));
-		sampleAdapter.addAll((Object[])Samples.MISC);
+		if(mTestType == TEST_TYPE_EXO_PLAYER) {
+			sampleAdapter.add(new Header("YouTube DASH"));
+			sampleAdapter.addAll((Object[])Samples.YOUTUBE_DASH_MP4);
+			sampleAdapter.add(new Header("Widevine GTS DASH"));
+			sampleAdapter.addAll((Object[])Samples.WIDEVINE_GTS);
+			sampleAdapter.add(new Header("SmoothStreaming"));
+			sampleAdapter.addAll((Object[])Samples.SMOOTHSTREAMING);
+		}
+		if(mTestType == TEST_TYPE_EXO_PLAYER || mTestType == TEST_TYPE_MEDIA_PLAYER) {
+			sampleAdapter.add(new Header("HLS"));
+			sampleAdapter.addAll((Object[])Samples.HLS);
+			sampleAdapter.add(new Header("Misc"));
+			sampleAdapter.addAll((Object[])Samples.MISC);
+		}
 
 		// Add WebM samples if the device has a VP9 decoder.
 		try {
-			if(MediaCodecUtil.getDecoderInfo(MimeTypes.VIDEO_VP9, false) != null) {
+			if(mTestType == TEST_TYPE_EXO_PLAYER && MediaCodecUtil.getDecoderInfo(MimeTypes.VIDEO_VP9, false) != null) {
 				sampleAdapter.add(new Header("YouTube WebM DASH (Experimental)"));
 				sampleAdapter.addAll((Object[])Samples.YOUTUBE_DASH_WEBM);
 			}

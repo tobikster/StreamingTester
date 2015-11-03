@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -36,11 +37,12 @@ public class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPrepa
 
 	public static final String TEST_VIDEO_URL = "https://archive.org/download/ksnn_compilation_master_the_internet/ksnn_compilation_master_the_internet_512kb.mp4";
 
-	SurfaceView mSurfaceView;
-	MediaPlayer mMediaPlayer;
-	MediaController mMediaController;
-	MediaPlayer.TrackInfo[] mTrackInfos;
-	MediaMetadataRetriever mMediaMetadataRetriever;
+	private View mRootView;
+	private SurfaceView mSurfaceView;
+	private MediaPlayer mMediaPlayer;
+	private MediaController mMediaController;
+	private MediaPlayer.TrackInfo[] mTrackInfos;
+	private MediaMetadataRetriever mMediaMetadataRetriever;
 
 	VideoUri mVideoUri;
 
@@ -113,6 +115,24 @@ public class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPrepa
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+
+		mRootView = view.findViewById(R.id.root);
+		mRootView.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				switch(event.getAction()) {
+					case MotionEvent.ACTION_DOWN:
+						toggleControlsVisibility();
+						break;
+
+					case MotionEvent.ACTION_UP:
+						mRootView.performClick();
+						break;
+				}
+				return true;
+			}
+		});
+
 		mSurfaceView = (SurfaceView)(view.findViewById(R.id.surface_view));
 
 		SurfaceHolder surfaceHolder = mSurfaceView.getHolder();
@@ -129,6 +149,19 @@ public class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPrepa
 				return false;
 			}
 		});
+	}
+
+	private void toggleControlsVisibility() {
+		if(mMediaController.isShowing()) {
+			mMediaController.hide();
+		}
+		else {
+			showControls();
+		}
+	}
+
+	private void showControls() {
+		mMediaController.show(0);
 	}
 
 	@Override
