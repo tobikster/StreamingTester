@@ -6,7 +6,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,13 +28,16 @@ public class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPrepa
                                                              MediaController.MediaPlayerControl,
                                                              MediaPlayer.OnBufferingUpdateListener,
                                                              MediaPlayer.OnInfoListener,
-                                                             MediaPlayer.OnVideoSizeChangedListener {
+                                                             MediaPlayer.OnVideoSizeChangedListener,
+                                                             MediaPlayer.OnErrorListener {
+
 	public static final String LOGCAT_TAG = "MediaPlayerFragment";
 	public static final String ARG_VIDEO_NAME = "video_name";
 	public static final String ARG_VIDEO_URI = "video_url";
 	public static final String ARG_VIDEO_REMOTE = "video_is_remote";
 
 	public static final String TEST_VIDEO_URL = "https://archive.org/download/ksnn_compilation_master_the_internet/ksnn_compilation_master_the_internet_512kb.mp4";
+	private static final String TEST_RTSP_URL = "rtsp://184.72.239.149/vod/mp4:BigBuckBunny_115k.mov";
 
 	private View mRootView;
 	private SurfaceView mSurfaceView;
@@ -53,16 +55,6 @@ public class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPrepa
 		mVideoUri = null;
 		mMediaPlayerPrepared = false;
 		mBufferPercentage = 0;
-	}
-
-	public static MediaPlayerFragment newInstance(VideoUri videoUri) {
-		MediaPlayerFragment instance = new MediaPlayerFragment();
-		Bundle args = new Bundle();
-		args.putString(ARG_VIDEO_NAME, videoUri.getName());
-		args.putString(ARG_VIDEO_URI, videoUri.getUri());
-		args.putBoolean(ARG_VIDEO_REMOTE, videoUri.isRemote());
-		instance.setArguments(args);
-		return instance;
 	}
 
 	public static MediaPlayerFragment newInstance(String uri) {
@@ -91,15 +83,17 @@ public class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPrepa
 		mMediaPlayer.setOnPreparedListener(this);
 		mMediaPlayer.setOnBufferingUpdateListener(this);
 		mMediaPlayer.setOnInfoListener(this);
+		mMediaPlayer.setOnErrorListener(this);
 
 		mMediaMetadataRetriever = new MediaMetadataRetriever();
 
 		try {
 			if(mVideoUri != null) {
-				Log.d(LOGCAT_TAG, String.format("Trying to play from URI: %s", mVideoUri.getUri()));
 				Uri fileUri = Uri.parse(mVideoUri.getUri());
 				mMediaPlayer.setDataSource(getActivity(), fileUri);
 				mMediaPlayer.prepareAsync();
+//				mMediaPlayer.setDataSource(getActivity(), Uri.parse(TEST_RTSP_URL));
+//				mMediaPlayer.prepareAsync();
 			}
 		}
 		catch(IOException e) {
@@ -321,5 +315,11 @@ public class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPrepa
 
 	@Override
 	public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
+	}
+
+	@Override
+	public boolean onError(MediaPlayer mp, int what, int extra) {
+		Log.d(LOGCAT_TAG, String.format("Error: %d, %d", what, extra));
+		return true;
 	}
 }

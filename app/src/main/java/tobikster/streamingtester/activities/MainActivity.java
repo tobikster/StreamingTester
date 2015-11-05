@@ -1,8 +1,12 @@
 package tobikster.streamingtester.activities;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,6 +19,10 @@ import tobikster.streamingtester.broadcastreceivers.BatteryStateReceiver;
 public class MainActivity extends FragmentActivity implements View.OnClickListener {
 	@SuppressWarnings("unused")
 	public static final String LOGCAT_TAG = "MainActivity";
+	public static final int TEST_TYPE_UNKNOWN = 0;
+	public static final int TEST_TYPE_MEDIA_PLAYER = 1;
+	public static final int TEST_TYPE_WEB_VIEW = 2;
+	public static final int TEST_TYPE_EXOPLAYER = 3;
 
 	Button mMediaPlayerTestButton;
 	Button mWebViewTestButton;
@@ -73,20 +81,25 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
 	@Override
 	public void onClick(View v) {
-		Intent startTestActivityIntent = new Intent(this, StreamingTestActivity.class);
-		switch(v.getId()) {
-			case R.id.media_player_test_button:
-				startTestActivityIntent.putExtra(StreamingTestActivity.EXTRA_TEST_TYPE, StreamingTestActivity.TEST_TYPE_MEDIA_PLAYER);
-				break;
-
-			case R.id.web_view_test_button:
-				startTestActivityIntent.putExtra(StreamingTestActivity.EXTRA_TEST_TYPE, StreamingTestActivity.TEST_TYPE_WEB_VIEW);
-				break;
-
-			case R.id.exo_player_test_button:
-				startTestActivityIntent.putExtra(StreamingTestActivity.EXTRA_TEST_TYPE, StreamingTestActivity.TEST_TYPE_EXO_PLAYER);
-				break;
+		int testType = TEST_TYPE_UNKNOWN;
+		if(v == mMediaPlayerTestButton) {
+			testType = TEST_TYPE_MEDIA_PLAYER;
+//			startTestActivityIntent.putExtra(StreamingTestActivity.EXTRA_TEST_TYPE, SamplesListActivity.TEST_TYPE_MEDIA_PLAYER);
 		}
+		else if(v == mWebViewTestButton) {
+			testType = TEST_TYPE_WEB_VIEW;
+//			startTestActivityIntent.putExtra(StreamingTestActivity.EXTRA_TEST_TYPE, SamplesListActivity.TEST_TYPE_WEB_VIEW);
+		}
+		else if(v == mExoPlayerYestButton) {
+			testType = TEST_TYPE_EXOPLAYER;
+//			startTestActivityIntent.putExtra(StreamingTestActivity.EXTRA_TEST_TYPE, SamplesListActivity.TEST_TYPE_EXOPLAYER);
+		}
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+//		getPreferences(Context.MODE_PRIVATE);
+		SharedPreferences.Editor editor = preferences.edit();
+		editor.putInt(getString(R.string.pref_test_type), testType);
+		editor.apply();
+		Intent startTestActivityIntent = new Intent(this, SamplesListActivity.class);
 		startActivity(startTestActivityIntent);
 	}
 }

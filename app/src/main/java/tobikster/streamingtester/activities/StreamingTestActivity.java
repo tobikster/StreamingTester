@@ -2,8 +2,10 @@ package tobikster.streamingtester.activities;
 
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
@@ -18,18 +20,14 @@ import tobikster.streamingtester.R;
 import tobikster.streamingtester.broadcastreceivers.BatteryStateReceiver;
 import tobikster.streamingtester.fragments.ExoPlayerFragment;
 import tobikster.streamingtester.fragments.MediaPlayerFragment;
-import tobikster.streamingtester.fragments.SampleChooserFragment;
 import tobikster.streamingtester.fragments.WebViewFragment;
 
-public class StreamingTestActivity extends FragmentActivity implements SampleChooserFragment.InteractionListener {
+public class StreamingTestActivity extends FragmentActivity {
 	@SuppressWarnings("unused")
 	public static final String LOGCAT_TAG = "StreamingTest";
-
-	public static final String EXTRA_TEST_TYPE = "test_type";
-
-	public static final int TEST_TYPE_EXO_PLAYER = 0;
-	public static final int TEST_TYPE_WEB_VIEW = 1;
-	public static final int TEST_TYPE_MEDIA_PLAYER = 2;
+	public static final String EXTRA_CONTENT_ID = "extra_content_id";
+	public static final String EXTRA_CONTENT_URI = "extra_content_uri";
+	public static final String EXTRA_CONTENT_TYPE = "extra_content_type";
 
 	private int mTestType;
 
@@ -42,21 +40,27 @@ public class StreamingTestActivity extends FragmentActivity implements SampleCho
 
 		getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		mTestType = preferences.getInt(getString(R.string.pref_test_type), MainActivity.TEST_TYPE_UNKNOWN);
 
 		Intent intent = getIntent();
-		mTestType = intent.getIntExtra(EXTRA_TEST_TYPE, -1);
 
-		if(mTestType != -1) {
+		if(mTestType != MainActivity.TEST_TYPE_UNKNOWN) {
 			Fragment fragment = null;
+
+			String contentId = intent.getStringExtra(EXTRA_CONTENT_ID);
+			String contentUri = intent.getStringExtra(EXTRA_CONTENT_URI);
+			int contentType = intent.getIntExtra(EXTRA_CONTENT_TYPE, ExoPlayerFragment.TYPE_OTHER);
+
 			switch(mTestType) {
-				case TEST_TYPE_EXO_PLAYER:
-					fragment = SampleChooserFragment.newInstance(SampleChooserFragment.TEST_TYPE_EXO_PLAYER);
+				case MainActivity.TEST_TYPE_EXOPLAYER:
+					fragment = ExoPlayerFragment.newInstance(contentUri, contentId, contentType);
 					break;
-				case TEST_TYPE_MEDIA_PLAYER:
-					fragment = SampleChooserFragment.newInstance(SampleChooserFragment.TEST_TYPE_MEDIA_PLAYER);
+				case MainActivity.TEST_TYPE_MEDIA_PLAYER:
+					fragment = MediaPlayerFragment.newInstance(contentUri);
 					break;
 
-				case TEST_TYPE_WEB_VIEW:
+				case MainActivity.TEST_TYPE_WEB_VIEW:
 					fragment = WebViewFragment.newInstance();
 					break;
 			}
@@ -103,25 +107,6 @@ public class StreamingTestActivity extends FragmentActivity implements SampleCho
 				eventConsumed = super.onOptionsItemSelected(item);
 		}
 		return eventConsumed;
-	}
-
-	@Override
-	public void onSampleSelected(String contentUri, String contentId, int type) {
-		switch(mTestType) {
-			case TEST_TYPE_EXO_PLAYER:
-				Fragment exoPlayerFragment = ExoPlayerFragment.newInstance(contentUri, contentId, type);
-				replaceFragment(exoPlayerFragment);
-				break;
-
-			case TEST_TYPE_MEDIA_PLAYER:
-				Fragment mediaPlayerFragment = MediaPlayerFragment.newInstance(contentUri);
-				replaceFragment(mediaPlayerFragment);
-				break;
-		}
-	}
-
-	private void replaceFragment(Fragment fragment) {
-		replaceFragment(fragment, true);
 	}
 
 	private void replaceFragment(Fragment fragment, boolean addToBackStack) {
