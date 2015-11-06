@@ -1,7 +1,9 @@
 package tobikster.streamingtester.fragments;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -11,13 +13,14 @@ import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.widget.Toast;
 
+import java.lang.reflect.InvocationTargetException;
+
 import tobikster.streamingtester.R;
 
 
 public class WebViewFragment extends Fragment {
 	@SuppressWarnings("unused")
 	public static final String LOGCAT_TAG = "WebViewFragment";
-	private static final String BASE_URL = "file:///android_asset/html/";
 	private static final String ARG_URL = "url";
 
 	private WebView mWebView;
@@ -39,7 +42,7 @@ public class WebViewFragment extends Fragment {
 		super.onCreate(savedInstanceState);
 		Bundle args = getArguments();
 		if(args != null) {
-			mUrl = BASE_URL + args.getString(ARG_URL, "");
+			mUrl = args.getString(ARG_URL, "");
 		}
 	}
 
@@ -57,6 +60,12 @@ public class WebViewFragment extends Fragment {
 		mWebView.getSettings().setJavaScriptEnabled(true);
 		mWebView.addJavascriptInterface(new VideoJavaScriptInterface(), "Android");
 		mWebView.loadUrl(mUrl);
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		mWebView.onPause();
 	}
 
 	protected class VideoJavaScriptInterface {

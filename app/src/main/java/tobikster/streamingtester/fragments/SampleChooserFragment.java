@@ -16,6 +16,8 @@ import android.widget.TextView;
 import com.google.android.exoplayer.MediaCodecUtil;
 import com.google.android.exoplayer.util.MimeTypes;
 
+import java.util.Objects;
+
 import tobikster.streamingtester.R;
 import tobikster.streamingtester.activities.MainActivity;
 import tobikster.streamingtester.activities.StreamingTestActivity;
@@ -62,35 +64,46 @@ public class SampleChooserFragment extends Fragment {
 		ListView sampleList = (ListView)(view.findViewById(R.id.sample_list));
 		final SampleAdapter sampleAdapter = new SampleAdapter(getActivity());
 
-		if(mTestType == SettingsFragment.TEST_TYPE_EXOPLAYER) {
-			sampleAdapter.add(new Header("YouTube DASH"));
-			sampleAdapter.addAll((Object[])Samples.YOUTUBE_DASH_MP4);
-			sampleAdapter.add(new Header("Widevine GTS DASH"));
-			sampleAdapter.addAll((Object[])Samples.WIDEVINE_GTS);
-			sampleAdapter.add(new Header("SmoothStreaming"));
-			sampleAdapter.addAll((Object[])Samples.SMOOTHSTREAMING);
-		}
-		if(mTestType == SettingsFragment.TEST_TYPE_EXOPLAYER || mTestType == SettingsFragment.TEST_TYPE_MEDIAPLAYER) {
-			sampleAdapter.add(new Header("HLS"));
-			sampleAdapter.addAll((Object[])Samples.HLS);
-			sampleAdapter.add(new Header("Misc"));
-			sampleAdapter.addAll((Object[])Samples.MISC);
-		}
+		switch(mTestType) {
+			case SettingsFragment.TEST_TYPE_EXOPLAYER:
+				sampleAdapter.add(new Header("YouTube DASH"));
+				sampleAdapter.addAll((Object[])Samples.YOUTUBE_DASH_MP4);
+				sampleAdapter.add(new Header("Widevine GTS DASH"));
+				sampleAdapter.addAll((Object[])Samples.WIDEVINE_GTS);
+				sampleAdapter.add(new Header("SmoothStreaming"));
+				sampleAdapter.addAll((Object[])Samples.SMOOTHSTREAMING);
+				sampleAdapter.add(new Header("HLS"));
+				sampleAdapter.addAll((Object[])Samples.HLS);
+				sampleAdapter.add(new Header("Misc"));
+				sampleAdapter.addAll((Object[])Samples.MISC);
+				// Add WebM samples if the device has a VP9 decoder.
+				try {
+					if(MediaCodecUtil.getDecoderInfo(MimeTypes.VIDEO_VP9, false) != null) {
+						sampleAdapter.add(new Header("YouTube WebM DASH (Experimental)"));
+						sampleAdapter.addAll((Object[])Samples.YOUTUBE_DASH_WEBM);
+					}
+				}
+				catch(MediaCodecUtil.DecoderQueryException e) {
+					Log.e(LOGCAT_TAG, "Failed to query vp9 decoder", e);
+				}
+				break;
 
-		// Add WebM samples if the device has a VP9 decoder.
-		try {
-			if(mTestType == SettingsFragment.TEST_TYPE_EXOPLAYER && MediaCodecUtil.getDecoderInfo(MimeTypes.VIDEO_VP9, false) != null) {
-				sampleAdapter.add(new Header("YouTube WebM DASH (Experimental)"));
-				sampleAdapter.addAll((Object[])Samples.YOUTUBE_DASH_WEBM);
-			}
-		}
-		catch(MediaCodecUtil.DecoderQueryException e) {
-			Log.e(LOGCAT_TAG, "Failed to query vp9 decoder", e);
-		}
+			case SettingsFragment.TEST_TYPE_MEDIAPLAYER:
+				sampleAdapter.add(new Header("HLS"));
+				sampleAdapter.addAll((Object[])Samples.HLS);
+				sampleAdapter.add(new Header("Misc"));
+				sampleAdapter.addAll((Object[])Samples.MISC);
+				break;
 
-		if(mTestType == SettingsFragment.TEST_TYPE_WEBVIEW) {
-			sampleAdapter.add(new Header("WEB"));
-			sampleAdapter.addAll((Object[])Samples.WEB);
+			case SettingsFragment.TEST_TYPE_WEBVIEW:
+				sampleAdapter.add(new Header("WEB MISC"));
+				sampleAdapter.addAll((Object[])Samples.WEB_MISC);
+				sampleAdapter.add(new Header("WEB HLS"));
+				sampleAdapter.addAll((Object[])Samples.WEB_HLS);
+				sampleAdapter.add(new Header("WEB SS"));
+				sampleAdapter.addAll((Object[])Samples.WEB_SS);
+				break;
+
 		}
 
 		sampleList.setAdapter(sampleAdapter);
