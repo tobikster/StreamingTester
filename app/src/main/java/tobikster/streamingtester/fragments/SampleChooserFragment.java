@@ -48,11 +48,6 @@ public class SampleChooserFragment extends Fragment {
 		if(args != null) {
 			mTestType = args.getInt(ARG_TEST_TYPE, SettingsFragment.TEST_TYPE_UNKNOWN);
 		}
-		//TODO: Replace after WebView test parametrized
-		if(mTestType == SettingsFragment.TEST_TYPE_WEBVIEW) {
-			Intent startWebViewTestActivityIntent = new Intent(getActivity(), StreamingTestActivity.class);
-			startActivity(startWebViewTestActivityIntent);
-		}
 	}
 
 	@Override

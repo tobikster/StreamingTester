@@ -84,7 +84,9 @@ public class Samples {
 			                                                 new Sample("Google Glass (WebM Video with Vorbis Audio)", "http://demos.webmproject.org/exoplayer/glass_vp9_vorbis.webm", ExoPlayerFragment.TYPE_OTHER),
 	};
 
-	public static final Sample[] WEB = new Sample[] {};
+	public static final Sample[] WEB = new Sample[] {
+															new Sample("WebView test 1", "video_1/bunny.html", ExoPlayerFragment.TYPE_OTHER),
+	};
 
 	private Samples() {
 	}

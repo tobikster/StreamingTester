@@ -17,17 +17,30 @@ import tobikster.streamingtester.R;
 public class WebViewFragment extends Fragment {
 	@SuppressWarnings("unused")
 	public static final String LOGCAT_TAG = "WebViewFragment";
+	private static final String BASE_URL = "file:///android_asset/html/";
+	private static final String ARG_URL = "url";
 
-	protected WebView mWebView;
+	private WebView mWebView;
+	private String mUrl;
 
 	public WebViewFragment() {
 	}
 
-	public static WebViewFragment newInstance() {
+	public static WebViewFragment newInstance(String url) {
 		WebViewFragment fragment = new WebViewFragment();
 		Bundle args = new Bundle();
+		args.putString(ARG_URL, url);
 		fragment.setArguments(args);
 		return fragment;
+	}
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		Bundle args = getArguments();
+		if(args != null) {
+			mUrl = BASE_URL + args.getString(ARG_URL, "");
+		}
 	}
 
 	@Override
@@ -43,7 +56,7 @@ public class WebViewFragment extends Fragment {
 		mWebView = (WebView)(view.findViewById(R.id.web_view));
 		mWebView.getSettings().setJavaScriptEnabled(true);
 		mWebView.addJavascriptInterface(new VideoJavaScriptInterface(), "Android");
-		mWebView.loadUrl("file:///android_res/raw/bunny.html");
+		mWebView.loadUrl(mUrl);
 	}
 
 	protected class VideoJavaScriptInterface {

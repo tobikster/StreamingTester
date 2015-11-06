@@ -60,7 +60,7 @@ public class StreamingTestActivity extends FragmentActivity {
 					break;
 
 				case SettingsFragment.TEST_TYPE_WEBVIEW:
-					fragment = WebViewFragment.newInstance();
+					fragment = WebViewFragment.newInstance(contentUri);
 					break;
 			}
 			if(fragment != null) {
