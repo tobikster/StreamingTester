@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import tobikster.streamingtester.R;
 import tobikster.streamingtester.fragments.SampleChooserFragment;
+import tobikster.streamingtester.fragments.SettingsFragment;
 
 public class SamplesListActivity extends AppCompatActivity implements SampleChooserFragment.InteractionListener {
 
@@ -19,7 +20,7 @@ public class SamplesListActivity extends AppCompatActivity implements SampleChoo
 		setContentView(R.layout.activity_samples_list);
 
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		int testType = preferences.getInt(getString(R.string.pref_test_type), MainActivity.TEST_TYPE_UNKNOWN);
+		int testType = preferences.getInt(SettingsFragment.PREF_TEST_TYPE, SettingsFragment.TEST_TYPE_UNKNOWN);
 
 		Fragment samplesListFragment = SampleChooserFragment.newInstance(testType);
 		FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();

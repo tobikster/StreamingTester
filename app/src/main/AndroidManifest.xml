@@ -37,6 +37,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activities.SamplesListActivity"/>
         </activity>
+
+        <activity android:name=".activities.SettingsActivity"/>
     </application>
 
 </manifest>

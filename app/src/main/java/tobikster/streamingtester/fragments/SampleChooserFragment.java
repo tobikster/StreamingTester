@@ -1,6 +1,7 @@
 package tobikster.streamingtester.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -17,6 +18,7 @@ import com.google.android.exoplayer.util.MimeTypes;
 
 import tobikster.streamingtester.R;
 import tobikster.streamingtester.activities.MainActivity;
+import tobikster.streamingtester.activities.StreamingTestActivity;
 import tobikster.streamingtester.utils.Samples;
 
 public class SampleChooserFragment extends Fragment {
@@ -44,9 +46,13 @@ public class SampleChooserFragment extends Fragment {
 		super.onCreate(savedInstanceState);
 		Bundle args = getArguments();
 		if(args != null) {
-			mTestType = args.getInt(ARG_TEST_TYPE, MainActivity.TEST_TYPE_UNKNOWN);
+			mTestType = args.getInt(ARG_TEST_TYPE, SettingsFragment.TEST_TYPE_UNKNOWN);
 		}
-		Log.d(LOGCAT_TAG, "Test type: " + mTestType);
+		//TODO: Replace after WebView test parametrized
+		if(mTestType == SettingsFragment.TEST_TYPE_WEBVIEW) {
+			Intent startWebViewTestActivityIntent = new Intent(getActivity(), StreamingTestActivity.class);
+			startActivity(startWebViewTestActivityIntent);
+		}
 	}
 
 	@Override
@@ -61,7 +67,7 @@ public class SampleChooserFragment extends Fragment {
 		ListView sampleList = (ListView)(view.findViewById(R.id.sample_list));
 		final SampleAdapter sampleAdapter = new SampleAdapter(getActivity());
 
-		if(mTestType == MainActivity.TEST_TYPE_EXOPLAYER) {
+		if(mTestType == SettingsFragment.TEST_TYPE_EXOPLAYER) {
 			sampleAdapter.add(new Header("YouTube DASH"));
 			sampleAdapter.addAll((Object[])Samples.YOUTUBE_DASH_MP4);
 			sampleAdapter.add(new Header("Widevine GTS DASH"));
@@ -69,7 +75,7 @@ public class SampleChooserFragment extends Fragment {
 			sampleAdapter.add(new Header("SmoothStreaming"));
 			sampleAdapter.addAll((Object[])Samples.SMOOTHSTREAMING);
 		}
-		if(mTestType == MainActivity.TEST_TYPE_EXOPLAYER || mTestType == MainActivity.TEST_TYPE_MEDIA_PLAYER) {
+		if(mTestType == SettingsFragment.TEST_TYPE_EXOPLAYER || mTestType == SettingsFragment.TEST_TYPE_MEDIAPLAYER) {
 			sampleAdapter.add(new Header("HLS"));
 			sampleAdapter.addAll((Object[])Samples.HLS);
 			sampleAdapter.add(new Header("Misc"));
@@ -78,13 +84,18 @@ public class SampleChooserFragment extends Fragment {
 
 		// Add WebM samples if the device has a VP9 decoder.
 		try {
-			if(mTestType == MainActivity.TEST_TYPE_EXOPLAYER && MediaCodecUtil.getDecoderInfo(MimeTypes.VIDEO_VP9, false) != null) {
+			if(mTestType == SettingsFragment.TEST_TYPE_EXOPLAYER && MediaCodecUtil.getDecoderInfo(MimeTypes.VIDEO_VP9, false) != null) {
 				sampleAdapter.add(new Header("YouTube WebM DASH (Experimental)"));
 				sampleAdapter.addAll((Object[])Samples.YOUTUBE_DASH_WEBM);
 			}
 		}
 		catch(MediaCodecUtil.DecoderQueryException e) {
 			Log.e(LOGCAT_TAG, "Failed to query vp9 decoder", e);
+		}
+
+		if(mTestType == SettingsFragment.TEST_TYPE_WEBVIEW) {
+			sampleAdapter.add(new Header("WEB"));
+			sampleAdapter.addAll((Object[])Samples.WEB);
 		}
 
 		sampleList.setAdapter(sampleAdapter);

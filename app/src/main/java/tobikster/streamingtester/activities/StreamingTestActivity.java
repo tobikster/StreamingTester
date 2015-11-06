@@ -20,6 +20,7 @@ import tobikster.streamingtester.R;
 import tobikster.streamingtester.broadcastreceivers.BatteryStateReceiver;
 import tobikster.streamingtester.fragments.ExoPlayerFragment;
 import tobikster.streamingtester.fragments.MediaPlayerFragment;
+import tobikster.streamingtester.fragments.SettingsFragment;
 import tobikster.streamingtester.fragments.WebViewFragment;
 
 public class StreamingTestActivity extends FragmentActivity {
@@ -28,8 +29,6 @@ public class StreamingTestActivity extends FragmentActivity {
 	public static final String EXTRA_CONTENT_ID = "extra_content_id";
 	public static final String EXTRA_CONTENT_URI = "extra_content_uri";
 	public static final String EXTRA_CONTENT_TYPE = "extra_content_type";
-
-	private int mTestType;
 
 	BatteryStateReceiver mBatteryStateReceiver;
 
@@ -41,26 +40,26 @@ public class StreamingTestActivity extends FragmentActivity {
 		getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		mTestType = preferences.getInt(getString(R.string.pref_test_type), MainActivity.TEST_TYPE_UNKNOWN);
+		int testType = preferences.getInt(SettingsFragment.PREF_TEST_TYPE, SettingsFragment.TEST_TYPE_UNKNOWN);
 
 		Intent intent = getIntent();
 
-		if(mTestType != MainActivity.TEST_TYPE_UNKNOWN) {
+		if(testType != SettingsFragment.TEST_TYPE_UNKNOWN) {
 			Fragment fragment = null;
 
 			String contentId = intent.getStringExtra(EXTRA_CONTENT_ID);
 			String contentUri = intent.getStringExtra(EXTRA_CONTENT_URI);
 			int contentType = intent.getIntExtra(EXTRA_CONTENT_TYPE, ExoPlayerFragment.TYPE_OTHER);
 
-			switch(mTestType) {
-				case MainActivity.TEST_TYPE_EXOPLAYER:
+			switch(testType) {
+				case SettingsFragment.TEST_TYPE_EXOPLAYER:
 					fragment = ExoPlayerFragment.newInstance(contentUri, contentId, contentType);
 					break;
-				case MainActivity.TEST_TYPE_MEDIA_PLAYER:
+				case SettingsFragment.TEST_TYPE_MEDIAPLAYER:
 					fragment = MediaPlayerFragment.newInstance(contentUri);
 					break;
 
-				case MainActivity.TEST_TYPE_WEB_VIEW:
+				case SettingsFragment.TEST_TYPE_WEBVIEW:
 					fragment = WebViewFragment.newInstance();
 					break;
 			}

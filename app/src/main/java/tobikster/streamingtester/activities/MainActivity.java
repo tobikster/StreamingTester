@@ -1,12 +1,10 @@
 package tobikster.streamingtester.activities;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,14 +13,11 @@ import android.widget.Toast;
 
 import tobikster.streamingtester.R;
 import tobikster.streamingtester.broadcastreceivers.BatteryStateReceiver;
+import tobikster.streamingtester.fragments.SettingsFragment;
 
 public class MainActivity extends FragmentActivity implements View.OnClickListener {
 	@SuppressWarnings("unused")
 	public static final String LOGCAT_TAG = "MainActivity";
-	public static final int TEST_TYPE_UNKNOWN = 0;
-	public static final int TEST_TYPE_MEDIA_PLAYER = 1;
-	public static final int TEST_TYPE_WEB_VIEW = 2;
-	public static final int TEST_TYPE_EXOPLAYER = 3;
 
 	Button mMediaPlayerTestButton;
 	Button mWebViewTestButton;
@@ -62,13 +57,22 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 		switch(item.getItemId()) {
 			case R.id.menu_item_clear_battery_log:
 				if(removeBatteryLogFile()) {
-					Toast.makeText(this, "Battery log file removed successfully", Toast.LENGTH_SHORT).show();
+					Toast.makeText(this, "Battery log file removed successfully", Toast.LENGTH_SHORT)
+					     .show();
 				}
 				else {
-					Toast.makeText(this, "There is a problem with removing battery log file!", Toast.LENGTH_SHORT).show();
+					Toast.makeText(this, "There is a problem with removing battery log file!", Toast.LENGTH_SHORT)
+					     .show();
 				}
 				consumeEvent = true;
 				break;
+
+			case R.id.menu_item_settings:
+				Intent startSettingsActivityIntent = new Intent(this, SettingsActivity.class);
+				startActivity(startSettingsActivityIntent);
+				consumeEvent = true;
+				break;
+
 			default:
 				consumeEvent = super.onOptionsItemSelected(item);
 		}
@@ -81,24 +85,21 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
 	@Override
 	public void onClick(View v) {
-		int testType = TEST_TYPE_UNKNOWN;
+		int testType = SettingsFragment.TEST_TYPE_UNKNOWN;
 		if(v == mMediaPlayerTestButton) {
-			testType = TEST_TYPE_MEDIA_PLAYER;
-//			startTestActivityIntent.putExtra(StreamingTestActivity.EXTRA_TEST_TYPE, SamplesListActivity.TEST_TYPE_MEDIA_PLAYER);
+			testType = SettingsFragment.TEST_TYPE_MEDIAPLAYER;
 		}
 		else if(v == mWebViewTestButton) {
-			testType = TEST_TYPE_WEB_VIEW;
-//			startTestActivityIntent.putExtra(StreamingTestActivity.EXTRA_TEST_TYPE, SamplesListActivity.TEST_TYPE_WEB_VIEW);
+			testType = SettingsFragment.TEST_TYPE_WEBVIEW;
 		}
 		else if(v == mExoPlayerYestButton) {
-			testType = TEST_TYPE_EXOPLAYER;
-//			startTestActivityIntent.putExtra(StreamingTestActivity.EXTRA_TEST_TYPE, SamplesListActivity.TEST_TYPE_EXOPLAYER);
+			testType = SettingsFragment.TEST_TYPE_EXOPLAYER;
 		}
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-//		getPreferences(Context.MODE_PRIVATE);
-		SharedPreferences.Editor editor = preferences.edit();
-		editor.putInt(getString(R.string.pref_test_type), testType);
-		editor.apply();
+
+		SharedPreferences.Editor preferencesEditor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
+		preferencesEditor.putInt(SettingsFragment.PREF_TEST_TYPE, testType);
+		preferencesEditor.apply();
+
 		Intent startTestActivityIntent = new Intent(this, SamplesListActivity.class);
 		startActivity(startTestActivityIntent);
 	}
