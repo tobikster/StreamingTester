@@ -3,6 +3,7 @@ package tobikster.streamingtester.fragments;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -13,6 +14,11 @@ import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.Closeable;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 
 import tobikster.streamingtester.R;
@@ -60,6 +66,35 @@ public class WebViewFragment extends Fragment {
 		mWebView.getSettings().setJavaScriptEnabled(true);
 		mWebView.addJavascriptInterface(new VideoJavaScriptInterface(), "Android");
 		mWebView.loadUrl(mUrl);
+
+//		String pageContent = null;
+//		AssetManager assetManager = getActivity().getAssets();
+//		BufferedReader reader = null;
+//		try {
+//			reader = new BufferedReader(new InputStreamReader(assetManager.open(mUrl.substring(22))));
+//			StringBuilder builder = new StringBuilder();
+//			String line;
+//			while((line = reader.readLine()) != null) {
+//				builder.append(line);
+//			}
+//
+//			pageContent = builder.toString();
+//		}
+//		catch(IOException e) {
+//			e.printStackTrace();
+//		}
+//		finally {
+//			if(reader != null) {
+//				try {
+//					reader.close();
+//				}
+//				catch(IOException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		}
+//		mWebView.loadDataWithBaseURL(null, pageContent, "text/html", "utf-8", null);
+
 	}
 
 	@Override

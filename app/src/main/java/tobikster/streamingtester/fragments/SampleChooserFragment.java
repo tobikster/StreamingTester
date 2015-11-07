@@ -97,11 +97,13 @@ public class SampleChooserFragment extends Fragment {
 
 			case SettingsFragment.TEST_TYPE_WEBVIEW:
 				sampleAdapter.add(new Header("WEB MISC"));
-				sampleAdapter.addAll((Object[])Samples.WEB_MISC);
+				sampleAdapter.addAll(Samples.WEB_MISC);
 				sampleAdapter.add(new Header("WEB HLS"));
-				sampleAdapter.addAll((Object[])Samples.WEB_HLS);
+				sampleAdapter.addAll(Samples.WEB_HLS);
 				sampleAdapter.add(new Header("WEB SS"));
-				sampleAdapter.addAll((Object[])Samples.WEB_SS);
+				sampleAdapter.addAll(Samples.WEB_SS);
+				sampleAdapter.add(new Header("WEB DASH"));
+				sampleAdapter.addAll(Samples.WEB_DASH);
 				break;
 
 		}

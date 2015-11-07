@@ -86,26 +86,29 @@ public class Samples {
 	};
 
 	public static final Sample[] WEB_MISC = new Sample[] {
-			                                                     new Sample("Dizzy", "file:///android_asset/web/misc/video_1/index.html", ExoPlayerFragment.TYPE_OTHER),
-			                                                     new Sample("Apple AAC 10s", "file:///android_asset/web/misc/audio_1/index.html", ExoPlayerFragment.TYPE_OTHER),
-			                                                     new Sample("Apple TS 10s", "file:///android_asset/web/misc/video_2/index.html", ExoPlayerFragment.TYPE_OTHER),
-			                                                     new Sample("Big Buck Bunny (MP4 video)", "file:///android_asset/web/misc/video_3/index.html", ExoPlayerFragment.TYPE_OTHER),
-			                                                     new Sample("Google Play (MP3 Audio)", "file:///android_asset/web/misc/audio_2/index.html", ExoPlayerFragment.TYPE_OTHER),
-			                                                     new Sample("Google Glass (WebM Video with Vorbis Audio)", "file:///android_asset/web/misc/video_4/index.html", ExoPlayerFragment.TYPE_OTHER),
+			                                                     new Sample("Dizzy", "file:///android_asset/www/misc/video_1/index.html", ExoPlayerFragment.TYPE_OTHER),
+			                                                     new Sample("Apple AAC 10s", "file:///android_asset/www/misc/audio_1/index.html", ExoPlayerFragment.TYPE_OTHER),
+			                                                     new Sample("Apple TS 10s", "file:///android_asset/www/misc/video_2/index.html", ExoPlayerFragment.TYPE_OTHER),
+			                                                     new Sample("Big Buck Bunny (MP4 video)", "file:///android_asset/www/misc/video_3/index.html", ExoPlayerFragment.TYPE_OTHER),
+			                                                     new Sample("Google Play (MP3 Audio)", "file:///android_asset/www/misc/audio_2/index.html", ExoPlayerFragment.TYPE_OTHER),
+			                                                     new Sample("Google Glass (WebM Video with Vorbis Audio)", "file:///android_asset/www/misc/video_4/index.html", ExoPlayerFragment.TYPE_OTHER),
 	};
 
 	public static final Sample[] WEB_HLS = new Sample[] {
-			                                                    new Sample("Apple master playlist", "file:///android_asset/web/hls/video_1/index.html", ExoPlayerFragment.TYPE_OTHER),
-			                                                    new Sample("Apple master playlist advanced", "file:///android_asset/web/hls/video_2/index.html", ExoPlayerFragment.TYPE_OTHER),
-			                                                    new Sample("Apple TS media playlist", "file:///android_asset/web/hls/video_3/index.html", ExoPlayerFragment.TYPE_OTHER),
-			                                                    new Sample("Apple AAC media playlist", "file:///android_asset/web/hls/audio_1/index.html", ExoPlayerFragment.TYPE_OTHER),
-			                                                    new Sample("Apple ID3 metadata", "file:///android_asset/web/hls/video_4/index.html", ExoPlayerFragment.TYPE_OTHER),
+			                                                    new Sample("Apple master playlist", "file:///android_asset/www/hls/video_1/index.html", ExoPlayerFragment.TYPE_OTHER),
+			                                                    new Sample("Apple master playlist advanced", "file:///android_asset/www/hls/video_2/index.html", ExoPlayerFragment.TYPE_OTHER),
+			                                                    new Sample("Apple TS media playlist", "file:///android_asset/www/hls/video_3/index.html", ExoPlayerFragment.TYPE_OTHER),
+			                                                    new Sample("Apple AAC media playlist", "file:///android_asset/www/hls/audio_1/index.html", ExoPlayerFragment.TYPE_OTHER),
+			                                                    new Sample("Apple ID3 metadata", "file:///android_asset/www/hls/video_4/index.html", ExoPlayerFragment.TYPE_OTHER),
 	};
 
 	public static final Sample[] WEB_SS = new Sample[] {
-			                                                   new Sample("Super speed", "file:///android_asset/web/ss/video_1/index.html", ExoPlayerFragment.TYPE_SS),
-			                                                   new Sample("Super speed (PlayReady)", "file:///android_asset/web/ss/video_2/index.html", ExoPlayerFragment.TYPE_SS),
+			                                                   new Sample("Super speed", "file:///android_asset/www/ss/video_1/index.html", ExoPlayerFragment.TYPE_SS),
+			                                                   new Sample("Super speed (PlayReady)", "file:///android_asset/www/ss/video_2/index.html", ExoPlayerFragment.TYPE_SS),
+	};
 
+	public static final Sample[] WEB_DASH = new Sample[] {
+			                                                     new Sample("DASH test", "file:///android_asset/www/dash/video_1/index.html", ExoPlayerFragment.TYPE_OTHER),
 	};
 
 	private Samples() {

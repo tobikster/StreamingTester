@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<base href="/android_asset/www/"/>
+	<script src="javascript/dash.webm.min.js"></script>
+	<script>
+    function startVideo(mpd) {
+      var video, context, player;
+      video = document.querySelector('video');
+      context = new Webm.di.WebmContext();
+      player = new MediaPlayer(context);
+      player.startup();
+      player.attachView(video);
+      player.setAutoPlay(false);
+      player.attachSource(mpd);
+    }
+
+	</script>
+</head>
+<body onload="startVideo('http://demo.unified-streaming.com/video/predators/predators.ism/predators.mpd');">
+<video controls></video>
+</body>
+</html>
