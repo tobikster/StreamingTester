@@ -86,7 +86,7 @@ public class Samples {
 	};
 
 	public static final Sample[] WEB_MISC = new Sample[] {
-			                                                     new Sample("Dizzy", "file:///android_asset/www/misc/video_1/index.html", ExoPlayerFragment.TYPE_OTHER),
+			                                                     new Sample("Dizzy", "http://localhost:8081/www/misc/video_1/index.html", ExoPlayerFragment.TYPE_OTHER),
 			                                                     new Sample("Apple AAC 10s", "file:///android_asset/www/misc/audio_1/index.html", ExoPlayerFragment.TYPE_OTHER),
 			                                                     new Sample("Apple TS 10s", "file:///android_asset/www/misc/video_2/index.html", ExoPlayerFragment.TYPE_OTHER),
 			                                                     new Sample("Big Buck Bunny (MP4 video)", "file:///android_asset/www/misc/video_3/index.html", ExoPlayerFragment.TYPE_OTHER),
@@ -108,7 +108,7 @@ public class Samples {
 	};
 
 	public static final Sample[] WEB_DASH = new Sample[] {
-			                                                     new Sample("DASH test", "file:///android_asset/www/dash/video_1/index.html", ExoPlayerFragment.TYPE_OTHER),
+			                                                     new Sample("Predators", "http://localhost:8081/www/dash/video_1/index.html", ExoPlayerFragment.TYPE_OTHER),
 	};
 
 	private Samples() {

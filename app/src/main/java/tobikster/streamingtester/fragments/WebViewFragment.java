@@ -1,10 +1,7 @@
 package tobikster.streamingtester.fragments;
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.res.AssetManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -14,12 +11,14 @@ import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.widget.Toast;
 
-import java.io.BufferedReader;
-import java.io.Closeable;
+import org.nikkii.embedhttp.HttpServer;
+import org.nikkii.embedhttp.handler.HttpRequestHandler;
+import org.nikkii.embedhttp.impl.HttpRequest;
+import org.nikkii.embedhttp.impl.HttpResponse;
+import org.nikkii.embedhttp.impl.HttpStatus;
+
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.lang.reflect.InvocationTargetException;
 
 import tobikster.streamingtester.R;
 
@@ -31,6 +30,8 @@ public class WebViewFragment extends Fragment {
 
 	private WebView mWebView;
 	private String mUrl;
+
+	private HttpServer mServer;
 
 	public WebViewFragment() {
 	}
@@ -50,6 +51,31 @@ public class WebViewFragment extends Fragment {
 		if(args != null) {
 			mUrl = args.getString(ARG_URL, "");
 		}
+
+		try {
+			mServer = new HttpServer();
+			mServer.addRequestHandler(new HttpRequestHandler() {
+				@Override
+				public HttpResponse handleRequest(HttpRequest request) {
+					String uri = request.getUri()
+					                    .substring(1);
+					HttpResponse response = null;
+					try {
+						InputStream input = getActivity().getAssets()
+						                                 .open(uri);
+						response = new HttpResponse(HttpStatus.OK, input);
+					}
+					catch(IOException e) {
+						e.printStackTrace();
+					}
+					return response;
+				}
+			});
+			mServer.bind(8081);
+		}
+		catch(IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -63,44 +89,29 @@ public class WebViewFragment extends Fragment {
 		super.onViewCreated(view, savedInstanceState);
 
 		mWebView = (WebView)(view.findViewById(R.id.web_view));
-		mWebView.getSettings().setJavaScriptEnabled(true);
+		mWebView.getSettings()
+		        .setJavaScriptEnabled(true);
 		mWebView.addJavascriptInterface(new VideoJavaScriptInterface(), "Android");
 		mWebView.loadUrl(mUrl);
 
-//		String pageContent = null;
-//		AssetManager assetManager = getActivity().getAssets();
-//		BufferedReader reader = null;
-//		try {
-//			reader = new BufferedReader(new InputStreamReader(assetManager.open(mUrl.substring(22))));
-//			StringBuilder builder = new StringBuilder();
-//			String line;
-//			while((line = reader.readLine()) != null) {
-//				builder.append(line);
-//			}
-//
-//			pageContent = builder.toString();
-//		}
-//		catch(IOException e) {
-//			e.printStackTrace();
-//		}
-//		finally {
-//			if(reader != null) {
-//				try {
-//					reader.close();
-//				}
-//				catch(IOException e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		}
-//		mWebView.loadDataWithBaseURL(null, pageContent, "text/html", "utf-8", null);
+	}
 
+	@Override
+	public void onResume() {
+		super.onResume();
+		mWebView.onResume();
+		if(mServer != null) {
+			mServer.start();
+		}
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
 		mWebView.onPause();
+		if(mServer != null) {
+			mServer.stop();
+		}
 	}
 
 	protected class VideoJavaScriptInterface {
@@ -112,7 +123,8 @@ public class WebViewFragment extends Fragment {
 
 		@JavascriptInterface
 		public void showToast(String text) {
-			Toast.makeText(mContext, text, Toast.LENGTH_SHORT).show();
+			Toast.makeText(mContext, text, Toast.LENGTH_SHORT)
+			     .show();
 		}
 	}
 }

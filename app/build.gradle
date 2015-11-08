@@ -22,4 +22,5 @@ dependencies {
 	compile 'com.android.support:support-v13:23.1.0'
 	compile 'com.android.support:appcompat-v7:23.1.0'
 	compile 'com.google.android.exoplayer:exoplayer:r1.5.2'
+	compile 'us.nikkii.embedhttp:embedhttp:1.1.2'
 }
