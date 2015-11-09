@@ -66,16 +66,18 @@ public class SampleChooserFragment extends Fragment {
 
 		switch(mTestType) {
 			case SettingsFragment.TEST_TYPE_EXOPLAYER:
+				sampleAdapter.add(new Header("MP4 DASH"));
+				sampleAdapter.addAll(Samples.DASH_MP4);
 				sampleAdapter.add(new Header("YouTube DASH"));
-				sampleAdapter.addAll((Object[])Samples.YOUTUBE_DASH_MP4);
+				sampleAdapter.addAll(Samples.YOUTUBE_DASH_MP4);
 				sampleAdapter.add(new Header("Widevine GTS DASH"));
-				sampleAdapter.addAll((Object[])Samples.WIDEVINE_GTS);
+				sampleAdapter.addAll(Samples.WIDEVINE_GTS);
 				sampleAdapter.add(new Header("SmoothStreaming"));
-				sampleAdapter.addAll((Object[])Samples.SMOOTHSTREAMING);
+				sampleAdapter.addAll(Samples.SMOOTHSTREAMING);
 				sampleAdapter.add(new Header("HLS"));
-				sampleAdapter.addAll((Object[])Samples.HLS);
+				sampleAdapter.addAll(Samples.HLS);
 				sampleAdapter.add(new Header("Misc"));
-				sampleAdapter.addAll((Object[])Samples.MISC);
+				sampleAdapter.addAll(Samples.MISC);
 				// Add WebM samples if the device has a VP9 decoder.
 				try {
 					if(MediaCodecUtil.getDecoderInfo(MimeTypes.VIDEO_VP9, false) != null) {
@@ -90,9 +92,9 @@ public class SampleChooserFragment extends Fragment {
 
 			case SettingsFragment.TEST_TYPE_MEDIAPLAYER:
 				sampleAdapter.add(new Header("HLS"));
-				sampleAdapter.addAll((Object[])Samples.HLS);
+				sampleAdapter.addAll(Samples.HLS);
 				sampleAdapter.add(new Header("Misc"));
-				sampleAdapter.addAll((Object[])Samples.MISC);
+				sampleAdapter.addAll(Samples.MISC);
 				break;
 
 			case SettingsFragment.TEST_TYPE_WEBVIEW:
