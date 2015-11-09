@@ -67,17 +67,17 @@ public class SampleChooserFragment extends Fragment {
 		switch(mTestType) {
 			case SettingsFragment.TEST_TYPE_EXOPLAYER:
 				sampleAdapter.add(new Header("MP4 DASH"));
-				sampleAdapter.addAll(Samples.DASH_MP4);
+				sampleAdapter.addAll((Object[])Samples.DASH_MP4);
 				sampleAdapter.add(new Header("YouTube DASH"));
-				sampleAdapter.addAll(Samples.YOUTUBE_DASH_MP4);
+				sampleAdapter.addAll((Object[])Samples.YOUTUBE_DASH_MP4);
 				sampleAdapter.add(new Header("Widevine GTS DASH"));
-				sampleAdapter.addAll(Samples.WIDEVINE_GTS);
+				sampleAdapter.addAll((Object[])Samples.WIDEVINE_GTS);
 				sampleAdapter.add(new Header("SmoothStreaming"));
-				sampleAdapter.addAll(Samples.SMOOTHSTREAMING);
+				sampleAdapter.addAll((Object[])Samples.SMOOTHSTREAMING);
 				sampleAdapter.add(new Header("HLS"));
-				sampleAdapter.addAll(Samples.HLS);
+				sampleAdapter.addAll((Object[])Samples.HLS);
 				sampleAdapter.add(new Header("Misc"));
-				sampleAdapter.addAll(Samples.MISC);
+				sampleAdapter.addAll((Object[])Samples.MISC);
 				// Add WebM samples if the device has a VP9 decoder.
 				try {
 					if(MediaCodecUtil.getDecoderInfo(MimeTypes.VIDEO_VP9, false) != null) {
@@ -92,20 +92,20 @@ public class SampleChooserFragment extends Fragment {
 
 			case SettingsFragment.TEST_TYPE_MEDIAPLAYER:
 				sampleAdapter.add(new Header("HLS"));
-				sampleAdapter.addAll(Samples.HLS);
+				sampleAdapter.addAll((Object[])Samples.HLS);
 				sampleAdapter.add(new Header("Misc"));
-				sampleAdapter.addAll(Samples.MISC);
+				sampleAdapter.addAll((Object[])Samples.MISC);
 				break;
 
 			case SettingsFragment.TEST_TYPE_WEBVIEW:
 				sampleAdapter.add(new Header("WEB MISC"));
-				sampleAdapter.addAll(Samples.WEB_MISC);
+				sampleAdapter.addAll((Object[])Samples.WEB_MISC);
 				sampleAdapter.add(new Header("WEB HLS"));
-				sampleAdapter.addAll(Samples.WEB_HLS);
+				sampleAdapter.addAll((Object[])Samples.WEB_HLS);
 				sampleAdapter.add(new Header("WEB SS"));
-				sampleAdapter.addAll(Samples.WEB_SS);
+				sampleAdapter.addAll((Object[])Samples.WEB_SS);
 				sampleAdapter.add(new Header("WEB DASH"));
-				sampleAdapter.addAll(Samples.WEB_DASH);
+				sampleAdapter.addAll((Object[])Samples.WEB_DASH);
 				break;
 
 		}

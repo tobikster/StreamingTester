@@ -11,13 +11,13 @@
       player = new MediaPlayer(context);
       player.startup();
       player.attachView(video);
-      player.setAutoPlay(false);
+      player.setAutoPlay(true);
       player.attachSource(mpd);
     }
 
 	</script>
 </head>
 <body onload="startVideo('http://demo.unified-streaming.com/video/predators/predators.ism/predators.mpd');">
-<video width="100%" controls></video>
+<video width="100%" controls loop></video>
 </body>
 </html>
