@@ -24,26 +24,6 @@ import tobikster.streamingtester.fragments.ExoPlayerFragment;
  */
 public class Samples {
 
-	public static class Sample {
-
-		public final String name;
-		public final String contentId;
-		public final String uri;
-		public final int type;
-
-		public Sample(String name, String uri, int type) {
-			this(name, name.toLowerCase(Locale.US)
-			               .replaceAll("\\s", ""), uri, type);
-		}
-
-		public Sample(String name, String contentId, String uri, int type) {
-			this.name = name;
-			this.contentId = contentId;
-			this.uri = uri;
-			this.type = type;
-		}
-	}
-
 	public static final Sample[] DASH_MP4 = new Sample[] {
 			                                                     new Sample("Predators", "http://demo.unified-streaming.com/video/predators/predators.ism/predators.mpd", ExoPlayerFragment.TYPE_DASH),
 	};
@@ -115,7 +95,34 @@ public class Samples {
 			                                                     new Sample("Predators", "http://localhost:8081/www/dash/video_1/index.html", ExoPlayerFragment.TYPE_OTHER),
 	};
 
+	public static final Sample[] LOCAL_SERVER = new Sample[] {
+			                                                      new Sample("Big Buck Bunny - MP4", "http://192.168.0.22/~tobikster/streamingtester/files/video_1.mp4", ExoPlayerFragment.TYPE_OTHER),
+	};
+
+	public static final Sample[] WEB_LOCAL_SERVER = new Sample[] {
+																		 new Sample("VIDEO 1 - MP4", "file:///android_asset/www/local/video_1/index.html", ExoPlayerFragment.TYPE_OTHER),
+	};
+
 	private Samples() {
+	}
+
+	public static class Sample {
+
+		public final String name;
+		public final String contentId;
+		public final String uri;
+		public final int type;
+
+		public Sample(String name, String uri, int type) {
+			this(name, name.toLowerCase(Locale.US).replaceAll("\\s", ""), uri, type);
+		}
+
+		public Sample(String name, String contentId, String uri, int type) {
+			this.name = name;
+			this.contentId = contentId;
+			this.uri = uri;
+			this.type = type;
+		}
 	}
 
 }

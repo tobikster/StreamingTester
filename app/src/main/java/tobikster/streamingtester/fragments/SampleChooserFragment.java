@@ -1,7 +1,6 @@
 package tobikster.streamingtester.fragments;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -16,11 +15,7 @@ import android.widget.TextView;
 import com.google.android.exoplayer.MediaCodecUtil;
 import com.google.android.exoplayer.util.MimeTypes;
 
-import java.util.Objects;
-
 import tobikster.streamingtester.R;
-import tobikster.streamingtester.activities.MainActivity;
-import tobikster.streamingtester.activities.StreamingTestActivity;
 import tobikster.streamingtester.utils.Samples;
 
 public class SampleChooserFragment extends Fragment {
@@ -88,6 +83,8 @@ public class SampleChooserFragment extends Fragment {
 				catch(MediaCodecUtil.DecoderQueryException e) {
 					Log.e(LOGCAT_TAG, "Failed to query vp9 decoder", e);
 				}
+				sampleAdapter.add(new Header("Local server"));
+				sampleAdapter.addAll((Object[])Samples.LOCAL_SERVER);
 				break;
 
 			case SettingsFragment.TEST_TYPE_MEDIAPLAYER:
@@ -95,6 +92,8 @@ public class SampleChooserFragment extends Fragment {
 				sampleAdapter.addAll((Object[])Samples.HLS);
 				sampleAdapter.add(new Header("Misc"));
 				sampleAdapter.addAll((Object[])Samples.MISC);
+				sampleAdapter.add(new Header("Local server"));
+				sampleAdapter.addAll((Object[])Samples.LOCAL_SERVER);
 				break;
 
 			case SettingsFragment.TEST_TYPE_WEBVIEW:
@@ -106,6 +105,8 @@ public class SampleChooserFragment extends Fragment {
 				sampleAdapter.addAll((Object[])Samples.WEB_SS);
 				sampleAdapter.add(new Header("WEB DASH"));
 				sampleAdapter.addAll((Object[])Samples.WEB_DASH);
+				sampleAdapter.add(new Header("Local server"));
+				sampleAdapter.addAll((Object[])Samples.WEB_LOCAL_SERVER);
 				break;
 
 		}
