@@ -82,11 +82,11 @@ import tobikster.streamingtester.player.renderersbuilders.SmoothStreamingRendere
  * An activity that plays media using {@link Player}.
  */
 public class ExoPlayerFragment extends Fragment implements SurfaceHolder.Callback,
-                                                            OnClickListener,
-                                                            Player.Listener,
-                                                            Player.CaptionListener,
-                                                            Player.Id3MetadataListener,
-                                                            AudioCapabilitiesReceiver.Listener {
+                                                           OnClickListener,
+                                                           Player.Listener,
+                                                           Player.CaptionListener,
+                                                           Player.Id3MetadataListener,
+                                                           AudioCapabilitiesReceiver.Listener {
 
 	// For use within demo app code.
 	public static final String ARG_CONTENT_URI = "content_uri";
