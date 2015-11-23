@@ -96,11 +96,13 @@ public class Samples {
 	};
 
 	public static final Sample[] LOCAL_SERVER = new Sample[] {
-			                                                      new Sample("Big Buck Bunny - MP4", "http://192.168.0.22/~tobikster/streamingtester/files/video_1.mp4", ExoPlayerFragment.TYPE_OTHER),
+			                                                         new Sample("Big Buck Bunny - MP4", "http://192.168.0.4/~tobikster/streamingtester/files/video_2.mp4", ExoPlayerFragment.TYPE_OTHER),
+			                                                         new Sample("Big Buck Bunny - MP4 (DASH)", "192.168.0.4/~tobikster/streamingtester/dash/video_2_dash.mpd", ExoPlayerFragment.TYPE_DASH),
+																	 new Sample("Sample (DASH)", "http://www.bok.net/dash/tears_of_steel/cleartext/stream.mpd", ExoPlayerFragment.TYPE_DASH),
 	};
 
 	public static final Sample[] WEB_LOCAL_SERVER = new Sample[] {
-																		 new Sample("VIDEO 1 - MP4", "file:///android_asset/www/local/video_1/index.html", ExoPlayerFragment.TYPE_OTHER),
+			                                                             new Sample("VIDEO 1 - MP4", "file:///android_asset/www/local/video_1/index.html", ExoPlayerFragment.TYPE_OTHER),
 	};
 
 	private Samples() {
