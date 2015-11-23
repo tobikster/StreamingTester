@@ -1,10 +1,10 @@
-package tobikster.streamingtester.activities;
+package tobikster.streamingtester.ui.activities;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 
-import tobikster.streamingtester.fragments.SettingsFragment;
+import tobikster.streamingtester.ui.fragments.SettingsFragment;
 
 /**
  * Created by tobikster on 2015-11-06.

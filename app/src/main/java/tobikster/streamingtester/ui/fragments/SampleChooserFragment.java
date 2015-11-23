@@ -1,4 +1,4 @@
-package tobikster.streamingtester.fragments;
+package tobikster.streamingtester.ui.fragments;
 
 import android.content.Context;
 import android.os.Bundle;

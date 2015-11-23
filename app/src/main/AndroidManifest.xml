@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest
+    xmlns:tools="http://schemas.android.com/tools"
     package="tobikster.streamingtester"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
@@ -10,9 +11,10 @@
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        tools:ignore="GoogleAppIndexingWarning">
 
-        <activity android:name=".activities.MainActivity">
+        <activity android:name=".ui.activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -21,24 +23,24 @@
         </activity>
 
         <activity
-            android:name=".activities.SamplesListActivity"
+            android:name=".ui.activities.SamplesListActivity"
             android:label="@string/title_activity_samples_list"
-            android:parentActivityName=".activities.MainActivity">
+            android:parentActivityName=".ui.activities.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="tobikster.streamingtester.activities.MainActivity"/>
+                android:value=".ui.activities.MainActivity"/>
         </activity>
 
         <activity
-            android:name=".activities.StreamingTestActivity"
+            android:name=".ui.activities.StreamingTestActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:parentActivityName=".activities.SamplesListActivity">
+            android:parentActivityName=".ui.activities.SamplesListActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activities.SamplesListActivity"/>
+                android:value=".ui.activities.SamplesListActivity"/>
         </activity>
 
-        <activity android:name=".activities.SettingsActivity"/>
+        <activity android:name=".ui.activities.SettingsActivity"/>
     </application>
 
 </manifest>

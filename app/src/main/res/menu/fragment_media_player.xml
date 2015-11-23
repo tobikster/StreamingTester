@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/action_show_media_info_dialog"
-        android:enabled="false"
+        android:enabled="true"
         android:title="@string/menu_entry_show_media_info_dialog"/>
     <item
         android:id="@+id/menu_item_loop_mode"
