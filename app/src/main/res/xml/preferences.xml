@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-
+    <Preference android:title="@string/pref_delete_battery_log">
+        <intent
+            android:action="tobikster.streamingtester.REMOVE_BATTERY_LOG_FILE"/>
+    </Preference>
 </PreferenceScreen>

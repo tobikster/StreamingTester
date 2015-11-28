@@ -12,8 +12,8 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import tobikster.streamingtester.R;
-import tobikster.streamingtester.broadcastreceivers.BatteryStateReceiver;
 import tobikster.streamingtester.ui.fragments.SettingsFragment;
+import tobikster.streamingtester.utils.FileUtils;
 
 public class MainActivity extends FragmentActivity implements View.OnClickListener {
 	@SuppressWarnings("unused")
@@ -80,7 +80,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 	}
 
 	private boolean removeBatteryLogFile() {
-		return BatteryStateReceiver.removeBatteryLogFile(this);
+		return FileUtils.removeBatteryLogFile(this);
 	}
 
 	@Override
