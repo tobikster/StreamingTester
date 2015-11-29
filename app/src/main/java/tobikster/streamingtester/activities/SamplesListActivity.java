@@ -1,4 +1,4 @@
-package tobikster.streamingtester.ui.activities;
+package tobikster.streamingtester.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,8 +9,8 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 
 import tobikster.streamingtester.R;
-import tobikster.streamingtester.ui.fragments.SampleChooserFragment;
-import tobikster.streamingtester.ui.fragments.SettingsFragment;
+import tobikster.streamingtester.fragments.SampleChooserFragment;
+import tobikster.streamingtester.fragments.SettingsFragment;
 
 public class SamplesListActivity extends AppCompatActivity implements SampleChooserFragment.InteractionListener {
 

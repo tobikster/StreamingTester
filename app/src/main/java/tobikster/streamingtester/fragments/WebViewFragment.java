@@ -1,4 +1,4 @@
-package tobikster.streamingtester.ui.fragments;
+package tobikster.streamingtester.fragments;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

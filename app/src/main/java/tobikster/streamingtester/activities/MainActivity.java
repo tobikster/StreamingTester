@@ -1,4 +1,4 @@
-package tobikster.streamingtester.ui.activities;
+package tobikster.streamingtester.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,11 +9,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import tobikster.streamingtester.R;
-import tobikster.streamingtester.ui.fragments.SettingsFragment;
-import tobikster.streamingtester.utils.FileUtils;
+import tobikster.streamingtester.fragments.SettingsFragment;
 
 public class MainActivity extends FragmentActivity implements View.OnClickListener {
 	@SuppressWarnings("unused")

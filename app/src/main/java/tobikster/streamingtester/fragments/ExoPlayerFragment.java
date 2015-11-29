@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package tobikster.streamingtester.ui.fragments;
+package tobikster.streamingtester.fragments;
 
 import android.annotation.TargetApi;
 import android.content.Context;

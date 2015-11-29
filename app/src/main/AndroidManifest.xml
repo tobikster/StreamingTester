@@ -14,7 +14,7 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
 
-        <activity android:name=".ui.activities.MainActivity">
+        <activity android:name=".activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -22,24 +22,24 @@
         </activity>
 
         <activity
-            android:name=".ui.activities.SamplesListActivity"
+            android:name=".activities.SamplesListActivity"
             android:label="@string/title_activity_samples_list"
-            android:parentActivityName=".ui.activities.MainActivity">
+            android:parentActivityName=".activities.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.activities.MainActivity"/>
+                android:value=".activities.MainActivity"/>
         </activity>
 
         <activity
-            android:name=".ui.activities.StreamingTestActivity"
+            android:name=".activities.StreamingTestActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:parentActivityName=".ui.activities.SamplesListActivity">
+            android:parentActivityName=".activities.SamplesListActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.activities.SamplesListActivity"/>
+                android:value=".activities.SamplesListActivity"/>
         </activity>
 
-        <activity android:name=".ui.activities.SettingsActivity"
+        <activity android:name=".activities.SettingsActivity"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="tobikster.streamingtester.REMOVE_BATTERY_LOG_FILE"/>

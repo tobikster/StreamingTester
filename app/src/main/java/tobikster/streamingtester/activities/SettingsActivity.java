@@ -1,4 +1,4 @@
-package tobikster.streamingtester.ui.activities;
+package tobikster.streamingtester.activities;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import tobikster.streamingtester.R;
-import tobikster.streamingtester.ui.fragments.SettingsFragment;
+import tobikster.streamingtester.fragments.SettingsFragment;
 import tobikster.streamingtester.utils.FileUtils;
 
 /**
