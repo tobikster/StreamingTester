@@ -55,18 +55,6 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 	public boolean onOptionsItemSelected(MenuItem item) {
 		boolean consumeEvent;
 		switch(item.getItemId()) {
-			case R.id.menu_item_clear_battery_log:
-				if(removeBatteryLogFile()) {
-					Toast.makeText(this, "Battery log file removed successfully", Toast.LENGTH_SHORT)
-					     .show();
-				}
-				else {
-					Toast.makeText(this, "There is a problem with removing battery log file!", Toast.LENGTH_SHORT)
-					     .show();
-				}
-				consumeEvent = true;
-				break;
-
 			case R.id.menu_item_settings:
 				Intent startSettingsActivityIntent = new Intent(this, SettingsActivity.class);
 				startActivity(startSettingsActivityIntent);
@@ -77,10 +65,6 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 				consumeEvent = super.onOptionsItemSelected(item);
 		}
 		return consumeEvent;
-	}
-
-	private boolean removeBatteryLogFile() {
-		return FileUtils.removeBatteryLogFile(this);
 	}
 
 	@Override

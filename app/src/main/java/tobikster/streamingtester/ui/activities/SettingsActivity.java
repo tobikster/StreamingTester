@@ -3,11 +3,9 @@ package tobikster.streamingtester.ui.activities;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.widget.Toast;
 
 import tobikster.streamingtester.R;
-import tobikster.streamingtester.broadcastreceivers.BatteryStateReceiver;
 import tobikster.streamingtester.ui.fragments.SettingsFragment;
 import tobikster.streamingtester.utils.FileUtils;
 

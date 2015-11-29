@@ -14,9 +14,6 @@ import java.util.Calendar;
 
 import tobikster.streamingtester.utils.FileUtils;
 
-/**
- * Created by tobikster on 2015-11-28.
- */
 public class BatteryStateReceiver extends BroadcastReceiver {
 	@SuppressWarnings("unused")
 	public static final String TAG = "BatteryStateReceiver";
