@@ -17,7 +17,7 @@ package tobikster.streamingtester.utils;
 
 import java.util.Locale;
 
-import tobikster.streamingtester.fragments.ExoPlayerFragment;
+import tobikster.streamingtester.ui.fragments.ExoPlayerFragment;
 
 /**
  * Holds statically defined sample definitions.

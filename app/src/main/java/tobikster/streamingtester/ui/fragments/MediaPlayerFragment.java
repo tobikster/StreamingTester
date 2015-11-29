@@ -1,8 +1,9 @@
-package tobikster.streamingtester.fragments;
+package tobikster.streamingtester.ui.fragments;
 
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -16,7 +17,6 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.MediaController;
-import android.widget.Toast;
 
 import java.io.IOException;
 
@@ -242,6 +242,19 @@ public class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPrepa
 	}
 
 	private void showMediaInfoDialog() {
+		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+			for(MediaPlayer.TrackInfo trackInfo : mMediaPlayer.getTrackInfo()) {
+				switch(trackInfo.getTrackType()) {
+					case MediaPlayer.TrackInfo.MEDIA_TRACK_TYPE_VIDEO:
+						Log.d(LOGCAT_TAG, String.format("Video format: %s", trackInfo.getFormat().toString()));
+						break;
+
+					case MediaPlayer.TrackInfo.MEDIA_TRACK_TYPE_AUDIO:
+						Log.d(LOGCAT_TAG, String.format("Audio format: %s", trackInfo.getFormat().toString()));
+						break;
+				}
+			}
+		}
 	}
 
 	@Override
@@ -306,10 +319,41 @@ public class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPrepa
 
 	@Override
 	public boolean onInfo(MediaPlayer mp, int what, int extra) {
-		Log.d(LOGCAT_TAG, String.format("New info: %d (%d)", what, extra));
-		if(MediaPlayer.MEDIA_INFO_METADATA_UPDATE == what) {
-			Toast.makeText(getActivity(), "Metadata update!", Toast.LENGTH_SHORT).show();
+		switch(what) {
+			case MediaPlayer.MEDIA_INFO_UNKNOWN:
+				break;
+			case MediaPlayer.MEDIA_INFO_VIDEO_TRACK_LAGGING:
+				Log.d(LOGCAT_TAG, "MEDIA_INFO_VIDEO_TRACK_LAGGING");
+				break;
+			case MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START:
+				Log.d(LOGCAT_TAG, "MEDIA_INFO_VIDEO_RENDERING_START");
+				break;
+			case MediaPlayer.MEDIA_INFO_BUFFERING_START:
+				Log.d(LOGCAT_TAG, "MEDIA_INFO_BUFFERING_START");
+				break;
+			case MediaPlayer.MEDIA_INFO_BUFFERING_END:
+				Log.d(LOGCAT_TAG, "MEDIA_INFO_BUFFERING_END");
+				//case MediaPlayer.MEDIA_INFO_NETWORK_BANDWIDTH:
+			case 703:
+				Log.d(LOGCAT_TAG, "MEDIA_INFO_NETWORK_BANDWIDTH");
+				break;
+			case MediaPlayer.MEDIA_INFO_BAD_INTERLEAVING:
+				Log.d(LOGCAT_TAG, "MEDIA_INFO_BAD_INTERLEAVING");
+				break;
+			case MediaPlayer.MEDIA_INFO_NOT_SEEKABLE:
+				Log.d(LOGCAT_TAG, "MEDIA_INFO_NOT_SEEKABLE");
+				break;
+			case MediaPlayer.MEDIA_INFO_METADATA_UPDATE:
+				Log.d(LOGCAT_TAG, "MEDIA_INFO_METADATA_UPDATE");
+				break;
+			case MediaPlayer.MEDIA_INFO_UNSUPPORTED_SUBTITLE:
+				Log.d(LOGCAT_TAG, "MEDIA_INFO_UNSUPPORTED_SUBTITLE");
+				break;
+			case MediaPlayer.MEDIA_INFO_SUBTITLE_TIMED_OUT:
+				Log.d(LOGCAT_TAG, "MEDIA_INFO_SUBTITLE_TIMED_OUT");
+				break;
 		}
+		Log.d(LOGCAT_TAG, String.format("Extra: %d", extra));
 		return false;
 	}
 

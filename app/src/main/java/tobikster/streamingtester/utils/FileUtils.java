@@ -6,8 +6,11 @@ import android.util.Log;
 
 import java.io.File;
 
+import tobikster.streamingtester.broadcastreceivers.BatteryStateReceiver;
+
 public class FileUtils {
 	public static final String LOGCAT_TAG = "FileUtils";
+	public static final String BATTERY_LOG_FILE_NAME = BatteryStateReceiver.LOG_FILE_NAME_BATTERY_LEVEL;
 
 	public static boolean isExternalStorageWritable() {
 		return Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState());
@@ -37,5 +40,9 @@ public class FileUtils {
 			result = !file.exists() || file.delete();
 		}
 		return result;
+	}
+
+	public static boolean removeBatteryLogFile(Context context) {
+		return removeExternalStorageFile(context, null, BATTERY_LOG_FILE_NAME);
 	}
 }

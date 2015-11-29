@@ -1,4 +1,4 @@
-package tobikster.streamingtester.activities;
+package tobikster.streamingtester.ui.activities;
 
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -18,10 +18,10 @@ import java.io.InputStreamReader;
 
 import tobikster.streamingtester.R;
 import tobikster.streamingtester.broadcastreceivers.BatteryStateReceiver;
-import tobikster.streamingtester.fragments.ExoPlayerFragment;
-import tobikster.streamingtester.fragments.MediaPlayerFragment;
-import tobikster.streamingtester.fragments.SettingsFragment;
-import tobikster.streamingtester.fragments.WebViewFragment;
+import tobikster.streamingtester.ui.fragments.ExoPlayerFragment;
+import tobikster.streamingtester.ui.fragments.MediaPlayerFragment;
+import tobikster.streamingtester.ui.fragments.SettingsFragment;
+import tobikster.streamingtester.ui.fragments.WebViewFragment;
 
 public class StreamingTestActivity extends FragmentActivity {
 	@SuppressWarnings("unused")

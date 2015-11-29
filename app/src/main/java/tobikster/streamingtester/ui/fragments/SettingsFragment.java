@@ -1,4 +1,4 @@
-package tobikster.streamingtester.fragments;
+package tobikster.streamingtester.ui.fragments;
 
 
 import android.app.Fragment;
@@ -17,14 +17,11 @@ public class SettingsFragment extends PreferenceFragment {
 	public static final int TEST_TYPE_EXOPLAYER = 2;
 	public static final int TEST_TYPE_WEBVIEW = 3;
 
-
-	public SettingsFragment() {
-		// Required empty public constructor
-	}
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		// Load the preferences from an XML resource
 		addPreferencesFromResource(R.xml.preferences);
 	}
 }
