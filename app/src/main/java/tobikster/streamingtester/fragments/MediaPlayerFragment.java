@@ -1,6 +1,5 @@
 package tobikster.streamingtester.fragments;
 
-import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
@@ -31,20 +30,16 @@ public class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPrepa
                                                              MediaPlayer.OnVideoSizeChangedListener,
                                                              MediaPlayer.OnErrorListener {
 
-	public static final String LOGCAT_TAG = "MediaPlayerFragment";
 	public static final String ARG_VIDEO_NAME = "video_name";
 	public static final String ARG_VIDEO_URI = "video_url";
 	public static final String ARG_VIDEO_REMOTE = "video_is_remote";
 
-	public static final String TEST_VIDEO_URL = "https://archive.org/download/ksnn_compilation_master_the_internet/ksnn_compilation_master_the_internet_512kb.mp4";
-	private static final String TEST_RTSP_URL = "rtsp://184.72.239.149/vod/mp4:BigBuckBunny_115k.mov";
+	private static final String TAG = "MediaPlayerFragment";
 
 	private View mRootView;
 	private SurfaceView mSurfaceView;
 	private MediaPlayer mMediaPlayer;
 	private MediaController mMediaController;
-	private MediaPlayer.TrackInfo[] mTrackInfos;
-	private MediaMetadataRetriever mMediaMetadataRetriever;
 
 	VideoUri mVideoUri;
 
@@ -74,7 +69,7 @@ public class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPrepa
 		Bundle args = getArguments();
 		if(args != null) {
 			String videoName = args.getString(ARG_VIDEO_NAME, null);
-			String videoUri = args.getString(ARG_VIDEO_URI, TEST_VIDEO_URL);
+			String videoUri = args.getString(ARG_VIDEO_URI, null);
 			boolean videoIsRemote = args.getBoolean(ARG_VIDEO_REMOTE, true);
 			mVideoUri = new VideoUri(videoName, videoUri, videoIsRemote);
 		}
@@ -85,15 +80,11 @@ public class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPrepa
 		mMediaPlayer.setOnInfoListener(this);
 		mMediaPlayer.setOnErrorListener(this);
 
-		mMediaMetadataRetriever = new MediaMetadataRetriever();
-
 		try {
 			if(mVideoUri != null) {
 				Uri fileUri = Uri.parse(mVideoUri.getUri());
 				mMediaPlayer.setDataSource(getActivity(), fileUri);
 				mMediaPlayer.prepareAsync();
-//				mMediaPlayer.setDataSource(getActivity(), Uri.parse(TEST_RTSP_URL));
-//				mMediaPlayer.prepareAsync();
 			}
 		}
 		catch(IOException e) {
@@ -221,7 +212,6 @@ public class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPrepa
 
 		holder.setFixedSize(width, height);
 		mp.start();
-		mTrackInfos = mp.getTrackInfo();
 		mMediaPlayer.setLooping(true);
 		mMediaPlayerPrepared = true;
 	}
@@ -246,11 +236,11 @@ public class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPrepa
 			for(MediaPlayer.TrackInfo trackInfo : mMediaPlayer.getTrackInfo()) {
 				switch(trackInfo.getTrackType()) {
 					case MediaPlayer.TrackInfo.MEDIA_TRACK_TYPE_VIDEO:
-						Log.d(LOGCAT_TAG, String.format("Video format: %s", trackInfo.getFormat().toString()));
+						Log.d(TAG, String.format("Video format: %s", trackInfo.getFormat().toString()));
 						break;
 
 					case MediaPlayer.TrackInfo.MEDIA_TRACK_TYPE_AUDIO:
-						Log.d(LOGCAT_TAG, String.format("Audio format: %s", trackInfo.getFormat().toString()));
+						Log.d(TAG, String.format("Audio format: %s", trackInfo.getFormat().toString()));
 						break;
 				}
 			}
@@ -323,37 +313,37 @@ public class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPrepa
 			case MediaPlayer.MEDIA_INFO_UNKNOWN:
 				break;
 			case MediaPlayer.MEDIA_INFO_VIDEO_TRACK_LAGGING:
-				Log.d(LOGCAT_TAG, "MEDIA_INFO_VIDEO_TRACK_LAGGING");
+				Log.d(TAG, "MEDIA_INFO_VIDEO_TRACK_LAGGING");
 				break;
 			case MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START:
-				Log.d(LOGCAT_TAG, "MEDIA_INFO_VIDEO_RENDERING_START");
+				Log.d(TAG, "MEDIA_INFO_VIDEO_RENDERING_START");
 				break;
 			case MediaPlayer.MEDIA_INFO_BUFFERING_START:
-				Log.d(LOGCAT_TAG, "MEDIA_INFO_BUFFERING_START");
+				Log.d(TAG, "MEDIA_INFO_BUFFERING_START");
 				break;
 			case MediaPlayer.MEDIA_INFO_BUFFERING_END:
-				Log.d(LOGCAT_TAG, "MEDIA_INFO_BUFFERING_END");
+				Log.d(TAG, "MEDIA_INFO_BUFFERING_END");
 				//case MediaPlayer.MEDIA_INFO_NETWORK_BANDWIDTH:
 			case 703:
-				Log.d(LOGCAT_TAG, "MEDIA_INFO_NETWORK_BANDWIDTH");
+				Log.d(TAG, "MEDIA_INFO_NETWORK_BANDWIDTH");
 				break;
 			case MediaPlayer.MEDIA_INFO_BAD_INTERLEAVING:
-				Log.d(LOGCAT_TAG, "MEDIA_INFO_BAD_INTERLEAVING");
+				Log.d(TAG, "MEDIA_INFO_BAD_INTERLEAVING");
 				break;
 			case MediaPlayer.MEDIA_INFO_NOT_SEEKABLE:
-				Log.d(LOGCAT_TAG, "MEDIA_INFO_NOT_SEEKABLE");
+				Log.d(TAG, "MEDIA_INFO_NOT_SEEKABLE");
 				break;
 			case MediaPlayer.MEDIA_INFO_METADATA_UPDATE:
-				Log.d(LOGCAT_TAG, "MEDIA_INFO_METADATA_UPDATE");
+				Log.d(TAG, "MEDIA_INFO_METADATA_UPDATE");
 				break;
 			case MediaPlayer.MEDIA_INFO_UNSUPPORTED_SUBTITLE:
-				Log.d(LOGCAT_TAG, "MEDIA_INFO_UNSUPPORTED_SUBTITLE");
+				Log.d(TAG, "MEDIA_INFO_UNSUPPORTED_SUBTITLE");
 				break;
 			case MediaPlayer.MEDIA_INFO_SUBTITLE_TIMED_OUT:
-				Log.d(LOGCAT_TAG, "MEDIA_INFO_SUBTITLE_TIMED_OUT");
+				Log.d(TAG, "MEDIA_INFO_SUBTITLE_TIMED_OUT");
 				break;
 		}
-		Log.d(LOGCAT_TAG, String.format("Extra: %d", extra));
+		Log.d(TAG, String.format("Extra: %d", extra));
 		return false;
 	}
 
@@ -363,7 +353,7 @@ public class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPrepa
 
 	@Override
 	public boolean onError(MediaPlayer mp, int what, int extra) {
-		Log.d(LOGCAT_TAG, String.format("Error: %d, %d", what, extra));
+		Log.d(TAG, String.format("Error: %d, %d", what, extra));
 		return true;
 	}
 }

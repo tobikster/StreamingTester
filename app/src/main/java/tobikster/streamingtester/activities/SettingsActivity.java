@@ -1,9 +1,9 @@
 package tobikster.streamingtester.activities;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Toast;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.AppCompatActivity;
 
 import tobikster.streamingtester.R;
 import tobikster.streamingtester.fragments.SettingsFragment;
@@ -12,7 +12,7 @@ import tobikster.streamingtester.utils.FileUtils;
 /**
  * Created by tobikster on 2015-11-06.
  */
-public class SettingsActivity extends Activity {
+public class SettingsActivity extends AppCompatActivity {
 	private static final String ACTION_REMOVE_BATTERY_LOG_FILE = "tobikster.streamingtester.REMOVE_BATTERY_LOG_FILE";
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +30,7 @@ public class SettingsActivity extends Activity {
 		super.onNewIntent(intent);
 		if(intent.getAction() != null && intent.getAction().equals(ACTION_REMOVE_BATTERY_LOG_FILE)) {
 			if(FileUtils.removeBatteryLogFile(this)) {
-				Toast.makeText(this, R.string.info_battery_log_file_removed_successfully, Toast.LENGTH_LONG).show();
+				Snackbar.make(findViewById(android.R.id.content), R.string.info_battery_log_file_removed_successfully, Snackbar.LENGTH_SHORT).show();
 			}
 		}
 	}

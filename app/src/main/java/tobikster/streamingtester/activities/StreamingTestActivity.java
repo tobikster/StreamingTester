@@ -9,6 +9,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -23,7 +24,7 @@ import tobikster.streamingtester.fragments.MediaPlayerFragment;
 import tobikster.streamingtester.fragments.SettingsFragment;
 import tobikster.streamingtester.fragments.WebViewFragment;
 
-public class StreamingTestActivity extends FragmentActivity {
+public class StreamingTestActivity extends AppCompatActivity {
 	@SuppressWarnings("unused")
 	public static final String LOGCAT_TAG = "StreamingTest";
 	public static final String EXTRA_CONTENT_ID = "extra_content_id";
@@ -115,21 +116,5 @@ public class StreamingTestActivity extends FragmentActivity {
 			transaction.addToBackStack(null);
 		}
 		transaction.commit();
-	}
-
-	private static class CPUMonitoringTask extends AsyncTask<Integer, Void, Void> {
-
-		@Override
-		protected Void doInBackground(Integer... params) {
-			int refreshInterval = params[0];
-			try {
-				Process process = Runtime.getRuntime().exec(String.format("top -d %d", refreshInterval));
-				BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-			}
-			catch(IOException e) {
-				e.printStackTrace();
-			}
-			return null;
-		}
 	}
 }
