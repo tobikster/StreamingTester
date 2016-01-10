@@ -26,6 +26,8 @@ import com.google.android.exoplayer.audio.AudioTrack;
 import com.google.android.exoplayer.chunk.Format;
 import com.google.android.exoplayer.util.VerboseLogUtil;
 
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -34,11 +36,12 @@ import java.util.Locale;
 /**
  * Logs player events using {@link Log}.
  */
-public class EventLogger implements Player.Listener,
-                                    Player.InfoListener,
-                                    Player.InternalErrorListener {
+public
+class EventLogger implements Player.Listener,
+                             Player.InfoListener,
+                             Player.InternalErrorListener {
 
-	private static final String TAG = "EventLogger";
+	private static final String TAG = EventLogger.class.getSimpleName();
 	private static final NumberFormat TIME_FORMAT;
 
 	static {
@@ -47,131 +50,60 @@ public class EventLogger implements Player.Listener,
 		TIME_FORMAT.setMaximumFractionDigits(2);
 	}
 
-	private long sessionStartTimeMs;
-	private long[] loadStartTimeMs;
-	private long[] availableRangeValuesUs;
+	private long mSessionStartTimeMs;
+	private long[] mLoadStartTimeMs;
+	private long[] mAvailableRangeValuesUs;
 
-	public EventLogger() {
-		loadStartTimeMs = new long[Player.RENDERER_COUNT];
+	public
+	EventLogger() {
+		mLoadStartTimeMs = new long[Player.RENDERER_COUNT];
 	}
 
-	public void startSession() {
-		sessionStartTimeMs = SystemClock.elapsedRealtime();
+	public
+	void startSession() {
+		mSessionStartTimeMs = SystemClock.elapsedRealtime();
 		Log.d(TAG, "start [0]");
 	}
 
-	public void endSession() {
+	public
+	void endSession() {
 		Log.d(TAG, "end [" + getSessionTimeString() + "]");
 	}
 
 	// DemoPlayer.Listener
 
+	private
+	String getSessionTimeString() {
+		return getTimeString(SystemClock.elapsedRealtime() - mSessionStartTimeMs);
+	}
+
+	private
+	String getTimeString(long timeMs) {
+		return TIME_FORMAT.format((timeMs) / 1000f);
+	}
+
 	@Override
-	public void onStateChanged(boolean playWhenReady, int state) {
+	public
+	void onStateChanged(boolean playWhenReady, int state) {
 		Log.d(TAG, "state [" + getSessionTimeString() + ", " + playWhenReady + ", " + getStateString(state) + "]");
-	}
-
-	@Override
-	public void onError(Exception e) {
-		Log.e(TAG, "playerFailed [" + getSessionTimeString() + "]", e);
-	}
-
-	@Override
-	public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
-		Log.d(TAG, "videoSizeChanged [" + width + ", " + height + ", " + unappliedRotationDegrees + ", " + pixelWidthHeightRatio + "]");
 	}
 
 	// DemoPlayer.InfoListener
 
 	@Override
-	public void onBandwidthSample(int elapsedMs, long bytes, long bitrateEstimate) {
-		Log.d(TAG, "bandwidth [" + getSessionTimeString() + ", " + bytes + ", " + getTimeString(elapsedMs) + ", " + bitrateEstimate + "]");
+	public
+	void onError(Exception e) {
+		Log.e(TAG, "playerFailed [" + getSessionTimeString() + "]", e);
 	}
 
 	@Override
-	public void onDroppedFrames(int count, long elapsed) {
-		Log.d(TAG, "droppedFrames [" + getSessionTimeString() + ", " + count + "]");
+	public
+	void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
+		Log.d(TAG, "videoSizeChanged [" + width + ", " + height + ", " + unappliedRotationDegrees + ", " + pixelWidthHeightRatio + "]");
 	}
 
-	@Override
-	public void onLoadStarted(int sourceId, long length, int type, int trigger, Format format, long mediaStartTimeMs, long mediaEndTimeMs) {
-		loadStartTimeMs[sourceId] = SystemClock.elapsedRealtime();
-		if(VerboseLogUtil.isTagEnabled(TAG)) {
-			Log.v(TAG, "loadStart [" + getSessionTimeString() + ", " + sourceId + ", " + type + ", " + mediaStartTimeMs + ", " + mediaEndTimeMs + "]");
-		}
-	}
-
-	@Override
-	public void onLoadCompleted(int sourceId, long bytesLoaded, int type, int trigger, Format format, long mediaStartTimeMs, long mediaEndTimeMs, long elapsedRealtimeMs, long loadDurationMs) {
-		if(VerboseLogUtil.isTagEnabled(TAG)) {
-			long downloadTime = SystemClock.elapsedRealtime() - loadStartTimeMs[sourceId];
-			Log.v(TAG, "loadEnd [" + getSessionTimeString() + ", " + sourceId + ", " + downloadTime + "]");
-		}
-	}
-
-	@Override
-	public void onVideoFormatEnabled(Format format, int trigger, long mediaTimeMs) {
-		Log.d(TAG, "videoFormat [" + getSessionTimeString() + ", " + format.id + ", " + Integer.toString(trigger) + "]");
-	}
-
-	@Override
-	public void onAudioFormatEnabled(Format format, int trigger, long mediaTimeMs) {
-		Log.d(TAG, "audioFormat [" + getSessionTimeString() + ", " + format.id + ", " + Integer.toString(trigger) + "]");
-	}
-
-	// DemoPlayer.InternalErrorListener
-
-	@Override
-	public void onLoadError(int sourceId, IOException e) {
-		printInternalError("loadError", e);
-	}
-
-	@Override
-	public void onRendererInitializationError(Exception e) {
-		printInternalError("rendererInitError", e);
-	}
-
-	@Override
-	public void onDrmSessionManagerError(Exception e) {
-		printInternalError("drmSessionManagerError", e);
-	}
-
-	@Override
-	public void onDecoderInitializationError(DecoderInitializationException e) {
-		printInternalError("decoderInitializationError", e);
-	}
-
-	@Override
-	public void onAudioTrackInitializationError(AudioTrack.InitializationException e) {
-		printInternalError("audioTrackInitializationError", e);
-	}
-
-	@Override
-	public void onAudioTrackWriteError(AudioTrack.WriteException e) {
-		printInternalError("audioTrackWriteError", e);
-	}
-
-	@Override
-	public void onCryptoError(CryptoException e) {
-		printInternalError("cryptoError", e);
-	}
-
-	@Override
-	public void onDecoderInitialized(String decoderName, long elapsedRealtimeMs, long initializationDurationMs) {
-		Log.d(TAG, "decoderInitialized [" + getSessionTimeString() + ", " + decoderName + "]");
-	}
-
-	@Override
-	public void onAvailableRangeChanged(TimeRange availableRange) {
-		availableRangeValuesUs = availableRange.getCurrentBoundsUs(availableRangeValuesUs);
-		Log.d(TAG, "availableRange [" + availableRange.isStatic() + ", " + availableRangeValuesUs[0] + ", " + availableRangeValuesUs[1] + "]");
-	}
-
-	private void printInternalError(String type, Exception e) {
-		Log.e(TAG, "internalError [" + getSessionTimeString() + ", " + type + "]", e);
-	}
-
-	private String getStateString(int state) {
+	private
+	String getStateString(int state) {
 		switch(state) {
 			case ExoPlayer.STATE_BUFFERING:
 				return "B";
@@ -188,12 +120,114 @@ public class EventLogger implements Player.Listener,
 		}
 	}
 
-	private String getSessionTimeString() {
-		return getTimeString(SystemClock.elapsedRealtime() - sessionStartTimeMs);
+	@Override
+	public
+	void onVideoFormatEnabled(Format format, int trigger, long mediaTimeMs) {
+		Log.d(TAG, "videoFormat [" + getSessionTimeString() + ", " + format.id + ", " + Integer.toString(trigger) + "]");
 	}
 
-	private String getTimeString(long timeMs) {
-		return TIME_FORMAT.format((timeMs) / 1000f);
+	@Override
+	public
+	void onAudioFormatEnabled(Format format, int trigger, long mediaTimeMs) {
+		Log.d(TAG, "audioFormat [" + getSessionTimeString() + ", " + format.id + ", " + Integer.toString(trigger) + "]");
+	}
+
+	@Override
+	public
+	void onDroppedFrames(int count, long elapsed) {
+		Log.d(TAG, "droppedFrames [" + getSessionTimeString() + ", " + count + "]");
+	}
+
+	// DemoPlayer.InternalErrorListener
+
+	@Override
+	public
+	void onBandwidthSample(int elapsedMs, long bytes, long bitrateEstimate) {
+		Log.d(TAG, "bandwidth [" + getSessionTimeString() + ", " + bytes + ", " + getTimeString(elapsedMs) + ", " + bitrateEstimate + "]");
+	}
+
+	@Override
+	public
+	void onLoadStarted(int sourceId, long length, int type, int trigger, Format format, long mediaStartTimeMs, long mediaEndTimeMs) {
+		mLoadStartTimeMs[sourceId] = SystemClock.elapsedRealtime();
+		if(VerboseLogUtil.isTagEnabled(TAG)) {
+			Log.v(TAG, "loadStart [" + getSessionTimeString() + ", " + sourceId + ", " + type + ", " + mediaStartTimeMs + ", " + mediaEndTimeMs + "]");
+		}
+	}
+
+	@Override
+	public
+	void onLoadCompleted(int sourceId, long bytesLoaded, int type, int trigger, Format format, long mediaStartTimeMs, long mediaEndTimeMs, long elapsedRealtimeMs, long loadDurationMs) {
+		if(VerboseLogUtil.isTagEnabled(TAG)) {
+			long downloadTime = SystemClock.elapsedRealtime() - mLoadStartTimeMs[sourceId];
+			Log.v(TAG, "loadEnd [" + getSessionTimeString() + ", " + sourceId + ", " + downloadTime + "]");
+		}
+	}
+
+	@Override
+	public
+	void onDecoderInitialized(String decoderName, long elapsedRealtimeMs, long initializationDurationMs) {
+		Log.d(TAG, "decoderInitialized [" + getSessionTimeString() + ", " + decoderName + "]");
+	}
+
+	@Override
+	public
+	void onAvailableRangeChanged(TimeRange availableRange) {
+		mAvailableRangeValuesUs = availableRange.getCurrentBoundsUs(mAvailableRangeValuesUs);
+		Log.d(TAG, "availableRange [" + availableRange.isStatic() + ", " + mAvailableRangeValuesUs[0] + ", " + mAvailableRangeValuesUs[1] + "]");
+	}
+
+	@Override
+	public
+	void onRendererInitializationError(Exception e) {
+		printInternalError("rendererInitError", e);
+	}
+
+	@Override
+	public
+	void onAudioTrackInitializationError(AudioTrack.InitializationException e) {
+		printInternalError("audioTrackInitializationError", e);
+	}
+
+	@Override
+	public
+	void onAudioTrackWriteError(AudioTrack.WriteException e) {
+		printInternalError("audioTrackWriteError", e);
+	}
+
+	@Override
+	public
+	void onAudioTrackUnderrun(int bufferSize, long bufferSizeMs, long elapsedSinceLastFeedMs) {
+		printInternalError("audioTrackUnderrun [" + bufferSize + ", " + bufferSizeMs + ", " + elapsedSinceLastFeedMs + "]", null);
+	}
+
+	@Override
+	public
+	void onDecoderInitializationError(DecoderInitializationException e) {
+		printInternalError("decoderInitializationError", e);
+	}
+
+	@Override
+	public
+	void onCryptoError(CryptoException e) {
+		printInternalError("cryptoError", e);
+	}
+
+	@Override
+	public
+	void onLoadError(int sourceId, IOException e) {
+		printInternalError("loadError", e);
+	}
+
+	@Override
+	public
+	void onDrmSessionManagerError(Exception e) {
+		printInternalError("drmSessionManagerError", e);
+	}
+
+	private
+	void printInternalError(String type, Exception e) {
+		Log.e(TAG, "internalError [" + getSessionTimeString() + ", " + type + "]", e);
 	}
 
 }

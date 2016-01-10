@@ -51,7 +51,8 @@ import tobikster.streamingtester.player.Player;
 /**
  * A {@link Player.RendererBuilder} for HLS.
  */
-public class HlsRendererBuilder implements Player.RendererBuilder {
+public
+class HlsRendererBuilder implements Player.RendererBuilder {
 
 	private static final int BUFFER_SEGMENT_SIZE = 64 * 1024;
 	private static final int BUFFER_SEGMENTS = 256;
@@ -62,27 +63,31 @@ public class HlsRendererBuilder implements Player.RendererBuilder {
 
 	private AsyncRendererBuilder currentAsyncBuilder;
 
-	public HlsRendererBuilder(Context context, String userAgent, String url) {
+	public
+	HlsRendererBuilder(Context context, String userAgent, String url) {
 		this.context = context;
 		this.userAgent = userAgent;
 		this.url = url;
 	}
 
 	@Override
-	public void buildRenderers(Player player) {
+	public
+	void buildRenderers(Player player) {
 		currentAsyncBuilder = new AsyncRendererBuilder(context, userAgent, url, player);
 		currentAsyncBuilder.init();
 	}
 
 	@Override
-	public void cancel() {
+	public
+	void cancel() {
 		if(currentAsyncBuilder != null) {
 			currentAsyncBuilder.cancel();
 			currentAsyncBuilder = null;
 		}
 	}
 
-	private static final class AsyncRendererBuilder implements ManifestCallback<HlsPlaylist> {
+	private static final
+	class AsyncRendererBuilder implements ManifestCallback<HlsPlaylist> {
 
 		private final Context context;
 		private final String userAgent;
@@ -92,7 +97,8 @@ public class HlsRendererBuilder implements Player.RendererBuilder {
 
 		private boolean canceled;
 
-		public AsyncRendererBuilder(Context context, String userAgent, String url, Player player) {
+		public
+		AsyncRendererBuilder(Context context, String userAgent, String url, Player player) {
 			this.context = context;
 			this.userAgent = userAgent;
 			this.url = url;
@@ -101,25 +107,19 @@ public class HlsRendererBuilder implements Player.RendererBuilder {
 			playlistFetcher = new ManifestFetcher<>(url, new DefaultUriDataSource(context, userAgent), parser);
 		}
 
-		public void init() {
+		public
+		void init() {
 			playlistFetcher.singleLoad(player.getMainHandler().getLooper(), this);
 		}
 
-		public void cancel() {
+		public
+		void cancel() {
 			canceled = true;
 		}
 
 		@Override
-		public void onSingleManifestError(IOException e) {
-			if(canceled) {
-				return;
-			}
-
-			player.onRenderersError(e);
-		}
-
-		@Override
-		public void onSingleManifest(HlsPlaylist manifest) {
+		public
+		void onSingleManifest(HlsPlaylist manifest) {
 			if(canceled) {
 				return;
 			}
@@ -158,6 +158,16 @@ public class HlsRendererBuilder implements Player.RendererBuilder {
 			renderers[Player.TYPE_METADATA] = id3Renderer;
 			renderers[Player.TYPE_TEXT] = closedCaptionRenderer;
 			player.onRenderers(renderers, bandwidthMeter);
+		}
+
+		@Override
+		public
+		void onSingleManifestError(IOException e) {
+			if(canceled) {
+				return;
+			}
+
+			player.onRenderersError(e);
 		}
 
 	}
