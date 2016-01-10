@@ -1,14 +1,10 @@
 package tobikster.streamingtester.activities;
 
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -27,7 +23,6 @@ import tobikster.streamingtester.fragments.ExoPlayerFragment;
 import tobikster.streamingtester.fragments.MediaPlayerFragment;
 import tobikster.streamingtester.fragments.SettingsFragment;
 import tobikster.streamingtester.fragments.WebViewFragment;
-import tobikster.streamingtester.services.CpuMonitoringService;
 
 public
 class StreamingTestActivity extends AppCompatActivity {
@@ -39,23 +34,6 @@ class StreamingTestActivity extends AppCompatActivity {
 	private static final String TAG = StreamingTestActivity.class.getSimpleName();
 
 	BatteryStateReceiver mBatteryStateReceiver;
-	CpuMonitoringService.Binder mCpuMonitoringServiceBinder;
-
-	private final ServiceConnection mCpuMonitoringServiceConnection = new ServiceConnection() {
-		@Override
-		public
-		void onServiceConnected(ComponentName name, IBinder service) {
-			Log.d(TAG, String.format("\"%s\" service connected", name.toString()));
-			mCpuMonitoringServiceBinder = (CpuMonitoringService.Binder)service;
-		}
-
-		@Override
-		public
-		void onServiceDisconnected(ComponentName name) {
-			Log.d(TAG, String.format("\"%s\" service disconnected", name.toString()));
-			mCpuMonitoringServiceBinder = null;
-		}
-	};
 
 	@Override
 	protected
@@ -109,7 +87,6 @@ class StreamingTestActivity extends AppCompatActivity {
 	protected
 	void onStop() {
 		super.onStop();
-		unbindService(mCpuMonitoringServiceConnection);
 	}
 
 	@Override
@@ -132,8 +109,6 @@ class StreamingTestActivity extends AppCompatActivity {
 	void onStart() {
 		super.onStart();
 		mBatteryStateReceiver = new BatteryStateReceiver();
-		Intent startCpuMonitoringServiceIntent = new Intent(this, CpuMonitoringService.class);
-		bindService(startCpuMonitoringServiceIntent, mCpuMonitoringServiceConnection, Context.BIND_AUTO_CREATE);
 	}
 
 	@Override
@@ -149,15 +124,7 @@ class StreamingTestActivity extends AppCompatActivity {
 		boolean eventConsumed;
 		switch(item.getItemId()) {
 			case R.id.menu_item_toggle_cpu_monitoring:
-//				boolean cpuMonitoringEnabled = !item.isChecked();
-//				item.setChecked(cpuMonitoringEnabled);
-//				if(cpuMonitoringEnabled) {
-//					mCpuMonitoringServiceBinder.startCpuMonitoring();
-//				}
-//				else {
-//					mCpuMonitoringServiceBinder.stopCpuMonitoring();
-//				}
-				new CpuMonitoringTask().execute((Void)null);
+//				new CpuMonitoringTask().execute((Void)null);
 				eventConsumed = true;
 				break;
 

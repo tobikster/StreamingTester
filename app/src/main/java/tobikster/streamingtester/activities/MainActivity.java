@@ -11,7 +11,6 @@ import android.view.View;
 import android.widget.Button;
 
 import tobikster.streamingtester.R;
-import tobikster.streamingtester.database.StreamingTesterDataSource;
 import tobikster.streamingtester.fragments.SettingsFragment;
 
 public
@@ -22,8 +21,6 @@ class MainActivity extends AppCompatActivity implements View.OnClickListener {
 	Button mMediaPlayerTestButton;
 	Button mWebViewTestButton;
 	Button mExoPlayerTestButton;
-
-	StreamingTesterDataSource mDataSource;
 
 	@Override
 	protected
@@ -38,8 +35,6 @@ class MainActivity extends AppCompatActivity implements View.OnClickListener {
 		mMediaPlayerTestButton.setOnClickListener(this);
 		mWebViewTestButton.setOnClickListener(this);
 		mExoPlayerTestButton.setOnClickListener(this);
-
-		mDataSource = new StreamingTesterDataSource(this);
 	}
 
 	@Override

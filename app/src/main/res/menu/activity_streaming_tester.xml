@@ -3,5 +3,6 @@
     <item
         android:id="@+id/menu_item_toggle_cpu_monitoring"
         android:title="@string/menu_item_cpu_monitoring_enabled"
-        android:checkable="true"/>
+        android:checkable="true"
+        android:enabled="false"/>
 </menu>

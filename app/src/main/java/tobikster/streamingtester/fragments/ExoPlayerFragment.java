@@ -17,7 +17,6 @@ package tobikster.streamingtester.fragments;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -77,7 +76,6 @@ import tobikster.streamingtester.player.renderersbuilders.DashRendererBuilder;
 import tobikster.streamingtester.player.renderersbuilders.ExtractorRendererBuilder;
 import tobikster.streamingtester.player.renderersbuilders.HlsRendererBuilder;
 import tobikster.streamingtester.player.renderersbuilders.SmoothStreamingRendererBuilder;
-import tobikster.streamingtester.services.CpuMonitoringService;
 import tobikster.streamingtester.utils.DebugTextViewHelper;
 
 /**
@@ -223,8 +221,6 @@ class ExoPlayerFragment extends Fragment implements SurfaceHolder.Callback,
 	@Override
 	public
 	View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		Intent cpuMonitoringServiceIntent = new Intent(getActivity(), CpuMonitoringService.class);
-		getActivity().startService(cpuMonitoringServiceIntent);
 		return inflater.inflate(R.layout.fragment_exo_player, container, false);
 	}
 

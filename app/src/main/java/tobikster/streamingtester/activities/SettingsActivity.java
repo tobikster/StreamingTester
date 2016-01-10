@@ -7,7 +7,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
 import tobikster.streamingtester.R;
-import tobikster.streamingtester.database.StreamingTesterDataSource;
 import tobikster.streamingtester.fragments.SettingsFragment;
 import tobikster.streamingtester.utils.FileUtils;
 
