@@ -5,9 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
     android:background="?attr/colorPrimary"
-    android:orientation="vertical"
     android:elevation="4dp"
-    android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-    android:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+    android:orientation="vertical"
+    android:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+    android:theme="@style/ThemeOverlay.AppCompat.ActionBar">
 
 </android.support.v7.widget.Toolbar>

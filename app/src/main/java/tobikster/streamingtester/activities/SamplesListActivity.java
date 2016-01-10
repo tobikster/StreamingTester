@@ -12,10 +12,12 @@ import tobikster.streamingtester.R;
 import tobikster.streamingtester.fragments.SampleChooserFragment;
 import tobikster.streamingtester.fragments.SettingsFragment;
 
-public class SamplesListActivity extends AppCompatActivity implements SampleChooserFragment.InteractionListener {
+public
+class SamplesListActivity extends AppCompatActivity implements SampleChooserFragment.InteractionListener {
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	protected
+	void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_samples_list);
 
@@ -29,7 +31,8 @@ public class SamplesListActivity extends AppCompatActivity implements SampleChoo
 	}
 
 	@Override
-	public void onSampleSelected(String contentUri, String contentId, int type) {
+	public
+	void onSampleSelected(String contentUri, String contentId, int type) {
 		Intent startTestActivityIntent = new Intent(this, StreamingTestActivity.class);
 		startTestActivityIntent.putExtra(StreamingTestActivity.EXTRA_CONTENT_URI, contentUri);
 		startTestActivityIntent.putExtra(StreamingTestActivity.EXTRA_CONTENT_ID, contentId);

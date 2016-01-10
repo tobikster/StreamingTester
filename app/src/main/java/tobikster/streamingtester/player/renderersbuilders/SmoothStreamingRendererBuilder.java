@@ -54,7 +54,8 @@ import tobikster.streamingtester.player.Player;
 /**
  * A {@link Player.RendererBuilder} for SmoothStreaming.
  */
-public class SmoothStreamingRendererBuilder implements Player.RendererBuilder {
+public
+class SmoothStreamingRendererBuilder implements Player.RendererBuilder {
 
 	private static final int BUFFER_SEGMENT_SIZE = 64 * 1024;
 	private static final int VIDEO_BUFFER_SEGMENTS = 200;
@@ -69,7 +70,8 @@ public class SmoothStreamingRendererBuilder implements Player.RendererBuilder {
 
 	private AsyncRendererBuilder currentAsyncBuilder;
 
-	public SmoothStreamingRendererBuilder(Context context, String userAgent, String url, MediaDrmCallback drmCallback) {
+	public
+	SmoothStreamingRendererBuilder(Context context, String userAgent, String url, MediaDrmCallback drmCallback) {
 		this.context = context;
 		this.userAgent = userAgent;
 		this.url = Util.toLowerInvariant(url).endsWith("/manifest") ? url : url + "/Manifest";
@@ -77,20 +79,23 @@ public class SmoothStreamingRendererBuilder implements Player.RendererBuilder {
 	}
 
 	@Override
-	public void buildRenderers(Player player) {
+	public
+	void buildRenderers(Player player) {
 		currentAsyncBuilder = new AsyncRendererBuilder(context, userAgent, url, drmCallback, player);
 		currentAsyncBuilder.init();
 	}
 
 	@Override
-	public void cancel() {
+	public
+	void cancel() {
 		if(currentAsyncBuilder != null) {
 			currentAsyncBuilder.cancel();
 			currentAsyncBuilder = null;
 		}
 	}
 
-	private static final class AsyncRendererBuilder implements ManifestFetcher.ManifestCallback<SmoothStreamingManifest> {
+	private static final
+	class AsyncRendererBuilder implements ManifestFetcher.ManifestCallback<SmoothStreamingManifest> {
 
 		private final Context context;
 		private final String userAgent;
@@ -100,7 +105,8 @@ public class SmoothStreamingRendererBuilder implements Player.RendererBuilder {
 
 		private boolean canceled;
 
-		public AsyncRendererBuilder(Context context, String userAgent, String url, MediaDrmCallback drmCallback, Player player) {
+		public
+		AsyncRendererBuilder(Context context, String userAgent, String url, MediaDrmCallback drmCallback, Player player) {
 			this.context = context;
 			this.userAgent = userAgent;
 			this.drmCallback = drmCallback;
@@ -109,25 +115,19 @@ public class SmoothStreamingRendererBuilder implements Player.RendererBuilder {
 			manifestFetcher = new ManifestFetcher<>(url, new DefaultHttpDataSource(userAgent, null), parser);
 		}
 
-		public void init() {
+		public
+		void init() {
 			manifestFetcher.singleLoad(player.getMainHandler().getLooper(), this);
 		}
 
-		public void cancel() {
+		public
+		void cancel() {
 			canceled = true;
 		}
 
 		@Override
-		public void onSingleManifestError(IOException exception) {
-			if(canceled) {
-				return;
-			}
-
-			player.onRenderersError(exception);
-		}
-
-		@Override
-		public void onSingleManifest(SmoothStreamingManifest manifest) {
+		public
+		void onSingleManifest(SmoothStreamingManifest manifest) {
 			if(canceled) {
 				return;
 			}
@@ -154,19 +154,39 @@ public class SmoothStreamingRendererBuilder implements Player.RendererBuilder {
 
 			// Build the video renderer.
 			DataSource videoDataSource = new DefaultUriDataSource(context, bandwidthMeter, userAgent);
-			ChunkSource videoChunkSource = new SmoothStreamingChunkSource(manifestFetcher, new DefaultSmoothStreamingTrackSelector(context, StreamElement.TYPE_VIDEO), videoDataSource, new AdaptiveEvaluator(bandwidthMeter), LIVE_EDGE_LATENCY_MS);
+			ChunkSource videoChunkSource = new SmoothStreamingChunkSource(manifestFetcher,
+			                                                              new DefaultSmoothStreamingTrackSelector(context, StreamElement.TYPE_VIDEO),
+			                                                              videoDataSource,
+			                                                              new AdaptiveEvaluator(bandwidthMeter),
+			                                                              LIVE_EDGE_LATENCY_MS);
 			ChunkSampleSource videoSampleSource = new ChunkSampleSource(videoChunkSource, loadControl, VIDEO_BUFFER_SEGMENTS * BUFFER_SEGMENT_SIZE, mainHandler, player, Player.TYPE_VIDEO);
-			TrackRenderer videoRenderer = new MediaCodecVideoTrackRenderer(context, videoSampleSource, MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT, 5000, drmSessionManager, true, mainHandler, player, 50);
+			TrackRenderer videoRenderer = new MediaCodecVideoTrackRenderer(context,
+			                                                               videoSampleSource,
+			                                                               MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT,
+			                                                               5000,
+			                                                               drmSessionManager,
+			                                                               true,
+			                                                               mainHandler,
+			                                                               player,
+			                                                               50);
 
 			// Build the audio renderer.
 			DataSource audioDataSource = new DefaultUriDataSource(context, bandwidthMeter, userAgent);
-			ChunkSource audioChunkSource = new SmoothStreamingChunkSource(manifestFetcher, new DefaultSmoothStreamingTrackSelector(context, StreamElement.TYPE_AUDIO), audioDataSource, null, LIVE_EDGE_LATENCY_MS);
+			ChunkSource audioChunkSource = new SmoothStreamingChunkSource(manifestFetcher,
+			                                                              new DefaultSmoothStreamingTrackSelector(context, StreamElement.TYPE_AUDIO),
+			                                                              audioDataSource,
+			                                                              null,
+			                                                              LIVE_EDGE_LATENCY_MS);
 			ChunkSampleSource audioSampleSource = new ChunkSampleSource(audioChunkSource, loadControl, AUDIO_BUFFER_SEGMENTS * BUFFER_SEGMENT_SIZE, mainHandler, player, Player.TYPE_AUDIO);
 			TrackRenderer audioRenderer = new MediaCodecAudioTrackRenderer(audioSampleSource, drmSessionManager, true, mainHandler, player, AudioCapabilities.getCapabilities(context));
 
 			// Build the text renderer.
 			DataSource textDataSource = new DefaultUriDataSource(context, bandwidthMeter, userAgent);
-			ChunkSource textChunkSource = new SmoothStreamingChunkSource(manifestFetcher, new DefaultSmoothStreamingTrackSelector(context, StreamElement.TYPE_TEXT), textDataSource, null, LIVE_EDGE_LATENCY_MS);
+			ChunkSource textChunkSource = new SmoothStreamingChunkSource(manifestFetcher,
+			                                                             new DefaultSmoothStreamingTrackSelector(context, StreamElement.TYPE_TEXT),
+			                                                             textDataSource,
+			                                                             null,
+			                                                             LIVE_EDGE_LATENCY_MS);
 			ChunkSampleSource textSampleSource = new ChunkSampleSource(textChunkSource, loadControl, TEXT_BUFFER_SEGMENTS * BUFFER_SEGMENT_SIZE, mainHandler, player, Player.TYPE_TEXT);
 			TrackRenderer textRenderer = new TextTrackRenderer(textSampleSource, player, mainHandler.getLooper());
 
@@ -176,6 +196,16 @@ public class SmoothStreamingRendererBuilder implements Player.RendererBuilder {
 			renderers[Player.TYPE_AUDIO] = audioRenderer;
 			renderers[Player.TYPE_TEXT] = textRenderer;
 			player.onRenderers(renderers, bandwidthMeter);
+		}
+
+		@Override
+		public
+		void onSingleManifestError(IOException exception) {
+			if(canceled) {
+				return;
+			}
+
+			player.onRenderersError(exception);
 		}
 
 	}

@@ -3,28 +3,28 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="vertical"
+              android:paddingBottom="@dimen/activity_vertical_margin"
               android:paddingLeft="@dimen/activity_horizontal_margin"
               android:paddingRight="@dimen/activity_horizontal_margin"
               android:paddingTop="@dimen/activity_vertical_margin"
-              android:paddingBottom="@dimen/activity_vertical_margin"
               tools:context=".MainActivity">
 
     <Button
+        android:id="@+id/media_player_test_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="MediaPlayer test"
-        android:id="@+id/media_player_test_button"/>
+        android:text="MediaPlayer test"/>
 
     <Button
+        android:id="@+id/web_view_test_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="WebView test"
-        android:id="@+id/web_view_test_button"/>
+        android:text="WebView test"/>
 
     <Button
+        android:id="@+id/exo_player_test_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="ExoPlayer"
-        android:id="@+id/exo_player_test_button"/>
+        android:text="ExoPlayer"/>
 </LinearLayout>
 

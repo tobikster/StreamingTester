@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -12,46 +11,56 @@ import android.view.View;
 import android.widget.Button;
 
 import tobikster.streamingtester.R;
+import tobikster.streamingtester.database.StreamingTesterDataSource;
 import tobikster.streamingtester.fragments.SettingsFragment;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public
+class MainActivity extends AppCompatActivity implements View.OnClickListener {
 	@SuppressWarnings("unused")
 	public static final String LOGCAT_TAG = "MainActivity";
 
 	Button mMediaPlayerTestButton;
 	Button mWebViewTestButton;
-	Button mExoPlayerYestButton;
+	Button mExoPlayerTestButton;
+
+	StreamingTesterDataSource mDataSource;
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	protected
+	void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
 		mMediaPlayerTestButton = (Button)(findViewById(R.id.media_player_test_button));
 		mWebViewTestButton = (Button)(findViewById(R.id.web_view_test_button));
-		mExoPlayerYestButton = (Button)(findViewById(R.id.exo_player_test_button));
+		mExoPlayerTestButton = (Button)(findViewById(R.id.exo_player_test_button));
 
 		mMediaPlayerTestButton.setOnClickListener(this);
 		mWebViewTestButton.setOnClickListener(this);
-		mExoPlayerYestButton.setOnClickListener(this);
+		mExoPlayerTestButton.setOnClickListener(this);
+
+		mDataSource = new StreamingTesterDataSource(this);
 	}
 
 	@Override
-	protected void onDestroy() {
+	protected
+	void onDestroy() {
 		super.onDestroy();
 		mMediaPlayerTestButton.setOnClickListener(null);
 		mWebViewTestButton.setOnClickListener(null);
-		mExoPlayerYestButton.setOnClickListener(null);
+		mExoPlayerTestButton.setOnClickListener(null);
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
+	public
+	boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.activity_main, menu);
 		return true;
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
+	public
+	boolean onOptionsItemSelected(MenuItem item) {
 		boolean consumeEvent;
 		switch(item.getItemId()) {
 			case R.id.menu_item_settings:
@@ -67,7 +76,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 	}
 
 	@Override
-	public void onClick(View v) {
+	public
+	void onClick(View v) {
 		int testType = SettingsFragment.TEST_TYPE_UNKNOWN;
 		if(v == mMediaPlayerTestButton) {
 			testType = SettingsFragment.TEST_TYPE_MEDIAPLAYER;
@@ -75,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 		else if(v == mWebViewTestButton) {
 			testType = SettingsFragment.TEST_TYPE_WEBVIEW;
 		}
-		else if(v == mExoPlayerYestButton) {
+		else if(v == mExoPlayerTestButton) {
 			testType = SettingsFragment.TEST_TYPE_EXOPLAYER;
 		}
 

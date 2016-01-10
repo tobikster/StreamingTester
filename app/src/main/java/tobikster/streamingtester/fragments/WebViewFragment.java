@@ -23,7 +23,8 @@ import java.io.InputStream;
 import tobikster.streamingtester.R;
 
 
-public class WebViewFragment extends Fragment {
+public
+class WebViewFragment extends Fragment {
 	@SuppressWarnings("unused")
 	public static final String LOGCAT_TAG = "WebViewFragment";
 	private static final String ARG_URL = "url";
@@ -33,10 +34,12 @@ public class WebViewFragment extends Fragment {
 
 	private HttpServer mServer;
 
-	public WebViewFragment() {
+	public
+	WebViewFragment() {
 	}
 
-	public static WebViewFragment newInstance(String url) {
+	public static
+	WebViewFragment newInstance(String url) {
 		WebViewFragment fragment = new WebViewFragment();
 		Bundle args = new Bundle();
 		args.putString(ARG_URL, url);
@@ -45,7 +48,8 @@ public class WebViewFragment extends Fragment {
 	}
 
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	public
+	void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Bundle args = getArguments();
 		if(args != null) {
@@ -56,13 +60,12 @@ public class WebViewFragment extends Fragment {
 			mServer = new HttpServer();
 			mServer.addRequestHandler(new HttpRequestHandler() {
 				@Override
-				public HttpResponse handleRequest(HttpRequest request) {
-					String uri = request.getUri()
-					                    .substring(1);
+				public
+				HttpResponse handleRequest(HttpRequest request) {
+					String uri = request.getUri().substring(1);
 					HttpResponse response = null;
 					try {
-						InputStream input = getActivity().getAssets()
-						                                 .open(uri);
+						InputStream input = getActivity().getAssets().open(uri);
 						response = new HttpResponse(HttpStatus.OK, input);
 					}
 					catch(IOException e) {
@@ -79,25 +82,27 @@ public class WebViewFragment extends Fragment {
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	public
+	View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		return inflater.inflate(R.layout.fragment_web_view, container, false);
 	}
 
 	@Override
 	@SuppressLint("setJavaScriptEnabled")
-	public void onViewCreated(View view, Bundle savedInstanceState) {
+	public
+	void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
 		mWebView = (WebView)(view.findViewById(R.id.web_view));
-		mWebView.getSettings()
-		        .setJavaScriptEnabled(true);
+		mWebView.getSettings().setJavaScriptEnabled(true);
 		mWebView.addJavascriptInterface(new VideoJavaScriptInterface(), "Android");
 		mWebView.loadUrl(mUrl);
 
 	}
 
 	@Override
-	public void onResume() {
+	public
+	void onResume() {
 		super.onResume();
 		mWebView.onResume();
 		if(mServer != null) {
@@ -106,7 +111,8 @@ public class WebViewFragment extends Fragment {
 	}
 
 	@Override
-	public void onPause() {
+	public
+	void onPause() {
 		super.onPause();
 		mWebView.onPause();
 		if(mServer != null) {
@@ -114,17 +120,19 @@ public class WebViewFragment extends Fragment {
 		}
 	}
 
-	protected class VideoJavaScriptInterface {
+	protected
+	class VideoJavaScriptInterface {
 		protected Context mContext;
 
-		public VideoJavaScriptInterface() {
+		public
+		VideoJavaScriptInterface() {
 			mContext = WebViewFragment.this.getActivity();
 		}
 
 		@JavascriptInterface
-		public void showToast(String text) {
-			Toast.makeText(mContext, text, Toast.LENGTH_SHORT)
-			     .show();
+		public
+		void showToast(String text) {
+			Toast.makeText(mContext, text, Toast.LENGTH_SHORT).show();
 		}
 	}
 }

@@ -33,7 +33,8 @@ import java.util.UUID;
  * Demo {@link StreamingDrmSessionManager} for smooth streaming test content.
  */
 @TargetApi(18)
-public class SmoothStreamingTestMediaDrmCallback implements MediaDrmCallback {
+public
+class SmoothStreamingTestMediaDrmCallback implements MediaDrmCallback {
 
 	private static final String PLAYREADY_TEST_DEFAULT_URI = "http://playready.directtaps.net/pr/svc/rightsmanager.asmx";
 	private static final Map<String, String> KEY_REQUEST_PROPERTIES;
@@ -46,13 +47,15 @@ public class SmoothStreamingTestMediaDrmCallback implements MediaDrmCallback {
 	}
 
 	@Override
-	public byte[] executeProvisionRequest(UUID uuid, ProvisionRequest request) throws IOException {
+	public
+	byte[] executeProvisionRequest(UUID uuid, ProvisionRequest request) throws IOException {
 		String url = request.getDefaultUrl() + "&signedRequest=" + new String(request.getData());
 		return Util.executePost(url, null, null);
 	}
 
 	@Override
-	public byte[] executeKeyRequest(UUID uuid, KeyRequest request) throws Exception {
+	public
+	byte[] executeKeyRequest(UUID uuid, KeyRequest request) throws Exception {
 		String url = request.getDefaultUrl();
 		if(TextUtils.isEmpty(url)) {
 			url = PLAYREADY_TEST_DEFAULT_URI;
