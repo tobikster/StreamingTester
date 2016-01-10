@@ -1,15 +1,19 @@
 package tobikster.streamingtester.activities;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -23,18 +27,39 @@ import tobikster.streamingtester.fragments.ExoPlayerFragment;
 import tobikster.streamingtester.fragments.MediaPlayerFragment;
 import tobikster.streamingtester.fragments.SettingsFragment;
 import tobikster.streamingtester.fragments.WebViewFragment;
+import tobikster.streamingtester.services.CpuMonitoringService;
 
-public class StreamingTestActivity extends AppCompatActivity {
+public
+class StreamingTestActivity extends AppCompatActivity {
 	@SuppressWarnings("unused")
 	public static final String LOGCAT_TAG = "StreamingTest";
 	public static final String EXTRA_CONTENT_ID = "extra_content_id";
 	public static final String EXTRA_CONTENT_URI = "extra_content_uri";
 	public static final String EXTRA_CONTENT_TYPE = "extra_content_type";
+	private static final String TAG = StreamingTestActivity.class.getSimpleName();
 
 	BatteryStateReceiver mBatteryStateReceiver;
+	CpuMonitoringService.Binder mCpuMonitoringServiceBinder;
+
+	private final ServiceConnection mCpuMonitoringServiceConnection = new ServiceConnection() {
+		@Override
+		public
+		void onServiceConnected(ComponentName name, IBinder service) {
+			Log.d(TAG, String.format("\"%s\" service connected", name.toString()));
+			mCpuMonitoringServiceBinder = (CpuMonitoringService.Binder)service;
+		}
+
+		@Override
+		public
+		void onServiceDisconnected(ComponentName name) {
+			Log.d(TAG, String.format("\"%s\" service disconnected", name.toString()));
+			mCpuMonitoringServiceBinder = null;
+		}
+	};
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	protected
+	void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_streaming_test);
 
@@ -70,36 +95,69 @@ public class StreamingTestActivity extends AppCompatActivity {
 		}
 	}
 
-	@Override
-	protected void onStart() {
-		super.onStart();
-		mBatteryStateReceiver = new BatteryStateReceiver();
+	private
+	void replaceFragment(Fragment fragment, boolean addToBackStack) {
+		final FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+		transaction.replace(R.id.fragment_container, fragment);
+		if(addToBackStack) {
+			transaction.addToBackStack(null);
+		}
+		transaction.commit();
 	}
 
 	@Override
-	protected void onResume() {
+	protected
+	void onStop() {
+		super.onStop();
+		unbindService(mCpuMonitoringServiceConnection);
+	}
+
+	@Override
+	protected
+	void onPause() {
+		unregisterReceiver(mBatteryStateReceiver);
+		super.onPause();
+	}
+
+	@Override
+	protected
+	void onResume() {
 		super.onResume();
 		IntentFilter batteryStateIntentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
 		registerReceiver(mBatteryStateReceiver, batteryStateIntentFilter);
 	}
 
 	@Override
-	protected void onPause() {
-		unregisterReceiver(mBatteryStateReceiver);
-		super.onPause();
+	protected
+	void onStart() {
+		super.onStart();
+		mBatteryStateReceiver = new BatteryStateReceiver();
+		Intent startCpuMonitoringServiceIntent = new Intent(this, CpuMonitoringService.class);
+		bindService(startCpuMonitoringServiceIntent, mCpuMonitoringServiceConnection, Context.BIND_AUTO_CREATE);
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
+	public
+	boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.activity_streaming_tester, menu);
 		return true;
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
+	public
+	boolean onOptionsItemSelected(MenuItem item) {
 		boolean eventConsumed;
 		switch(item.getItemId()) {
 			case R.id.menu_item_toggle_cpu_monitoring:
+//				boolean cpuMonitoringEnabled = !item.isChecked();
+//				item.setChecked(cpuMonitoringEnabled);
+//				if(cpuMonitoringEnabled) {
+//					mCpuMonitoringServiceBinder.startCpuMonitoring();
+//				}
+//				else {
+//					mCpuMonitoringServiceBinder.stopCpuMonitoring();
+//				}
+				new CpuMonitoringTask().execute((Void)null);
 				eventConsumed = true;
 				break;
 
@@ -109,12 +167,25 @@ public class StreamingTestActivity extends AppCompatActivity {
 		return eventConsumed;
 	}
 
-	private void replaceFragment(Fragment fragment, boolean addToBackStack) {
-		final FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-		transaction.replace(R.id.fragment_container, fragment);
-		if(addToBackStack) {
-			transaction.addToBackStack(null);
+	private static
+	class CpuMonitoringTask extends AsyncTask<Void, Void, Void> {
+
+		@Override
+		protected
+		Void doInBackground(Void... params) {
+			try {
+				Process process = Runtime.getRuntime().exec("top -d 0.1");
+				final BufferedReader outputReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
+				String line;
+				while((line = outputReader.readLine()) != null) {
+					Log.d(TAG, String.format("TOP command output: %s", line));
+				}
+			}
+			catch(IOException e) {
+				e.printStackTrace();
+			}
+			return null;
 		}
-		transaction.commit();
 	}
 }

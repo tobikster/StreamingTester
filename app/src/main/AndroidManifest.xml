@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-    package="tobikster.streamingtester"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<manifest package="tobikster.streamingtester"
+          xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
@@ -13,14 +12,13 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-
         <activity android:name=".activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
+
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-
         <activity
             android:name=".activities.SamplesListActivity"
             android:label="@string/title_activity_samples_list"
@@ -29,7 +27,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activities.MainActivity"/>
         </activity>
-
         <activity
             android:name=".activities.StreamingTestActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -38,14 +35,22 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activities.SamplesListActivity"/>
         </activity>
-
-        <activity android:name=".activities.SettingsActivity"
+        <activity
+            android:name=".activities.SettingsActivity"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="tobikster.streamingtester.REMOVE_BATTERY_LOG_FILE"/>
-                <category android:name="android.intent.category.DEFAULT" />
+                <action android:name="tobikster.streamingtester.INITIALIZE_DATABASE"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".services.CpuMonitoringService"
+            android:enabled="true"
+            android:exported="false">
+        </service>
     </application>
 
 </manifest>

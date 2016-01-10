@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <Preference android:title="@string/pref_delete_battery_log">
-        <intent
-            android:action="tobikster.streamingtester.REMOVE_BATTERY_LOG_FILE"/>
+        <intent android:action="tobikster.streamingtester.REMOVE_BATTERY_LOG_FILE"/>
     </Preference>
+    <Preference android:title="@string/pref_initialize_database">
+        <intent android:action="tobikster.streamingtester.INITIALIZE_DATABASE"/>
+    </Preference>
+    <EditTextPreference
+        android:defaultValue="192.168.0.4"
+        android:title="@string/local_server_address"/>
 </PreferenceScreen>
