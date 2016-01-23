@@ -12,7 +12,7 @@ import tobikster.streamingtester.utils.Samples;
  */
 public
 class Utils {
-	static
+	public static
 	class Matchers {
 		public static
 		Matcher<Object> sampleNameMatches(final Matcher<String> nameMatcher) {

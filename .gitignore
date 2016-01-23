@@ -1,9 +1,9 @@
-.gradle
+.gradle/
 /local.properties
 /.idea/workspace.xml
 /.idea/dictionaries/
 /.idea/libraries
 .DS_Store
-/build
-/ExoPlayer/build
+/build/
+/app/build/
 *.iml

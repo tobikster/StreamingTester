@@ -24,7 +24,7 @@ import tobikster.streamingtester.fragments.ExoPlayerFragment;
  */
 public
 class Samples {
-	public static final String LOCAL_SERVER_IP = "192.168.0.16";
+	public static final String LOCAL_SERVER_IP = "192.168.0.4";
 	public static final String APACHE_PORT = "80";
 	public static final String NGINX_PORT = "8080";
 
@@ -147,24 +147,31 @@ class Samples {
 	};
 
 	public static final Sample[] LOCAL_SERVER = new Sample[] {
-			                                                         new Sample("Big Buck Bunny - MP4",
-			                                                                    String.format("http://%s:%s/~tobikster/streamingtester/files/video_2.mp4", LOCAL_SERVER_IP, APACHE_PORT),
-			                                                                    ExoPlayerFragment.TYPE_OTHER),
+			                                                         new Sample("Big Buck Bunny - MP4", String.format("http://%s:%s/~tobikster/streamingtester/files/video_2.mp4",
+			                                                                                                          LOCAL_SERVER_IP,
+			                                                                                                          APACHE_PORT), ExoPlayerFragment.TYPE_OTHER),
 			                                                         new Sample("Tears of steel (DASH)",
-			                                                                    String.format("http://%s:%s/~tobikster/streamingtester/dash/tears_of_steel/stream.mpd", LOCAL_SERVER_IP, APACHE_PORT),
+			                                                                    String.format("http://%s:%s/~tobikster/streamingtester/dash/tears_of_steel/stream.mpd",
+			                                                                                  LOCAL_SERVER_IP,
+			                                                                                  APACHE_PORT),
 			                                                                    ExoPlayerFragment.TYPE_DASH),
 			                                                         new Sample("Tears of steel (DASH) - remote server",
 			                                                                    "http://www.bok.net/dash/tears_of_steel/cleartext/stream.mpd",
 			                                                                    ExoPlayerFragment.TYPE_DASH),
 			                                                         new Sample("Big Buck Bunny - DASH",
-			                                                                    String.format("http://%s:%s/~tobikster/streamingtester/dash/BigBuckBunny/MPDs/BigBuckBunny_1s_isoffmain_DIS_23009_1_v_2_1c2_2011_08_30.mpd", LOCAL_SERVER_IP,
+			                                                                    String.format("http://%s:%s/~tobikster/streamingtester/dash/BigBuckBunny/MPDs/BigBuckBunny_1s_isoffmain_DIS_23009_1_v_2_1c2_2011_08_30.mpd",
+			                                                                                  LOCAL_SERVER_IP,
 			                                                                                  APACHE_PORT),
 			                                                                    ExoPlayerFragment.TYPE_DASH),
 			                                                         new Sample("Big Buck Bunny - remote dataset",
 			                                                                    "http://www-itec.uni-klu.ac.at/ftp/datasets/DASHDataset2014/BigBuckBunny/1sec/BigBuckBunny_1s_simple_2014_05_09.mpd",
 			                                                                    ExoPlayerFragment.TYPE_DASH),
-			                                                         new Sample("Tears of steel - nginx", String.format("http://%s:%s/dash/tears_of_steel/stream.mpd", LOCAL_SERVER_IP, NGINX_PORT), ExoPlayerFragment.TYPE_DASH),
-																	 new Sample("Video - nginx", String.format("http://%s:%s/hls/video/playlist.m3u8", LOCAL_SERVER_IP, NGINX_PORT), ExoPlayerFragment.TYPE_HLS),
+			                                                         new Sample("Tears of steel - nginx",
+			                                                                    String.format("http://%s:%s/dash/tears_of_steel/stream.mpd", LOCAL_SERVER_IP, NGINX_PORT),
+			                                                                    ExoPlayerFragment.TYPE_DASH),
+			                                                         new Sample("Video - nginx",
+			                                                                    String.format("http://%s:%s/hls/video/playlist.m3u8", LOCAL_SERVER_IP, NGINX_PORT),
+			                                                                    ExoPlayerFragment.TYPE_HLS),
 	};
 
 	public static final Sample[] WEB_LOCAL_SERVER = new Sample[] {

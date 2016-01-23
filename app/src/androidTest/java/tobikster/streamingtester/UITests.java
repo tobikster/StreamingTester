@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import tobikster.streamingtester.activities.MainActivity;
+import tobikster.streamingtester.pageobjects.MainActivityPage;
 
 
 /**
@@ -20,10 +21,16 @@ import tobikster.streamingtester.activities.MainActivity;
  */
 @RunWith(AndroidJUnit4.class)
 public
-class TestCase {
+class UITests {
 
 	@Rule
 	public ActivityTestRule<MainActivity> activityRule = new ActivityTestRule<>(MainActivity.class);
+
+	@Test
+	public
+	void testOpenMediaPlayer() throws Exception {
+		new MainActivityPage().openMediaPlayerTest().selectSample("Dizzy");
+	}
 
 	@Test
 	public
