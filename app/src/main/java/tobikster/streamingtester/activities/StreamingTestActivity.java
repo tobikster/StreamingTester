@@ -44,7 +44,7 @@ class StreamingTestActivity extends AppCompatActivity {
 		getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		int testType = preferences.getInt(SettingsFragment.PREF_TEST_TYPE, SettingsFragment.TEST_TYPE_UNKNOWN);
+		int testType = preferences.getInt(getString(R.string.pref_test_type), SettingsFragment.TEST_TYPE_UNKNOWN);
 
 		Intent intent = getIntent();
 
@@ -64,7 +64,7 @@ class StreamingTestActivity extends AppCompatActivity {
 					break;
 
 				case SettingsFragment.TEST_TYPE_WEBVIEW:
-					fragment = WebViewFragment.newInstance(contentUri);
+					fragment = WebViewFragment.newInstance(contentUri, contentType);
 					break;
 			}
 			if(fragment != null) {

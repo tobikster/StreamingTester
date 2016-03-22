@@ -35,6 +35,8 @@ class MainActivity extends AppCompatActivity implements View.OnClickListener {
 		mMediaPlayerTestButton.setOnClickListener(this);
 		mWebViewTestButton.setOnClickListener(this);
 		mExoPlayerTestButton.setOnClickListener(this);
+
+		PreferenceManager.setDefaultValues(getApplicationContext(), R.xml.preferences, false);
 	}
 
 	@Override
@@ -85,7 +87,7 @@ class MainActivity extends AppCompatActivity implements View.OnClickListener {
 		}
 
 		SharedPreferences.Editor preferencesEditor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
-		preferencesEditor.putInt(SettingsFragment.PREF_TEST_TYPE, testType);
+		preferencesEditor.putInt(getString(R.string.pref_test_type), testType);
 		preferencesEditor.apply();
 
 		Intent startTestActivityIntent = new Intent(this, SamplesListActivity.class);

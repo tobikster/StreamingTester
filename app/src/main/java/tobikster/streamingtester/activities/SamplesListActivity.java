@@ -22,7 +22,7 @@ class SamplesListActivity extends AppCompatActivity implements SampleChooserFrag
 		setContentView(R.layout.activity_samples_list);
 
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		int testType = preferences.getInt(SettingsFragment.PREF_TEST_TYPE, SettingsFragment.TEST_TYPE_UNKNOWN);
+		int testType = preferences.getInt(getString(R.string.pref_test_type), SettingsFragment.TEST_TYPE_UNKNOWN);
 
 		Fragment samplesListFragment = SampleChooserFragment.newInstance(testType);
 		FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();

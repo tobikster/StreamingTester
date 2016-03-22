@@ -25,9 +25,14 @@
     <string name="menu_item_cpu_monitoring_enabled">CPU monitoring enabled</string>
     <string name="title_activity_samples_list">SamplesListActivity</string>
     <string name="action_settings">Settings</string>
-    <string name="pref_test_type">test_type</string>
     <string name="pref_delete_battery_log">Remove battery log file</string>
-    <string name="local_server_address">Local server address</string>
+    <string name="media_server_address">Media server IP address</string>
+	<string name="media_server_port">Media server TCP port</string>
     <string name="pref_initialize_database">Initialize database</string>
     <string name="info_operation_not_supported_yet">Operation not supported yet</string>
+	<string name="pref_test_type" translatable="false">pref_test_type</string>
+	<string name="pref_media_server_address" translatable="false">pref_media_server_ip_address</string>
+	<string name="pref_media_server_port" translatable="false">pref_media_server_tcp_port</string>
+	<string name="pref_default_media_server_address" translatable="false">10.0.0.2</string>
+	<string name="pref_default_media_server_port" translatable="false">8081</string>
 </resources>

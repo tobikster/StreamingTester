@@ -12,7 +12,6 @@ import tobikster.streamingtester.R;
  */
 public
 class SettingsFragment extends PreferenceFragment {
-	public static final String PREF_TEST_TYPE = "test_type";
 	public static final int TEST_TYPE_UNKNOWN = 0;
 	public static final int TEST_TYPE_MEDIAPLAYER = 1;
 	public static final int TEST_TYPE_EXOPLAYER = 2;

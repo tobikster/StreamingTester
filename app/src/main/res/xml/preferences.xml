@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <Preference android:title="@string/pref_delete_battery_log">
-        <intent android:action="tobikster.streamingtester.REMOVE_BATTERY_LOG_FILE"/>
-    </Preference>
-    <Preference android:title="@string/pref_initialize_database">
-        <intent android:action="tobikster.streamingtester.INITIALIZE_DATABASE"/>
-    </Preference>
-    <EditTextPreference
-        android:defaultValue="192.168.0.4"
-        android:title="@string/local_server_address"/>
+<PreferenceScreen xmlns:android = "http://schemas.android.com/apk/res/android">
+	<Preference android:title = "@string/pref_delete_battery_log">
+		<intent android:action = "tobikster.streamingtester.REMOVE_BATTERY_LOG_FILE" />
+	</Preference>
+	<Preference
+		android:enabled = "false"
+		android:title = "@string/pref_initialize_database">
+		<intent android:action = "tobikster.streamingtester.INITIALIZE_DATABASE" />
+	</Preference>
+	<EditTextPreference
+		android:defaultValue = "@string/pref_default_media_server_address"
+		android:key = "@string/pref_media_server_address"
+		android:title = "@string/media_server_address" />
+	<EditTextPreference
+		android:defaultValue = "@string/pref_default_media_server_port"
+		android:key = "@string/pref_media_server_port"
+		android:title = "@string/media_server_port" />
 </PreferenceScreen>

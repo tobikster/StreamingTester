@@ -17,8 +17,10 @@ package tobikster.streamingtester.fragments;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
@@ -66,6 +68,7 @@ import java.net.CookiePolicy;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.prefs.PreferenceChangeEvent;
 
 import tobikster.streamingtester.R;
 import tobikster.streamingtester.player.EventLogger;
@@ -89,6 +92,8 @@ class ExoPlayerFragment extends Fragment implements SurfaceHolder.Callback,
                                                     Player.Id3MetadataListener,
                                                     AudioCapabilitiesReceiver.Listener {
 
+	private static final String TAG = ExoPlayerFragment.class.getSimpleName();
+
 	// For use within demo app code.
 	public static final String ARG_CONTENT_URI = "content_uri";
 	public static final String ARG_CONTENT_ID = "content_id";
@@ -96,9 +101,8 @@ class ExoPlayerFragment extends Fragment implements SurfaceHolder.Callback,
 	public static final int TYPE_DASH = 0;
 	public static final int TYPE_SS = 1;
 	public static final int TYPE_HLS = 2;
-	public static final int TYPE_OTHER = 3;
 
-	private static final String TAG = "PlayerActivity";
+	public static final int TYPE_OTHER = 3;
 	private static final int MENU_GROUP_TRACKS = 1;
 	private static final int ID_OFFSET = 2;
 
@@ -209,9 +213,14 @@ class ExoPlayerFragment extends Fragment implements SurfaceHolder.Callback,
 	void onCreate(Bundle savedInstanceState) {
 		setHasOptionsMenu(true);
 		super.onCreate(savedInstanceState);
+
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
+		final String mediaServerAddress = preferences.getString(getString(R.string.pref_media_server_address), getString(R.string.pref_default_media_server_address));
+		final String mediaServerPort = preferences.getString(getString(R.string.pref_media_server_port), getString(R.string.pref_default_media_server_port));
+
 		Bundle args = getArguments();
 		if(args != null) {
-			mContentUri = Uri.parse(args.getString(ARG_CONTENT_URI));
+			mContentUri = Uri.parse(String.format("http://%s:%s/%s", mediaServerAddress, mediaServerPort, args.getString(ARG_CONTENT_URI)));
 			mContentId = args.getString(ARG_CONTENT_ID);
 			mContentType = args.getInt(ARG_CONTENT_TYPE, TYPE_OTHER);
 		}
