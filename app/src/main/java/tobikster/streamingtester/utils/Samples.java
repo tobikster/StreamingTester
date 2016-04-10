@@ -91,7 +91,8 @@ public class Samples {
 		new Sample("Audio - br 128 - sr 44100 - mp4 - libmp3lame - seg 4", "dash/streaming_tester/audio/sample_sr_44100_br_128_mp4_libmp3lame_seg_dash_4/stream.mpd", ExoPlayerFragment.TYPE_DASH),
 		new Sample("Audio - br 64 - sr 44100 - mp4 - libmp3lame - seg 1", "dash/streaming_tester/audio/sample_sr_44100_br_64_mp4_libmp3lame_seg_dash_1/stream.mpd", ExoPlayerFragment.TYPE_DASH),
 		new Sample("Audio - br 64 - sr 44100 - mp4 - libmp3lame - seg 2", "dash/streaming_tester/audio/sample_sr_44100_br_64_mp4_libmp3lame_seg_dash_2/stream.mpd", ExoPlayerFragment.TYPE_DASH),
-		new Sample("Audio - br 64 - sr 44100 - mp4 - libmp3lame - seg 4", "dash/streaming_tester/audio/sample_sr_44100_br_64_mp4_libmp3lame_seg_dash_4/stream.mpd", ExoPlayerFragment.TYPE_DASH)
+		new Sample("Audio - br 64 - sr 44100 - mp4 - libmp3lame - seg 4", "dash/streaming_tester/audio/sample_sr_44100_br_64_mp4_libmp3lame_seg_dash_4/stream.mpd", ExoPlayerFragment.TYPE_DASH),
+		new Sample("BigBuckBunny - test", "dash/streaming_tester/bunny/stream.mpd", ExoPlayerFragment.TYPE_DASH)
 	};
 	// @formatter:on
 

@@ -70,6 +70,12 @@ public class SampleChooserFragment extends Fragment {
 
 		switch(mTestType) {
 			case SettingsFragment.TEST_TYPE_WEBVIEW:
+				sampleAdapter.add(new Header("DASH"));
+				sampleAdapter.addAll((Object[]) Samples.DASH);
+				sampleAdapter.add(new Header("HLS"));
+				sampleAdapter.addAll((Object[]) Samples.HLS);
+				sampleAdapter.add(new Header("DIRECT STREAMING"));
+				sampleAdapter.addAll((Object[]) Samples.DIRECT_STREAMING);
 				break;
 
 			case SettingsFragment.TEST_TYPE_EXOPLAYER:

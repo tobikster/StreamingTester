@@ -53,22 +53,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import tobikster.streamingtester.utils.DebugTextViewHelper;
 
 /**
- * A wrapper around {@link ExoPlayer} that provides a higher level interface. It can be prepared
- * with one of a number of {@link RendererBuilder} classes to suit different use cases (e.g. DASH,
- * SmoothStreaming and so on).
+ * A wrapper around {@link ExoPlayer} that provides a higher level interface. It can be prepared with one of a number of
+ * {@link RendererBuilder} classes to suit different use cases (e.g. DASH, SmoothStreaming and so on).
  */
-public
-class Player implements ExoPlayer.Listener,
-                        ChunkSampleSource.EventListener,
-                        HlsSampleSource.EventListener,
-                        BandwidthMeter.EventListener,
-                        MediaCodecVideoTrackRenderer.EventListener,
-                        MediaCodecAudioTrackRenderer.EventListener,
-                        StreamingDrmSessionManager.EventListener,
-                        DashChunkSource.EventListener,
-                        TextRenderer,
-                        MetadataRenderer<Map<String, Object>>,
-                        DebugTextViewHelper.Provider {
+public class Player implements ExoPlayer.Listener, ChunkSampleSource.EventListener, HlsSampleSource.EventListener, BandwidthMeter.EventListener, MediaCodecVideoTrackRenderer.EventListener, MediaCodecAudioTrackRenderer.EventListener, StreamingDrmSessionManager.EventListener, DashChunkSource.EventListener, TextRenderer, MetadataRenderer<Map<String, Object>>, DebugTextViewHelper.Provider {
 
 
 	public static final int DISABLED_TRACK = -1;
@@ -111,8 +99,7 @@ class Player implements ExoPlayer.Listener,
 	private long mPlaybackStartedTime;
 	private long mBasePlaybackPosition;
 
-	public
-	Player(RendererBuilder rendererBuilder) {
+	public Player(RendererBuilder rendererBuilder) {
 		this.mRendererBuilder = rendererBuilder;
 		mPlayer = ExoPlayer.Factory.newInstance(RENDERER_COUNT, 1000, 5000);
 		mPlayer.addListener(this);
@@ -127,29 +114,24 @@ class Player implements ExoPlayer.Listener,
 		mTrackDuration = ExoPlayer.UNKNOWN_TIME;
 	}
 
-	public
-	PlayerControl getPlayerControl() {
+	public PlayerControl getPlayerControl() {
 		return mPlayerControl;
 	}
 
-	public
-	long getTrackDuration() {
+	public long getTrackDuration() {
 		return mTrackDuration;
 	}
 
-	public
-	Surface getSurface() {
+	public Surface getSurface() {
 		return mSurface;
 	}
 
-	public
-	void setSurface(Surface surface) {
+	public void setSurface(Surface surface) {
 		this.mSurface = surface;
 		pushSurface(false);
 	}
 
-	private
-	void pushSurface(boolean blockForSurfacePush) {
+	private void pushSurface(boolean blockForSurfacePush) {
 		if(mVideoRenderer == null) {
 			return;
 		}
@@ -162,13 +144,11 @@ class Player implements ExoPlayer.Listener,
 		}
 	}
 
-	public
-	boolean getBackgrounded() {
+	public boolean getBackgrounded() {
 		return mBackgrounded;
 	}
 
-	public
-	void setBackgrounded(boolean backgrounded) {
+	public void setBackgrounded(boolean backgrounded) {
 		if(this.mBackgrounded == backgrounded) {
 			return;
 		}
@@ -183,123 +163,109 @@ class Player implements ExoPlayer.Listener,
 		}
 	}
 
-	public
-	int getSelectedTrack(int type) {
+	public int getSelectedTrack(int type) {
 		return mPlayer.getSelectedTrack(type);
 	}
 
-	public
-	void setSelectedTrack(int type, int index) {
+	public void setSelectedTrack(int type, int index) {
 		mPlayer.setSelectedTrack(type, index);
 		if(type == TYPE_TEXT && index < 0 && mCaptionListener != null) {
-			mCaptionListener.onCues(Collections.<Cue>emptyList());
+			mCaptionListener.onCues(Collections.<Cue> emptyList());
 		}
 	}
 
-	public
-	void blockingClearSurface() {
+	public void blockingClearSurface() {
 		mSurface = null;
 		pushSurface(true);
 	}
 
-	public
-	long getDuration() {
+	public long getDuration() {
 		return mPlayer.getDuration();
 	}
 
-	public
-	int getBufferedPercentage() {
+	public int getBufferedPercentage() {
 		return mPlayer.getBufferedPercentage();
 	}
 
-	public
-	boolean getPlayWhenReady() {
+	public boolean getPlayWhenReady() {
 		return mPlayer.getPlayWhenReady();
 	}
 
-	public
-	void setPlayWhenReady(boolean playWhenReady) {
+	public void setPlayWhenReady(boolean playWhenReady) {
 		mPlayer.setPlayWhenReady(playWhenReady);
 	}
 
-	public
-	Looper getPlaybackLooper() {
+	public Looper getPlaybackLooper() {
 		return mPlayer.getPlaybackLooper();
 	}
 
-	public
-	Handler getMainHandler() {
+	public Handler getMainHandler() {
 		return mMainHandler;
 	}
 
-	public
-	void setInternalErrorListener(InternalErrorListener listener) {
+	public void setInternalErrorListener(InternalErrorListener listener) {
 		mInternalErrorListener = listener;
-	}	public
-	float getPlaybackInterceptionFactor() {
-		long currentPosition = getCurrentPosition() - mBasePlaybackPosition;
-		long playbackTime = System.currentTimeMillis() - mPlaybackStartedTime;
-		Log.d(TAG, String.format("playback time: %d, currentPosition: %d", playbackTime, currentPosition));
-		return (float)(currentPosition) / (float)(playbackTime);
 	}
 
-	public
-	void setInfoListener(InfoListener listener) {
+	public void setInfoListener(InfoListener listener) {
 		mInfoListener = listener;
-	}	@Override
-	public
-	long getCurrentPosition() {
+	}
+
+	@Override
+	public long getCurrentPosition() {
 		return mPlayer.getCurrentPosition();
 	}
 
-	public
-	void setCaptionListener(CaptionListener listener) {
+	public void setCaptionListener(CaptionListener listener) {
 		mCaptionListener = listener;
-	}	@Override
-	public
-	Format getFormat() {
+	}
+
+	@Override
+	public Format getFormat() {
 		return mVideoFormat;
 	}
 
-	public
-	void setMetadataListener(Id3MetadataListener listener) {
+	public void setMetadataListener(Id3MetadataListener listener) {
 		mId3MetadataListener = listener;
-	}	@Override
-	public
-	float getPlaybackInterruptionFactor() {
-		return getPlaybackInterceptionFactor();
 	}
 
-	public
-	void addListener(Listener listener) {
+	@Override
+	public float getPlaybackInterruptionFactor() {
+		long currentPosition = getCurrentPosition() - mBasePlaybackPosition;
+		long playbackTime = System.currentTimeMillis() - mPlaybackStartedTime;
+		Log.d(TAG, String.format("getPlaybackInterruptionFactor: playback time: %d, currentPosition: %d", playbackTime, currentPosition));
+		float playbackInterruptionFactor = (float) (currentPosition) / (float) (playbackTime);
+		Log.d(TAG, String.format("getPlaybackInterruptionFactor: %.2f", playbackInterruptionFactor));
+		return playbackInterruptionFactor;
+	}
+
+	public void addListener(Listener listener) {
 		mListeners.add(listener);
-	}	@Override
-	public
-	BandwidthMeter getBandwidthMeter() {
+	}
+
+	@Override
+	public BandwidthMeter getBandwidthMeter() {
 		return mBandwidthMeter;
 	}
 
-	public
-	void removeListener(Listener listener) {
+	public void removeListener(Listener listener) {
 		mListeners.remove(listener);
-	}	@Override
-	public
-	CodecCounters getCodecCounters() {
+	}
+
+	@Override
+	public CodecCounters getCodecCounters() {
 		return mCodecCounters;
 	}
 
-	public
-	int getTrackCount(int type) {
+	public int getTrackCount(int type) {
 		return mPlayer.getTrackCount(type);
 	}
 
-	public
-	MediaFormat getTrackFormat(int type, int index) {
+	public MediaFormat getTrackFormat(int type, int index) {
 		return mPlayer.getTrackFormat(type, index);
 	}
 
-	public
-	void prepare() {
+	public void prepare() {
 		if(mRendererBuildingState == RENDERER_BUILDING_STATE_BUILT) {
 			mPlayer.stop();
 		}
@@ -312,8 +278,7 @@ class Player implements ExoPlayer.Listener,
 		mRendererBuilder.buildRenderers(this);
 	}
 
-	private
-	void maybeReportPlayerState() {
+	private void maybeReportPlayerState() {
 		boolean playWhenReady = mPlayer.getPlayWhenReady();
 		int playbackState = getPlaybackState();
 		if(mLastReportedPlayWhenReady != playWhenReady || mLastReportedPlaybackState != playbackState) {
@@ -325,8 +290,7 @@ class Player implements ExoPlayer.Listener,
 		}
 	}
 
-	public
-	int getPlaybackState() {
+	public int getPlaybackState() {
 		if(mRendererBuildingState == RENDERER_BUILDING_STATE_BUILDING) {
 			return ExoPlayer.STATE_PREPARING;
 		}
@@ -342,12 +306,11 @@ class Player implements ExoPlayer.Listener,
 	/**
 	 * Invoked with the results from a {@link RendererBuilder}.
 	 *
-	 * @param renderers      Renderers indexed by {@link Player} TYPE_* constants. An individual
-	 *                       element may be null if there do not exist tracks of the corresponding type.
+	 * @param renderers      Renderers indexed by {@link Player} TYPE_* constants. An individual element may be null if
+	 *                       there do not exist tracks of the corresponding type.
 	 * @param bandwidthMeter Provides an estimate of the currently available bandwidth. May be null.
 	 */
-	public
-	void onRenderers(TrackRenderer[] renderers, BandwidthMeter bandwidthMeter) {
+	public void onRenderers(TrackRenderer[] renderers, BandwidthMeter bandwidthMeter) {
 		for(int i = 0; i < RENDERER_COUNT; ++i) {
 			if(renderers[i] == null) {
 				// Convert a null renderer to a dummy renderer.
@@ -356,7 +319,7 @@ class Player implements ExoPlayer.Listener,
 		}
 		// Complete preparation.
 		this.mVideoRenderer = renderers[TYPE_VIDEO];
-		this.mCodecCounters = mVideoRenderer instanceof MediaCodecTrackRenderer ? ((MediaCodecTrackRenderer)mVideoRenderer).codecCounters : renderers[TYPE_AUDIO] instanceof MediaCodecTrackRenderer ? ((MediaCodecTrackRenderer)renderers[TYPE_AUDIO]).codecCounters : null;
+		this.mCodecCounters = mVideoRenderer instanceof MediaCodecTrackRenderer ? ((MediaCodecTrackRenderer) mVideoRenderer).codecCounters : renderers[TYPE_AUDIO] instanceof MediaCodecTrackRenderer ? ((MediaCodecTrackRenderer) renderers[TYPE_AUDIO]).codecCounters : null;
 		this.mBandwidthMeter = bandwidthMeter;
 		pushSurface(false);
 		mPlayer.prepare(renderers);
@@ -369,8 +332,7 @@ class Player implements ExoPlayer.Listener,
 	 *
 	 * @param e Describes the error.
 	 */
-	public
-	void onRenderersError(Exception e) {
+	public void onRenderersError(Exception e) {
 		if(mInternalErrorListener != null) {
 			mInternalErrorListener.onRendererInitializationError(e);
 		}
@@ -381,13 +343,11 @@ class Player implements ExoPlayer.Listener,
 		maybeReportPlayerState();
 	}
 
-	public
-	void seekTo(long positionMs) {
+	public void seekTo(long positionMs) {
 		mPlayer.seekTo(positionMs);
 	}
 
-	public
-	void release() {
+	public void release() {
 		mRendererBuilder.cancel();
 		mRendererBuildingState = RENDERER_BUILDING_STATE_IDLE;
 		mSurface = null;
@@ -395,8 +355,7 @@ class Player implements ExoPlayer.Listener,
 	}
 
 	@Override
-	public
-	void onPlayerStateChanged(boolean playWhenReady, int state) {
+	public void onPlayerStateChanged(boolean playWhenReady, int state) {
 		maybeReportPlayerState();
 		if(isLoopModeEnabled() && state == ExoPlayer.STATE_ENDED) {
 			mPlayer.seekTo(0);
@@ -404,26 +363,22 @@ class Player implements ExoPlayer.Listener,
 		}
 	}
 
-	public
-	boolean isLoopModeEnabled() {
+	public boolean isLoopModeEnabled() {
 		return mLoopModeEnabled;
 	}
 
-	public
-	void setLoopModeEnabled(boolean loopModeEnabled) {
+	public void setLoopModeEnabled(boolean loopModeEnabled) {
 		mLoopModeEnabled = loopModeEnabled;
 	}
 
 	@Override
-	public
-	void onPlayWhenReadyCommitted() {
+	public void onPlayWhenReadyCommitted() {
 		mPlaybackStartedTime = System.currentTimeMillis();
 		mBasePlaybackPosition = getCurrentPosition();
 	}
 
 	@Override
-	public
-	void onPlayerError(ExoPlaybackException exception) {
+	public void onPlayerError(ExoPlaybackException exception) {
 		mRendererBuildingState = RENDERER_BUILDING_STATE_IDLE;
 		for(Listener listener : mListeners) {
 			listener.onError(exception);
@@ -431,160 +386,147 @@ class Player implements ExoPlayer.Listener,
 	}
 
 	@Override
-	public
-	void onDroppedFrames(int count, long elapsed) {
+	public void onDroppedFrames(int count, long elapsed) {
 		if(mInfoListener != null) {
 			mInfoListener.onDroppedFrames(count, elapsed);
 		}
 	}
 
 	@Override
-	public
-	void onVideoSizeChanged(int width, int height, int unappliedTotationDegrees, float pixelWidthHeightRatio) {
+	public void onVideoSizeChanged(int width, int height, int unappliedTotationDegrees, float pixelWidthHeightRatio) {
 		for(Listener listener : mListeners) {
 			listener.onVideoSizeChanged(width, height, unappliedTotationDegrees, pixelWidthHeightRatio);
 		}
 	}
 
 	@Override
-	public
-	void onDrawnToSurface(Surface surface) {
+	public void onDrawnToSurface(Surface surface) {
 		// Do nothing.
 	}
 
 	@Override
-	public
-	void onBandwidthSample(int elapsedMs, long bytes, long bitrateEstimate) {
+	public void onBandwidthSample(int elapsedMs, long bytes, long bitrateEstimate) {
 		if(mInfoListener != null) {
 			mInfoListener.onBandwidthSample(elapsedMs, bytes, bitrateEstimate);
 		}
 	}
 
 	@Override
-	public
-	void onDrmKeysLoaded() {
+	public void onDrmKeysLoaded() {
 		// Do nothing.
 	}
 
 	@Override
-	public
-	void onDrmSessionManagerError(Exception e) {
+	public void onDrmSessionManagerError(Exception e) {
 		if(mInternalErrorListener != null) {
 			mInternalErrorListener.onDrmSessionManagerError(e);
 		}
 	}
 
 	@Override
-	public
-	void onDecoderInitializationError(DecoderInitializationException e) {
+	public void onDecoderInitializationError(DecoderInitializationException e) {
 		if(mInternalErrorListener != null) {
 			mInternalErrorListener.onDecoderInitializationError(e);
 		}
 	}
 
 	@Override
-	public
-	void onCryptoError(CryptoException e) {
+	public void onCryptoError(CryptoException e) {
 		if(mInternalErrorListener != null) {
 			mInternalErrorListener.onCryptoError(e);
 		}
 	}
 
 	@Override
-	public
-	void onDecoderInitialized(String decoderName, long elapsedRealtimeMs, long initializationDurationMs) {
+	public void onDecoderInitialized(String decoderName, long elapsedRealtimeMs, long initializationDurationMs) {
 		if(mInfoListener != null) {
 			mInfoListener.onDecoderInitialized(decoderName, elapsedRealtimeMs, initializationDurationMs);
 		}
 	}
 
 	@Override
-	public
-	void onAudioTrackInitializationError(AudioTrack.InitializationException e) {
+	public void onAudioTrackInitializationError(AudioTrack.InitializationException e) {
 		if(mInternalErrorListener != null) {
 			mInternalErrorListener.onAudioTrackInitializationError(e);
 		}
 	}
 
 	@Override
-	public
-	void onAudioTrackWriteError(AudioTrack.WriteException e) {
+	public void onAudioTrackWriteError(AudioTrack.WriteException e) {
 		if(mInternalErrorListener != null) {
 			mInternalErrorListener.onAudioTrackWriteError(e);
 		}
 	}
 
 	@Override
-	public
-	void onAudioTrackUnderrun(int bufferSize, long bufferSizeMs, long elapsedSinceLastFeedMs) {
+	public void onAudioTrackUnderrun(int bufferSize, long bufferSizeMs, long elapsedSinceLastFeedMs) {
 		if(mInternalErrorListener != null) {
 			mInternalErrorListener.onAudioTrackUnderrun(bufferSize, bufferSizeMs, elapsedSinceLastFeedMs);
 		}
 	}
 
 	@Override
-	public
-	void onCues(List<Cue> cues) {
+	public void onCues(List<Cue> cues) {
 		if(mCaptionListener != null && getSelectedTrack(TYPE_TEXT) != DISABLED_TRACK) {
 			mCaptionListener.onCues(cues);
 		}
 	}
 
 	@Override
-	public
-	void onMetadata(Map<String, Object> metadata) {
+	public void onMetadata(Map<String, Object> metadata) {
 		if(mId3MetadataListener != null && getSelectedTrack(TYPE_METADATA) != DISABLED_TRACK) {
 			mId3MetadataListener.onId3Metadata(metadata);
 		}
 	}
 
 	@Override
-	public
-	void onAvailableRangeChanged(TimeRange availableRange) {
+	public void onAvailableRangeChanged(TimeRange availableRange) {
 		if(mInfoListener != null) {
 			mInfoListener.onAvailableRangeChanged(availableRange);
 		}
 	}
 
 	@Override
-	public
-	void onLoadStarted(int sourceId, long length, int type, int trigger, Format format, long mediaStartTimeMs, long mediaEndTimeMs) {
+	public void onLoadStarted(int sourceId, long length, int type, int trigger, Format format, long mediaStartTimeMs, long mediaEndTimeMs) {
 		if(mInfoListener != null) {
 			mInfoListener.onLoadStarted(sourceId, length, type, trigger, format, mediaStartTimeMs, mediaEndTimeMs);
 		}
 	}
 
 	@Override
-	public
-	void onLoadCompleted(int sourceId, long bytesLoaded, int type, int trigger, Format format, long mediaStartTimeMs, long mediaEndTimeMs, long elapsedRealtimeMs, long loadDurationMs) {
+	public void onLoadCompleted(int sourceId, long bytesLoaded, int type, int trigger, Format format, long mediaStartTimeMs, long mediaEndTimeMs, long elapsedRealtimeMs, long loadDurationMs) {
 		if(mInfoListener != null) {
-			mInfoListener.onLoadCompleted(sourceId, bytesLoaded, type, trigger, format, mediaStartTimeMs, mediaEndTimeMs, elapsedRealtimeMs, loadDurationMs);
+			mInfoListener.onLoadCompleted(sourceId,
+			                              bytesLoaded,
+			                              type,
+			                              trigger,
+			                              format,
+			                              mediaStartTimeMs,
+			                              mediaEndTimeMs,
+			                              elapsedRealtimeMs,
+			                              loadDurationMs);
 		}
 	}
 
 	@Override
-	public
-	void onLoadCanceled(int sourceId, long bytesLoaded) {
+	public void onLoadCanceled(int sourceId, long bytesLoaded) {
 		// Do nothing.
 	}
 
 	@Override
-	public
-	void onLoadError(int sourceId, IOException e) {
+	public void onLoadError(int sourceId, IOException e) {
 		if(mInternalErrorListener != null) {
 			mInternalErrorListener.onLoadError(sourceId, e);
 		}
 	}
 
 	@Override
-	public
-	void onUpstreamDiscarded(int sourceId, long mediaStartTimeMs, long mediaEndTimeMs) {
+	public void onUpstreamDiscarded(int sourceId, long mediaStartTimeMs, long mediaEndTimeMs) {
 		// Do nothing.
 	}
 
 	@Override
-	public
-	void onDownstreamFormatChanged(int sourceId, Format format, int trigger, long mediaTimeMs) {
+	public void onDownstreamFormatChanged(int sourceId, Format format, int trigger, long mediaTimeMs) {
 		if(mInfoListener == null) {
 			return;
 		}
@@ -600,22 +542,20 @@ class Player implements ExoPlayer.Listener,
 	/**
 	 * Builds renderers for the player.
 	 */
-	public
-	interface RendererBuilder {
+	public interface RendererBuilder {
 		/**
 		 * Builds renderers for playback.
 		 *
-		 * @param player The player for which renderers are being built. {@link Player#onRenderers}
-		 *               should be invoked once the renderers have been built. If building fails,
-		 *               {@link Player#onRenderersError} should be invoked.
+		 * @param player The player for which renderers are being built. {@link Player#onRenderers} should be invoked
+		 *               once the renderers have been built. If building fails, {@link Player#onRenderersError} should
+		 *               be invoked.
 		 */
 		void buildRenderers(Player player);
 
 		/**
-		 * Cancels the current build operation, if there is one. Else does nothing.
-		 * <p/>
-		 * A canceled build operation must not invoke {@link Player#onRenderers} or
-		 * {@link Player#onRenderersError} on the player, which may have been released.
+		 * Cancels the current build operation, if there is one. Else does nothing. <p/> A canceled build operation must
+		 * not invoke {@link Player#onRenderers} or {@link Player#onRenderersError} on the player, which may have been
+		 * released.
 		 */
 		void cancel();
 	}
@@ -623,74 +563,71 @@ class Player implements ExoPlayer.Listener,
 	/**
 	 * A listener for core events.
 	 */
-	public
-	interface Listener {
+	public interface Listener {
 		void onStateChanged(boolean playWhenReady, int playbackState);
+
 		void onError(Exception e);
+
 		void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio);
 	}
 
 	/**
-	 * A listener for internal errors.
-	 * <p/>
-	 * These errors are not visible to the user, and hence this listener is provided for
-	 * informational purposes only. Note however that an internal error may cause a fatal
-	 * error if the player fails to recover. If this happens, {@link Listener#onError(Exception)}
-	 * will be invoked.
+	 * A listener for internal errors. <p/> These errors are not visible to the user, and hence this listener is
+	 * provided for informational purposes only. Note however that an internal error may cause a fatal error if the
+	 * player fails to recover. If this happens, {@link Listener#onError(Exception)} will be invoked.
 	 */
-	public
-	interface InternalErrorListener {
+	public interface InternalErrorListener {
 		void onRendererInitializationError(Exception e);
+
 		void onAudioTrackInitializationError(AudioTrack.InitializationException e);
+
 		void onAudioTrackWriteError(AudioTrack.WriteException e);
+
 		void onAudioTrackUnderrun(int bufferSize, long bufferSizeMs, long elapsedSinceLastFeedMs);
+
 		void onDecoderInitializationError(DecoderInitializationException e);
+
 		void onCryptoError(CryptoException e);
+
 		void onLoadError(int sourceId, IOException e);
+
 		void onDrmSessionManagerError(Exception e);
 	}
 
 	/**
 	 * A listener for debugging information.
 	 */
-	public
-	interface InfoListener {
+	public interface InfoListener {
 		void onVideoFormatEnabled(Format format, int trigger, long mediaTimeMs);
+
 		void onAudioFormatEnabled(Format format, int trigger, long mediaTimeMs);
+
 		void onDroppedFrames(int count, long elapsed);
+
 		void onBandwidthSample(int elapsedMs, long bytes, long bitrateEstimate);
+
 		void onLoadStarted(int sourceId, long length, int type, int trigger, Format format, long mediaStartTimeMs, long mediaEndTimeMs);
+
 		void onLoadCompleted(int sourceId, long bytesLoaded, int type, int trigger, Format format, long mediaStartTimeMs, long mediaEndTimeMs, long elapsedRealtimeMs, long loadDurationMs);
+
 		void onDecoderInitialized(String decoderName, long elapsedRealtimeMs, long initializationDurationMs);
+
 		void onAvailableRangeChanged(TimeRange availableRange);
 	}
 
 	/**
 	 * A listener for receiving notifications of timed text.
 	 */
-	public
-	interface CaptionListener {
+	public interface CaptionListener {
 		void onCues(List<Cue> cues);
 	}
 
 	/**
 	 * A listener for receiving ID3 metadata parsed from the media stream.
 	 */
-	public
-	interface Id3MetadataListener {
+	public interface Id3MetadataListener {
 		void onId3Metadata(Map<String, Object> metadata);
 	}
-
-
-
-
-
-
-
-
-
-
-
 
 
 }
