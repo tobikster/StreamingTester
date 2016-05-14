@@ -3,6 +3,7 @@ package tobikster.streamingtester.fragments;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -73,14 +74,24 @@ public class WebViewFragment extends Fragment {
 		switch(mStreamType) {
 			case ExoPlayerFragment.TYPE_DASH:
 				Log.d(TAG, "onViewCreated: loading dash page");
-				final String url = String.format("http://%s:%s/%s?url=/%s&type=%s",
-				                                 mediaServerAddress,
-				                                 mediaServerPort,
-				                                 INDEX_DASH_URL,
-				                                 mContentUrl,
-				                                 mStreamType);
-				Log.d(TAG, String.format("onViewCreated: url: %s", url));
-				mWebView.loadUrl(url);
+				Uri uri = new Uri.Builder().scheme("http")
+				                           .encodedAuthority(String.format("%s:%s",
+				                                                           mediaServerAddress,
+				                                                           mediaServerPort))
+				                           .encodedPath(INDEX_DASH_URL)
+				                           .appendQueryParameter("url", mContentUrl)
+				                           .appendQueryParameter("type", Integer.toString(mStreamType))
+				                           .build();
+//				final String url = String.format("http://%s:%s/%s?url=/%s&type=%s",
+//				                                 mediaServerAddress,
+//				                                 mediaServerPort,
+//				                                 INDEX_DASH_URL,
+//				                                 mContentUrl,
+//				                                 mStreamType);
+//				Log.d(TAG, String.format("onViewCreated: url: %s", url));
+//				mWebView.loadUrl(url);
+				Log.d(TAG, String.format("onViewCreated: loading url: %s", uri));
+				mWebView.loadUrl(uri.toString());
 				break;
 			case ExoPlayerFragment.TYPE_HLS:
 			case ExoPlayerFragment.TYPE_OTHER:

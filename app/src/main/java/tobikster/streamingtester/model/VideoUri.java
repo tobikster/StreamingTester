@@ -7,11 +7,6 @@ class VideoUri {
 	boolean mRemote;
 
 	public
-	VideoUri(String name, String uri) {
-		this(name, uri, true);
-	}
-
-	public
 	VideoUri(String name, String uri, boolean remote) {
 		mName = name;
 		mUri = uri;
