@@ -23,6 +23,7 @@ import tobikster.streamingtester.fragments.ExoPlayerFragment;
 import tobikster.streamingtester.fragments.MediaPlayerFragment;
 import tobikster.streamingtester.fragments.SettingsFragment;
 import tobikster.streamingtester.fragments.WebViewFragment;
+import tobikster.streamingtester.utils.Samples;
 
 public
 class StreamingTestActivity extends AppCompatActivity {
@@ -53,11 +54,11 @@ class StreamingTestActivity extends AppCompatActivity {
 
 			String contentId = intent.getStringExtra(EXTRA_CONTENT_ID);
 			String contentUri = intent.getStringExtra(EXTRA_CONTENT_URI);
-			int contentType = intent.getIntExtra(EXTRA_CONTENT_TYPE, ExoPlayerFragment.TYPE_OTHER);
+			int contentType = intent.getIntExtra(EXTRA_CONTENT_TYPE, Samples.TYPE_OTHER);
 
 			switch(testType) {
 				case SettingsFragment.TEST_TYPE_EXOPLAYER:
-					fragment = ExoPlayerFragment.newInstance(contentUri, contentId, contentType);
+					fragment = ExoPlayerFragment.newInstance(contentUri, contentId, contentType, "");
 					break;
 				case SettingsFragment.TEST_TYPE_MEDIAPLAYER:
 					fragment = MediaPlayerFragment.newInstance(contentUri);
