@@ -106,6 +106,7 @@ public class Player implements ExoPlayer.Listener,
 	private Id3MetadataListener id3MetadataListener;
 	private InternalErrorListener internalErrorListener;
 	private InfoListener infoListener;
+	private boolean mLoopModeEnabled;
 
 	public Player(RendererBuilder rendererBuilder) {
 		this.rendererBuilder = rendererBuilder;
@@ -118,6 +119,15 @@ public class Player implements ExoPlayer.Listener,
 		rendererBuildingState = RENDERER_BUILDING_STATE_IDLE;
 		// Disable text initially.
 		player.setSelectedTrack(TYPE_TEXT, TRACK_DISABLED);
+		mLoopModeEnabled = true;
+	}
+
+	public void setLoopModeEnabled(final boolean loopModeEnabled) {
+		mLoopModeEnabled = loopModeEnabled;
+	}
+
+	public boolean isLoopModeEnabled() {
+		return mLoopModeEnabled;
 	}
 
 	public PlayerControl getPlayerControl() {

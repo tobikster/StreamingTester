@@ -76,21 +76,11 @@ public class WebViewFragment extends Fragment {
 			case Samples.TYPE_DASH:
 				Log.d(TAG, "onViewCreated: loading dash page");
 				Uri uri = new Uri.Builder().scheme("http")
-				                           .encodedAuthority(String.format("%s:%s",
-				                                                           mediaServerAddress,
-				                                                           mediaServerPort))
+				                           .encodedAuthority(mediaServerAddress + ":" + mediaServerPort)
 				                           .encodedPath(INDEX_DASH_URL)
 				                           .appendQueryParameter("url", mContentUrl)
 				                           .appendQueryParameter("type", Integer.toString(mStreamType))
 				                           .build();
-//				final String url = String.format("http://%s:%s/%s?url=/%s&type=%s",
-//				                                 mediaServerAddress,
-//				                                 mediaServerPort,
-//				                                 INDEX_DASH_URL,
-//				                                 mContentUrl,
-//				                                 mStreamType);
-//				Log.d(TAG, String.format("onViewCreated: url: %s", url));
-//				mWebView.loadUrl(url);
 				Log.d(TAG, String.format("onViewCreated: loading url: %s", uri));
 				mWebView.loadUrl(uri.toString());
 				break;
