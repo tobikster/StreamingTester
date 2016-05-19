@@ -37,7 +37,7 @@ public class SampleChooserFragment extends Fragment {
 	@Override
 	public void onAttach(Context context) {
 		super.onAttach(context);
-		if(context instanceof InteractionListener) {
+		if (context instanceof InteractionListener) {
 			mListener = (InteractionListener) (context);
 		}
 		else {
@@ -51,7 +51,7 @@ public class SampleChooserFragment extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Bundle args = getArguments();
-		if(args != null) {
+		if (args != null) {
 			mTestType = args.getInt(ARG_TEST_TYPE, SettingsFragment.TEST_TYPE_UNKNOWN);
 		}
 	}
@@ -68,7 +68,7 @@ public class SampleChooserFragment extends Fragment {
 		ListView sampleList = (ListView) (view.findViewById(R.id.sample_list));
 		final SampleAdapter sampleAdapter = new SampleAdapter(getActivity());
 
-		switch(mTestType) {
+		switch (mTestType) {
 			case SettingsFragment.TEST_TYPE_WEBVIEW:
 				sampleAdapter.add(new Header("DASH"));
 				sampleAdapter.addAll((Object[]) Samples.DASH);
@@ -101,8 +101,8 @@ public class SampleChooserFragment extends Fragment {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				Object item = sampleAdapter.getItem(position);
-				if(item instanceof Samples.Sample) {
-					Samples.Sample selectedSample = (Samples.Sample) (item);
+				if (item instanceof Samples.Sample) {
+					Samples.Sample selectedSample = (Samples.Sample) item;
 					mListener.onSampleSelected(selectedSample.uri, selectedSample.contentId, selectedSample.type);
 				}
 			}
@@ -128,16 +128,18 @@ public class SampleChooserFragment extends Fragment {
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			View view = convertView;
-			if(view == null) {
-				int layoutId = getItemViewType(position) == 1 ? android.R.layout.simple_list_item_1 : R.layout.sample_chooser_inline_header;
+			if (view == null) {
+				int layoutId = getItemViewType(position) == 1 ?
+				               android.R.layout.simple_list_item_1 :
+				               R.layout.sample_chooser_inline_header;
 				view = LayoutInflater.from(getContext()).inflate(layoutId, null, false);
 			}
 			Object item = getItem(position);
 			String name = null;
-			if(item instanceof Samples.Sample) {
+			if (item instanceof Samples.Sample) {
 				name = ((Samples.Sample) item).name;
 			}
-			else if(item instanceof Header) {
+			else if (item instanceof Header) {
 				name = ((Header) item).name;
 			}
 			((TextView) view).setText(name);

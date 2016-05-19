@@ -15,12 +15,15 @@
  */
 package tobikster.streamingtester.fragments;
 
+import android.Manifest.permission;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
@@ -34,7 +37,6 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
@@ -47,17 +49,22 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.exoplayer.AspectRatioFrameLayout;
+import com.google.android.exoplayer.ExoPlaybackException;
 import com.google.android.exoplayer.ExoPlayer;
+import com.google.android.exoplayer.MediaCodecTrackRenderer.DecoderInitializationException;
+import com.google.android.exoplayer.MediaCodecUtil.DecoderQueryException;
 import com.google.android.exoplayer.MediaFormat;
 import com.google.android.exoplayer.audio.AudioCapabilities;
 import com.google.android.exoplayer.audio.AudioCapabilitiesReceiver;
 import com.google.android.exoplayer.drm.UnsupportedDrmException;
-import com.google.android.exoplayer.metadata.GeobMetadata;
-import com.google.android.exoplayer.metadata.PrivMetadata;
-import com.google.android.exoplayer.metadata.TxxxMetadata;
+import com.google.android.exoplayer.metadata.id3.GeobFrame;
+import com.google.android.exoplayer.metadata.id3.Id3Frame;
+import com.google.android.exoplayer.metadata.id3.PrivFrame;
+import com.google.android.exoplayer.metadata.id3.TxxxFrame;
 import com.google.android.exoplayer.text.CaptionStyleCompat;
 import com.google.android.exoplayer.text.Cue;
 import com.google.android.exoplayer.text.SubtitleLayout;
+import com.google.android.exoplayer.util.DebugTextViewHelper;
 import com.google.android.exoplayer.util.MimeTypes;
 import com.google.android.exoplayer.util.Util;
 import com.google.android.exoplayer.util.VerboseLogUtil;
@@ -67,42 +74,34 @@ import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.prefs.PreferenceChangeEvent;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import tobikster.streamingtester.R;
-import tobikster.streamingtester.player.EventLogger;
-import tobikster.streamingtester.player.Player;
-import tobikster.streamingtester.player.SmoothStreamingTestMediaDrmCallback;
-import tobikster.streamingtester.player.WidevineTestMediaDrmCallback;
-import tobikster.streamingtester.player.renderersbuilders.DashRendererBuilder;
-import tobikster.streamingtester.player.renderersbuilders.ExtractorRendererBuilder;
-import tobikster.streamingtester.player.renderersbuilders.HlsRendererBuilder;
-import tobikster.streamingtester.player.renderersbuilders.SmoothStreamingRendererBuilder;
-import tobikster.streamingtester.utils.DebugTextViewHelper;
+import tobikster.streamingtester.exoplayer.EventLogger;
+import tobikster.streamingtester.exoplayer.SmoothStreamingTestMediaDrmCallback;
+import tobikster.streamingtester.exoplayer.WidevineTestMediaDrmCallback;
+import tobikster.streamingtester.exoplayer.player.DashRendererBuilder;
+import tobikster.streamingtester.exoplayer.player.ExtractorRendererBuilder;
+import tobikster.streamingtester.exoplayer.player.HlsRendererBuilder;
+import tobikster.streamingtester.exoplayer.player.Player;
+import tobikster.streamingtester.exoplayer.player.SmoothStreamingRendererBuilder;
 
 /**
  * An activity that plays media using {@link Player}.
  */
-public
-class ExoPlayerFragment extends Fragment implements SurfaceHolder.Callback,
-                                                    OnClickListener,
-                                                    Player.Listener,
-                                                    Player.CaptionListener,
-                                                    Player.Id3MetadataListener,
-                                                    AudioCapabilitiesReceiver.Listener {
+public class ExoPlayerFragment extends Fragment implements SurfaceHolder.Callback,
+                                                           Player.Listener,
+                                                           Player.CaptionListener,
+                                                           Player.Id3MetadataListener,
+                                                           AudioCapabilitiesReceiver.Listener {
 
-	private static final String TAG = ExoPlayerFragment.class.getSimpleName();
-
-	// For use within demo app code.
-	public static final String ARG_CONTENT_URI = "content_uri";
+	private static final String LOG_TAG = ExoPlayerFragment.class.getSimpleName();
+	public static final String ARG_CONTENT_URI = "arg_content_uri";
 	public static final String ARG_CONTENT_ID = "content_id";
 	public static final String ARG_CONTENT_TYPE = "content_type";
-	public static final int TYPE_DASH = 0;
-	public static final int TYPE_SS = 1;
-	public static final int TYPE_HLS = 2;
-
-	public static final int TYPE_OTHER = 3;
+	public static final String ARG_PROVIDER = "provider";
 	private static final int MENU_GROUP_TRACKS = 1;
 	private static final int ID_OFFSET = 2;
 
@@ -113,149 +112,105 @@ class ExoPlayerFragment extends Fragment implements SurfaceHolder.Callback,
 		defaultCookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ORIGINAL_SERVER);
 	}
 
+	@BindView(R.id.controls_root) View mDebugRootView;
+	@BindView(R.id.shutter) View mShutterView;
+	@BindView(R.id.video_frame) AspectRatioFrameLayout mVideoFrame;
+	@BindView(R.id.surface_view) SurfaceView mSurfaceView;
+	@BindView(R.id.debug_text_view) TextView mDebugTextView;
+	@BindView(R.id.player_state_view) TextView mPlayerStateTextView;
+	@BindView(R.id.subtitles) SubtitleLayout mSubtitleLayout;
+	@BindView(R.id.video_controls) Button mVideoButton;
+	@BindView(R.id.audio_controls) Button mAudioButton;
+	@BindView(R.id.text_controls) Button mTextButton;
+	@BindView(R.id.retry_button) Button mRetryButton;
+	@BindView(R.id.verbose_log_controls) Button mVerboseLogButton;
+
 	private EventLogger mEventLogger;
 	private MediaController mMediaController;
-	private View mDebugRootView;
-	private View mShutterView;
-	private AspectRatioFrameLayout mVideoFrame;
-	private SurfaceView mSurfaceView;
-	private TextView mDebugTextView;
-	private TextView mPlayerStateTextView;
-	private SubtitleLayout mSubtitleLayout;
-	private Button mVideoButton;
-	private Button mAudioButton;
-	private Button mTextButton;
-	private Button mRetryButton;
-	private Button mVerboseLogButton;
-
 	private Player mPlayer;
 	private DebugTextViewHelper mDebugTextViewHelper;
 	private boolean mPlayerNeedsPrepare;
 
 	private long mPlayerPosition;
-	private boolean mBackgroundAudioEnabled;
+	private boolean mEnableBackgroundAudio;
 
 	private Uri mContentUri;
-	private String mContentId;
 	private int mContentType;
+	private String mContentId;
+	private String mProvider;
 
 	private AudioCapabilitiesReceiver audioCapabilitiesReceiver;
 
-	public
-	ExoPlayerFragment() {
+	public ExoPlayerFragment() {
 	}
 
-	public static
-	ExoPlayerFragment newInstance(String contentUri, String contentId, int contentType) {
-		ExoPlayerFragment instance = new ExoPlayerFragment();
+	public static ExoPlayerFragment newInstance(final String contentUri, final String contentId, final int contentType, final String provider) {
+
 		Bundle args = new Bundle();
 		args.putString(ARG_CONTENT_URI, contentUri);
 		args.putString(ARG_CONTENT_ID, contentId);
 		args.putInt(ARG_CONTENT_TYPE, contentType);
-		instance.setArguments(args);
-		return instance;
-	}
-
-	// Activity lifecycle
-
-	private static
-	String buildTrackName(MediaFormat format) {
-		if(format.adaptive) {
-			return "auto";
-		}
-		String trackName;
-		if(MimeTypes.isVideo(format.mimeType)) {
-			trackName = joinWithSeparator(joinWithSeparator(buildResolutionString(format), buildBitrateString(format)), buildTrackIdString(format));
-		}
-		else if(MimeTypes.isAudio(format.mimeType)) {
-			trackName = joinWithSeparator(joinWithSeparator(joinWithSeparator(buildLanguageString(format), buildAudioPropertyString(format)), buildBitrateString(format)), buildTrackIdString(format));
-		}
-		else {
-			trackName = joinWithSeparator(joinWithSeparator(buildLanguageString(format), buildBitrateString(format)), buildTrackIdString(format));
-		}
-		return trackName.length() == 0 ? "unknown" : trackName;
-	}
-
-	private static
-	String buildResolutionString(MediaFormat format) {
-		return format.width == MediaFormat.NO_VALUE || format.height == MediaFormat.NO_VALUE ? "" : format.width + "x" + format.height;
-	}
-
-	private static
-	String buildAudioPropertyString(MediaFormat format) {
-		return format.channelCount == MediaFormat.NO_VALUE || format.sampleRate == MediaFormat.NO_VALUE ? "" : format.channelCount + "ch, " + format.sampleRate + "Hz";
-	}
-
-	private static
-	String buildLanguageString(MediaFormat format) {
-		return TextUtils.isEmpty(format.language) || "und".equals(format.language) ? "" : format.language;
-	}
-
-	private static
-	String buildBitrateString(MediaFormat format) {
-		return format.bitrate == MediaFormat.NO_VALUE ? "" : String.format(Locale.US, "%.2fMbit", format.bitrate / 1000000f);
-	}
-
-	private static
-	String joinWithSeparator(String first, String second) {
-		return first.length() == 0 ? second : (second.length() == 0 ? first : first + ", " + second);
-	}
-
-	// OnClickListener methods
-
-	private static
-	String buildTrackIdString(MediaFormat format) {
-		return format.trackId == null ? "" : String.format("(%s)", format.trackId);
+		args.putString(ARG_PROVIDER, provider);
+		ExoPlayerFragment fragment = new ExoPlayerFragment();
+		fragment.setArguments(args);
+		return fragment;
 	}
 
 	@Override
-	public
-	void onCreate(Bundle savedInstanceState) {
-		setHasOptionsMenu(true);
+	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+		if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+			preparePlayer(true);
+		}
+		else {
+			Toast.makeText(getContext().getApplicationContext(), R.string.storage_permission_denied, Toast.LENGTH_LONG)
+			     .show();
+			getActivity().finish();
+		}
+	}
+
+	@Override
+	public void onCreate(@Nullable final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
-		final String mediaServerAddress = preferences.getString(getString(R.string.pref_media_server_address), getString(R.string.pref_default_media_server_address));
-		final String mediaServerPort = preferences.getString(getString(R.string.pref_media_server_port), getString(R.string.pref_default_media_server_port));
+		final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+		final String mediaServerAddress = preferences.getString(getString(R.string.pref_media_server_address),
+		                                                        getString(R.string.pref_default_media_server_address));
+		final String mediaServerPort = preferences.getString(getString(R.string.pref_media_server_port),
+		                                                     getString(R.string.pref_default_media_server_port));
 
 		Bundle args = getArguments();
-		if(args != null) {
-			mContentUri = Uri.parse(String.format("http://%s:%s/%s", mediaServerAddress, mediaServerPort, args.getString(ARG_CONTENT_URI)));
-			mContentId = args.getString(ARG_CONTENT_ID);
-			mContentType = args.getInt(ARG_CONTENT_TYPE, TYPE_OTHER);
-		}
+		mContentUri = new Uri.Builder().scheme("http")
+		                               .encodedAuthority(mediaServerAddress + ":" + mediaServerPort)
+		                               .appendEncodedPath(args.getString(ARG_CONTENT_URI))
+		                               .build();
+		mContentId = args.getString(ARG_CONTENT_ID);
+		mContentType = args.getInt(ARG_CONTENT_TYPE);
+		mProvider = args.getString(ARG_PROVIDER);
+		setHasOptionsMenu(true);
 	}
 
 	@Nullable
 	@Override
-	public
-	View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		return inflater.inflate(R.layout.fragment_exo_player, container, false);
+	public View onCreateView(final LayoutInflater inflater, @Nullable final ViewGroup container, @Nullable final Bundle savedInstanceState) {
+		View root = inflater.inflate(R.layout.fragment_exo_player, container, false);
+
+		ButterKnife.bind(this, root);
+
+		mMediaController = new KeyCompatibleMediaController(getContext());
+		mMediaController.setAnchorView(root);
+
+		return root;
 	}
 
 	@Override
-	public
-	void onDestroyView() {
-
-		super.onDestroyView();
-	}
-
-	// AudioCapabilitiesReceiver.Listener methods
-
-	@Override
-	public
-	void onViewCreated(View view, Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-
-		View root = view.findViewById(R.id.root);
+	public void onViewCreated(final View root, @Nullable final Bundle savedInstanceState) {
 		root.setOnTouchListener(new OnTouchListener() {
 			@Override
-			public
-			boolean onTouch(View view, MotionEvent motionEvent) {
-				if(motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+			public boolean onTouch(View view, MotionEvent motionEvent) {
+				if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
 					toggleControlsVisibility();
 				}
-				else if(motionEvent.getAction() == MotionEvent.ACTION_UP) {
+				else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
 					view.performClick();
 				}
 				return true;
@@ -263,95 +218,71 @@ class ExoPlayerFragment extends Fragment implements SurfaceHolder.Callback,
 		});
 		root.setOnKeyListener(new OnKeyListener() {
 			@Override
-			public
-			boolean onKey(View v, int keyCode, KeyEvent event) {
-				return !(keyCode == KeyEvent.KEYCODE_BACK || keyCode == KeyEvent.KEYCODE_ESCAPE || keyCode == KeyEvent.KEYCODE_MENU) && mMediaController.dispatchKeyEvent(event);
+			public boolean onKey(View v, int keyCode, KeyEvent event) {
+				return !(keyCode == KeyEvent.KEYCODE_BACK || keyCode == KeyEvent.KEYCODE_ESCAPE || keyCode == KeyEvent.KEYCODE_MENU) && mMediaController
+				  .dispatchKeyEvent(event);
 			}
 		});
 
-		mShutterView = view.findViewById(R.id.shutter);
-		mDebugRootView = view.findViewById(R.id.controls_root);
-
-		mVideoFrame = (AspectRatioFrameLayout)view.findViewById(R.id.video_frame);
-		mSurfaceView = (SurfaceView)view.findViewById(R.id.surface_view);
 		mSurfaceView.getHolder().addCallback(this);
-		mDebugTextView = (TextView)view.findViewById(R.id.debug_text_view);
 
-		mPlayerStateTextView = (TextView)view.findViewById(R.id.player_state_view);
-		mSubtitleLayout = (SubtitleLayout)view.findViewById(R.id.subtitles);
-
-		mMediaController = new MediaController(getActivity());
-		mMediaController.setAnchorView(root);
-		mRetryButton = (Button)view.findViewById(R.id.retry_button);
-		mVideoButton = (Button)view.findViewById(R.id.video_controls);
-		mAudioButton = (Button)view.findViewById(R.id.audio_controls);
-		mTextButton = (Button)view.findViewById(R.id.text_controls);
-		mVerboseLogButton = (Button)view.findViewById(R.id.verbose_log_controls);
-
-		mRetryButton.setOnClickListener(this);
-		mVideoButton.setOnClickListener(this);
-		mAudioButton.setOnClickListener(this);
-		mTextButton.setOnClickListener(this);
-		mVerboseLogButton.setOnClickListener(this);
+		audioCapabilitiesReceiver = new AudioCapabilitiesReceiver(getContext(), this);
+		audioCapabilitiesReceiver.register();
 
 		CookieHandler currentHandler = CookieHandler.getDefault();
-		if(currentHandler != defaultCookieManager) {
+		if (currentHandler != defaultCookieManager) {
 			CookieHandler.setDefault(defaultCookieManager);
 		}
-
-		audioCapabilitiesReceiver = new AudioCapabilitiesReceiver(getActivity(), this);
-		audioCapabilitiesReceiver.register();
 	}
 
-	// Internal methods
+	@Override
+	public void onStart() {
+		super.onStart();
+		if (Util.SDK_INT > 23) {
+			onShown();
+		}
+	}
 
 	@Override
-	public
-	void onResume() {
+	public void onResume() {
 		super.onResume();
-		configureSubtitleView();
-		if(mPlayer == null) {
-			preparePlayer(true);
-		}
-		else {
-			mPlayer.setBackgrounded(false);
+		if (Util.SDK_INT <= 23 || mPlayer == null) {
+			onShown();
 		}
 	}
 
 	@Override
-	public
-	void onPause() {
+	public void onPause() {
 		super.onPause();
-		if(!mBackgroundAudioEnabled) {
-			releasePlayer();
+		if (Util.SDK_INT <= 23) {
+			onHidden();
 		}
-		else {
-			mPlayer.setBackgrounded(true);
-		}
-		mShutterView.setVisibility(View.VISIBLE);
 	}
 
 	@Override
-	public
-	void onDestroy() {
+	public void onStop() {
+		super.onStop();
+		if (Util.SDK_INT > 23) {
+			onHidden();
+		}
+	}
+
+	@Override
+	public void onDestroy() {
 		super.onDestroy();
 		audioCapabilitiesReceiver.unregister();
 		releasePlayer();
 	}
 
-	// DemoPlayer.Listener implementation
-
 	@Override
-	public
-	void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		inflater.inflate(R.menu.fragment_exo_player, menu);
 	}
 
 	@Override
-	public
-	boolean onOptionsItemSelected(MenuItem item) {
+	public boolean onOptionsItemSelected(MenuItem item) {
 		boolean eventConsumed;
-		switch(item.getItemId()) {
+		switch (item.getItemId()) {
 			case R.id.menu_item_loop_mode:
 				item.setChecked(!item.isChecked());
 				mPlayer.setLoopModeEnabled(item.isChecked());
@@ -364,9 +295,18 @@ class ExoPlayerFragment extends Fragment implements SurfaceHolder.Callback,
 		return eventConsumed;
 	}
 
-	private
-	void releasePlayer() {
-		if(mPlayer != null) {
+	private void onHidden() {
+		if (!mEnableBackgroundAudio) {
+			releasePlayer();
+		}
+		else {
+			mPlayer.setBackgrounded(true);
+		}
+		mShutterView.setVisibility(View.VISIBLE);
+	}
+
+	private void releasePlayer() {
+		if (mPlayer != null) {
 			mDebugTextViewHelper.stop();
 			mDebugTextViewHelper = null;
 			mPlayerPosition = mPlayer.getCurrentPosition();
@@ -377,13 +317,22 @@ class ExoPlayerFragment extends Fragment implements SurfaceHolder.Callback,
 		}
 	}
 
-	// User controls
+	private void onShown() {
+		configureSubtitleView();
+		if (mPlayer == null) {
+			if (!maybeRequestPermission()) {
+				preparePlayer(true);
+			}
+		}
+		else {
+			mPlayer.setBackgrounded(false);
+		}
+	}
 
-	private
-	void configureSubtitleView() {
+	private void configureSubtitleView() {
 		CaptionStyleCompat style;
 		float fontScale;
-		if(Util.SDK_INT >= 19) {
+		if (Util.SDK_INT >= 19) {
 			style = getUserCaptionStyleV19();
 			fontScale = getUserCaptionFontScaleV19();
 		}
@@ -395,9 +344,59 @@ class ExoPlayerFragment extends Fragment implements SurfaceHolder.Callback,
 		mSubtitleLayout.setFractionalTextSize(SubtitleLayout.DEFAULT_TEXT_SIZE_FRACTION * fontScale);
 	}
 
-	private
-	void preparePlayer(boolean playWhenReady) {
-		if(mPlayer == null) {
+	/**
+	 * Checks whether it is necessary to ask for permission to read storage. If necessary, it also requests permission.
+	 *
+	 * @return true if a permission request is made. False if it is not necessary.
+	 */
+	@TargetApi(23)
+	private boolean maybeRequestPermission() {
+		if (requiresPermission(mContentUri)) {
+			requestPermissions(new String[]{permission.READ_EXTERNAL_STORAGE}, 0);
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	// Internal methods
+
+	@TargetApi(19)
+	private CaptionStyleCompat getUserCaptionStyleV19() {
+		CaptioningManager captioningManager = (CaptioningManager) getContext().getSystemService(Context.CAPTIONING_SERVICE);
+		return CaptionStyleCompat.createFromCaptionStyle(captioningManager.getUserStyle());
+	}
+
+	@TargetApi(19)
+	private float getUserCaptionFontScaleV19() {
+		CaptioningManager captioningManager =
+		  (CaptioningManager) getContext().getSystemService(Context.CAPTIONING_SERVICE);
+		return captioningManager.getFontScale();
+	}
+
+	@TargetApi(23)
+	private boolean requiresPermission(Uri uri) {
+		return Util.SDK_INT >= 23 && Util.isLocalFileUri(uri) && getContext().checkSelfPermission(permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED;
+	}
+
+	private void toggleControlsVisibility() {
+		if (mMediaController.isShowing()) {
+			mMediaController.hide();
+			mDebugRootView.setVisibility(View.GONE);
+		}
+		else {
+			showControls();
+		}
+	}
+
+	private void showControls() {
+		mMediaController.show(0);
+		mDebugRootView.setVisibility(View.VISIBLE);
+	}
+
+	private void preparePlayer(boolean playWhenReady) {
+		if (mPlayer == null) {
 			mPlayer = new Player(getRendererBuilder());
 			mPlayer.addListener(this);
 			mPlayer.setCaptionListener(this);
@@ -414,101 +413,60 @@ class ExoPlayerFragment extends Fragment implements SurfaceHolder.Callback,
 			mDebugTextViewHelper = new DebugTextViewHelper(mPlayer, mDebugTextView);
 			mDebugTextViewHelper.start();
 		}
-		if(mPlayerNeedsPrepare) {
+		if (mPlayerNeedsPrepare) {
 			mPlayer.prepare();
 			mPlayerNeedsPrepare = false;
 			updateButtonVisibilities();
 		}
 		mPlayer.setSurface(mSurfaceView.getHolder().getSurface());
 		mPlayer.setPlayWhenReady(playWhenReady);
-		mPlayer.setLoopModeEnabled(true);
 	}
 
-	@TargetApi(19)
-	private
-	CaptionStyleCompat getUserCaptionStyleV19() {
-		CaptioningManager captioningManager = (CaptioningManager)getActivity().getSystemService(Context.CAPTIONING_SERVICE);
-		return CaptionStyleCompat.createFromCaptionStyle(captioningManager.getUserStyle());
-	}
+	// User controls
 
-	@TargetApi(19)
-	private
-	float getUserCaptionFontScaleV19() {
-		CaptioningManager captioningManager = (CaptioningManager)getActivity().getSystemService(Context.CAPTIONING_SERVICE);
-		return captioningManager.getFontScale();
-	}
-
-	private
-	Player.RendererBuilder getRendererBuilder() {
-		String userAgent = Util.getUserAgent(getActivity(), "ExoPlayerDemo");
-		switch(mContentType) {
-			case TYPE_SS:
-				return new SmoothStreamingRendererBuilder(getActivity(), userAgent, mContentUri.toString(), new SmoothStreamingTestMediaDrmCallback());
-			case TYPE_DASH:
-				return new DashRendererBuilder(getActivity(), userAgent, mContentUri.toString(), new WidevineTestMediaDrmCallback(mContentId));
-			case TYPE_HLS:
-				return new HlsRendererBuilder(getActivity(), userAgent, mContentUri.toString());
-			case TYPE_OTHER:
-				return new ExtractorRendererBuilder(getActivity(), userAgent, mContentUri);
+	private Player.RendererBuilder getRendererBuilder() {
+		String userAgent = Util.getUserAgent(getContext(), "ExoPlayerDemo");
+		final Player.RendererBuilder rendererBuilder;
+		Log.d(LOG_TAG, "loaded URI: " + mContentUri.toString());
+		switch (mContentType) {
+			case Util.TYPE_SS:
+				rendererBuilder = new SmoothStreamingRendererBuilder(getContext(),
+				                                                     userAgent,
+				                                                     mContentUri.toString(),
+				                                                     new SmoothStreamingTestMediaDrmCallback());
+				break;
+			case Util.TYPE_DASH:
+				rendererBuilder = new DashRendererBuilder(getContext(),
+				                                          userAgent,
+				                                          mContentUri.toString(),
+				                                          new WidevineTestMediaDrmCallback(mContentId, mProvider));
+				break;
+			case Util.TYPE_HLS:
+				rendererBuilder = new HlsRendererBuilder(getContext(), userAgent, mContentUri.toString());
+				break;
+			case Util.TYPE_OTHER:
+				rendererBuilder = new ExtractorRendererBuilder(getContext(), userAgent, mContentUri);
+				break;
 			default:
 				throw new IllegalStateException("Unsupported type: " + mContentType);
 		}
+		return rendererBuilder;
 	}
 
-	private
-	void updateButtonVisibilities() {
+	private void updateButtonVisibilities() {
 		mRetryButton.setVisibility(mPlayerNeedsPrepare ? View.VISIBLE : View.GONE);
 		mVideoButton.setVisibility(haveTracks(Player.TYPE_VIDEO) ? View.VISIBLE : View.GONE);
 		mAudioButton.setVisibility(haveTracks(Player.TYPE_AUDIO) ? View.VISIBLE : View.GONE);
 		mTextButton.setVisibility(haveTracks(Player.TYPE_TEXT) ? View.VISIBLE : View.GONE);
 	}
 
-	private
-	boolean haveTracks(int type) {
+	private boolean haveTracks(int type) {
 		return mPlayer != null && mPlayer.getTrackCount(type) > 0;
 	}
 
-	private
-	void toggleControlsVisibility() {
-		if(mMediaController.isShowing()) {
-			mMediaController.hide();
-			mDebugRootView.setVisibility(View.GONE);
-		}
-		else {
-			showControls();
-		}
-	}
-
-	private
-	void showControls() {
-		mMediaController.show(0);
-		mDebugRootView.setVisibility(View.VISIBLE);
-	}
-
 	@Override
-	public
-	void onClick(View view) {
-		if(view == mRetryButton) {
-			preparePlayer(true);
-		}
-		else if(view == mVideoButton) {
-			showVideoPopup(view);
-		}
-		else if(view == mAudioButton) {
-			showAudioPopup(view);
-		}
-		else if(view == mTextButton) {
-			showTextPopup(view);
-		}
-		else if(view == mVerboseLogButton) {
-			showVerboseLogPopup(view);
-		}
-	}
-
-	@Override
-	public
-	void onAudioCapabilitiesChanged(AudioCapabilities audioCapabilities) {
-		if(mPlayer == null) {
+	public void onAudioCapabilitiesChanged(AudioCapabilities audioCapabilities) {
+		if (mPlayer == null) {
 			return;
 		}
 		boolean backgrounded = mPlayer.getBackgrounded();
@@ -519,13 +477,12 @@ class ExoPlayerFragment extends Fragment implements SurfaceHolder.Callback,
 	}
 
 	@Override
-	public
-	void onStateChanged(boolean playWhenReady, int playbackState) {
-		if(playbackState == ExoPlayer.STATE_ENDED && !mPlayer.isLoopModeEnabled()) {
+	public void onStateChanged(boolean playWhenReady, int playbackState) {
+		if (playbackState == ExoPlayer.STATE_ENDED) {
 			showControls();
 		}
 		String text = "playWhenReady=" + playWhenReady + ", playbackState=";
-		switch(playbackState) {
+		switch (playbackState) {
 			case ExoPlayer.STATE_BUFFERING:
 				text += "buffering";
 				break;
@@ -550,13 +507,38 @@ class ExoPlayerFragment extends Fragment implements SurfaceHolder.Callback,
 	}
 
 	@Override
-	public
-	void onError(Exception e) {
-		if(e instanceof UnsupportedDrmException) {
+	public void onError(Exception e) {
+		String errorString = null;
+		if (e instanceof UnsupportedDrmException) {
 			// Special case DRM failures.
-			UnsupportedDrmException unsupportedDrmException = (UnsupportedDrmException)e;
-			int stringId = Util.SDK_INT < 18 ? R.string.drm_error_not_supported : unsupportedDrmException.reason == UnsupportedDrmException.REASON_UNSUPPORTED_SCHEME ? R.string.drm_error_unsupported_scheme : R.string.drm_error_unknown;
-			Toast.makeText(getActivity(), stringId, Toast.LENGTH_LONG).show();
+			UnsupportedDrmException unsupportedDrmException = (UnsupportedDrmException) e;
+			errorString = getString(Util.SDK_INT < 18 ?
+			                        R.string.error_drm_not_supported :
+			                        unsupportedDrmException.reason == UnsupportedDrmException.REASON_UNSUPPORTED_SCHEME ?
+			                        R.string.error_drm_unsupported_scheme :
+			                        R.string.error_drm_unknown);
+		}
+		else if (e instanceof ExoPlaybackException && e.getCause() instanceof DecoderInitializationException) {
+			// Special case for decoder initialization failures.
+			DecoderInitializationException decoderInitializationException = (DecoderInitializationException) e.getCause();
+			if (decoderInitializationException.decoderName == null) {
+				if (decoderInitializationException.getCause() instanceof DecoderQueryException) {
+					errorString = getString(R.string.error_querying_decoders);
+				}
+				else if (decoderInitializationException.secureDecoderRequired) {
+					errorString = getString(R.string.error_no_secure_decoder, decoderInitializationException.mimeType);
+				}
+				else {
+					errorString = getString(R.string.error_no_decoder, decoderInitializationException.mimeType);
+				}
+			}
+			else {
+				errorString = getString(R.string.error_instantiating_decoder,
+				                        decoderInitializationException.decoderName);
+			}
+		}
+		if (errorString != null) {
+			Toast.makeText(getContext(), errorString, Toast.LENGTH_LONG).show();
 		}
 		mPlayerNeedsPrepare = true;
 		updateButtonVisibilities();
@@ -564,33 +546,117 @@ class ExoPlayerFragment extends Fragment implements SurfaceHolder.Callback,
 	}
 
 	@Override
-	public
-	void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthAspectRatio) {
+	public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthAspectRatio) {
 		mShutterView.setVisibility(View.GONE);
 		mVideoFrame.setAspectRatio(height == 0 ? 1 : (width * pixelWidthAspectRatio) / height);
 	}
 
-	public
-	void showVideoPopup(View v) {
-		PopupMenu popup = new PopupMenu(getActivity(), v);
+	@SuppressWarnings("unused")
+	@OnClick({R.id.video_controls})
+	public void showVideoPopup(View v) {
+		PopupMenu popup = new PopupMenu(getContext(), v);
 		configurePopupWithTracks(popup, null, Player.TYPE_VIDEO);
 		popup.show();
 	}
 
-	public
-	void showAudioPopup(View v) {
-		PopupMenu popup = new PopupMenu(getActivity(), v);
+	private void configurePopupWithTracks(PopupMenu popup, final OnMenuItemClickListener customActionClickListener, final int trackType) {
+		if (mPlayer == null) {
+			return;
+		}
+		int trackCount = mPlayer.getTrackCount(trackType);
+		if (trackCount == 0) {
+			return;
+		}
+		popup.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+			@Override
+			public boolean onMenuItemClick(MenuItem item) {
+				return (customActionClickListener != null && customActionClickListener.onMenuItemClick(item)) || onTrackItemClick(
+				  item,
+				  trackType);
+			}
+		});
+		Menu menu = popup.getMenu();
+		// ID_OFFSET ensures we avoid clashing with Menu.NONE (which equals 0).
+		menu.add(MENU_GROUP_TRACKS, Player.TRACK_DISABLED + ID_OFFSET, Menu.NONE, R.string.off);
+		for (int i = 0; i < trackCount; i++) {
+			menu.add(MENU_GROUP_TRACKS, i + ID_OFFSET, Menu.NONE, buildTrackName(mPlayer.getTrackFormat(trackType, i)));
+		}
+		menu.setGroupCheckable(MENU_GROUP_TRACKS, true, true);
+		menu.findItem(mPlayer.getSelectedTrack(trackType) + ID_OFFSET).setChecked(true);
+	}
+
+	private boolean onTrackItemClick(MenuItem item, int type) {
+		if (mPlayer == null || item.getGroupId() != MENU_GROUP_TRACKS) {
+			return false;
+		}
+		mPlayer.setSelectedTrack(type, item.getItemId() - ID_OFFSET);
+		return true;
+	}
+
+	private static String buildTrackName(MediaFormat format) {
+		if (format.adaptive) {
+			return "auto";
+		}
+		String trackName;
+		if (MimeTypes.isVideo(format.mimeType)) {
+			trackName = joinWithSeparator(joinWithSeparator(buildResolutionString(format), buildBitrateString(format)),
+			                              buildTrackIdString(format));
+		}
+		else if (MimeTypes.isAudio(format.mimeType)) {
+			trackName = joinWithSeparator(joinWithSeparator(joinWithSeparator(buildLanguageString(format),
+			                                                                  buildAudioPropertyString(format)),
+			                                                buildBitrateString(format)), buildTrackIdString(format));
+		}
+		else {
+			trackName = joinWithSeparator(joinWithSeparator(buildLanguageString(format), buildBitrateString(format)),
+			                              buildTrackIdString(format));
+		}
+		return trackName.length() == 0 ? "unknown" : trackName;
+	}
+
+	private static String joinWithSeparator(String first, String second) {
+		return first.length() == 0 ? second : (second.length() == 0 ? first : first + ", " + second);
+	}
+
+	private static String buildResolutionString(MediaFormat format) {
+		return format.width == MediaFormat.NO_VALUE || format.height == MediaFormat.NO_VALUE ?
+		       "" :
+		       format.width + "x" + format.height;
+	}
+
+	private static String buildBitrateString(MediaFormat format) {
+		return format.bitrate == MediaFormat.NO_VALUE ?
+		       "" :
+		       String.format(Locale.US, "%.2fMbit", format.bitrate / 1000000f);
+	}
+
+	private static String buildTrackIdString(MediaFormat format) {
+		return format.trackId == null ? "" : " (" + format.trackId + ")";
+	}
+
+	private static String buildLanguageString(MediaFormat format) {
+		return TextUtils.isEmpty(format.language) || "und".equals(format.language) ? "" : format.language;
+	}
+
+	private static String buildAudioPropertyString(MediaFormat format) {
+		return format.channelCount == MediaFormat.NO_VALUE || format.sampleRate == MediaFormat.NO_VALUE ?
+		       "" :
+		       format.channelCount + "ch, " + format.sampleRate + "Hz";
+	}
+
+	@OnClick({R.id.audio_controls})
+	public void onAudioControlButtonClicked(View v) {
+		PopupMenu popup = new PopupMenu(getContext(), v);
 		Menu menu = popup.getMenu();
 		menu.add(Menu.NONE, Menu.NONE, Menu.NONE, R.string.enable_background_audio);
 		final MenuItem backgroundAudioItem = menu.findItem(0);
 		backgroundAudioItem.setCheckable(true);
-		backgroundAudioItem.setChecked(mBackgroundAudioEnabled);
+		backgroundAudioItem.setChecked(mEnableBackgroundAudio);
 		OnMenuItemClickListener clickListener = new OnMenuItemClickListener() {
 			@Override
-			public
-			boolean onMenuItemClick(MenuItem item) {
-				if(item == backgroundAudioItem) {
-					mBackgroundAudioEnabled = !item.isChecked();
+			public boolean onMenuItemClick(MenuItem item) {
+				if (item == backgroundAudioItem) {
+					mEnableBackgroundAudio = !item.isChecked();
 					return true;
 				}
 				return false;
@@ -600,18 +666,23 @@ class ExoPlayerFragment extends Fragment implements SurfaceHolder.Callback,
 		popup.show();
 	}
 
-	public
-	void showTextPopup(View v) {
-		PopupMenu popup = new PopupMenu(getActivity(), v);
+	// SurfaceHolder.Callback implementation
+
+	@OnClick({R.id.retry_button})
+	public void onRetryButtonClicked(final View view) {
+		preparePlayer(true);
+	}
+
+	@OnClick({R.id.text_controls})
+	public void onTextControlsButtonClicked(View v) {
+		PopupMenu popup = new PopupMenu(getContext(), v);
 		configurePopupWithTracks(popup, null, Player.TYPE_TEXT);
 		popup.show();
 	}
 
-	// DemoPlayer.CaptionListener implementation
-
-	public
-	void showVerboseLogPopup(View v) {
-		PopupMenu popup = new PopupMenu(getActivity(), v);
+	@OnClick({R.id.verbose_log_controls})
+	public void onVerboseLogControlsButtonClicked(View v) {
+		PopupMenu popup = new PopupMenu(getContext(), v);
 		Menu menu = popup.getMenu();
 		menu.add(Menu.NONE, 0, Menu.NONE, R.string.logging_normal);
 		menu.add(Menu.NONE, 1, Menu.NONE, R.string.logging_verbose);
@@ -619,9 +690,8 @@ class ExoPlayerFragment extends Fragment implements SurfaceHolder.Callback,
 		menu.findItem((VerboseLogUtil.areAllTagsEnabled()) ? 1 : 0).setChecked(true);
 		popup.setOnMenuItemClickListener(new OnMenuItemClickListener() {
 			@Override
-			public
-			boolean onMenuItemClick(MenuItem item) {
-				if(item.getItemId() == 0) {
+			public boolean onMenuItemClick(MenuItem item) {
+				if (item.getItemId() == 0) {
 					VerboseLogUtil.setEnableAllTags(false);
 				}
 				else {
@@ -633,93 +703,94 @@ class ExoPlayerFragment extends Fragment implements SurfaceHolder.Callback,
 		popup.show();
 	}
 
-	// DemoPlayer.MetadataListener implementation
-
-	private
-	void configurePopupWithTracks(PopupMenu popup, final OnMenuItemClickListener customActionClickListener, final int trackType) {
-		if(mPlayer == null) {
-			return;
-		}
-		int trackCount = mPlayer.getTrackCount(trackType);
-		if(trackCount == 0) {
-			return;
-		}
-		popup.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-			@Override
-			public
-			boolean onMenuItemClick(MenuItem item) {
-				return (customActionClickListener != null && customActionClickListener.onMenuItemClick(item)) || onTrackItemClick(item, trackType);
-			}
-		});
-		Menu menu = popup.getMenu();
-		// ID_OFFSET ensures we avoid clashing with Menu.NONE (which equals 0)
-		menu.add(MENU_GROUP_TRACKS, ExoPlayer.TRACK_DISABLED + ID_OFFSET, Menu.NONE, R.string.off);
-		for(int i = 0; i < trackCount; i++) {
-			menu.add(MENU_GROUP_TRACKS, i + ID_OFFSET, Menu.NONE, buildTrackName(mPlayer.getTrackFormat(trackType, i)));
-		}
-		menu.setGroupCheckable(MENU_GROUP_TRACKS, true, true);
-		menu.findItem(mPlayer.getSelectedTrack(trackType) + ID_OFFSET).setChecked(true);
-	}
-
-	// SurfaceHolder.Callback implementation
-
-	private
-	boolean onTrackItemClick(MenuItem item, int type) {
-		if(mPlayer == null || item.getGroupId() != MENU_GROUP_TRACKS) {
-			return false;
-		}
-		mPlayer.setSelectedTrack(type, item.getItemId() - ID_OFFSET);
-		return true;
-	}
-
 	@Override
-	public
-	void onCues(List<Cue> cues) {
+	public void onCues(List<Cue> cues) {
 		mSubtitleLayout.setCues(cues);
 	}
 
 	@Override
-	public
-	void onId3Metadata(Map<String, Object> metadata) {
-		for(Map.Entry<String, Object> entry : metadata.entrySet()) {
-			if(TxxxMetadata.TYPE.equals(entry.getKey())) {
-				TxxxMetadata txxxMetadata = (TxxxMetadata)entry.getValue();
-				Log.i(TAG, String.format("ID3 TimedMetadata %s: description=%s, value=%s", TxxxMetadata.TYPE, txxxMetadata.description, txxxMetadata.value));
+	public void onId3Metadata(List<Id3Frame> id3Frames) {
+		for (Id3Frame id3Frame : id3Frames) {
+			if (id3Frame instanceof TxxxFrame) {
+				TxxxFrame txxxFrame = (TxxxFrame) id3Frame;
+				Log.i(LOG_TAG,
+				      String.format("ID3 TimedMetadata %s: description=%s, value=%s",
+				                    txxxFrame.id,
+				                    txxxFrame.description,
+				                    txxxFrame.value));
 			}
-			else if(PrivMetadata.TYPE.equals(entry.getKey())) {
-				PrivMetadata privMetadata = (PrivMetadata)entry.getValue();
-				Log.i(TAG, String.format("ID3 TimedMetadata %s: owner=%s", PrivMetadata.TYPE, privMetadata.owner));
+			else if (id3Frame instanceof PrivFrame) {
+				PrivFrame privFrame = (PrivFrame) id3Frame;
+				Log.i(LOG_TAG, String.format("ID3 TimedMetadata %s: owner=%s", privFrame.id, privFrame.owner));
 			}
-			else if(GeobMetadata.TYPE.equals(entry.getKey())) {
-				GeobMetadata geobMetadata = (GeobMetadata)entry.getValue();
-				Log.i(TAG, String.format("ID3 TimedMetadata %s: mimeType=%s, filename=%s, description=%s", GeobMetadata.TYPE, geobMetadata.mimeType, geobMetadata.filename, geobMetadata.description));
+			else if (id3Frame instanceof GeobFrame) {
+				GeobFrame geobFrame = (GeobFrame) id3Frame;
+				Log.i(LOG_TAG,
+				      String.format("ID3 TimedMetadata %s: mimeType=%s, filename=%s, description=%s",
+				                    geobFrame.id,
+				                    geobFrame.mimeType,
+				                    geobFrame.filename,
+				                    geobFrame.description));
 			}
 			else {
-				Log.i(TAG, String.format("ID3 TimedMetadata %s", entry.getKey()));
+				Log.i(LOG_TAG, String.format("ID3 TimedMetadata %s", id3Frame.id));
 			}
 		}
 	}
 
 	@Override
-	public
-	void surfaceCreated(SurfaceHolder holder) {
-		if(mPlayer != null) {
+	public void surfaceCreated(SurfaceHolder holder) {
+		if (mPlayer != null) {
 			mPlayer.setSurface(holder.getSurface());
 		}
 	}
 
 	@Override
-	public
-	void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
 		// Do nothing.
 	}
 
 	@Override
-	public
-	void surfaceDestroyed(SurfaceHolder holder) {
-		if(mPlayer != null) {
+	public void surfaceDestroyed(SurfaceHolder holder) {
+		if (mPlayer != null) {
 			mPlayer.blockingClearSurface();
 		}
 	}
 
+	private static final class KeyCompatibleMediaController extends MediaController {
+
+		private MediaPlayerControl playerControl;
+
+		public KeyCompatibleMediaController(Context context) {
+			super(context);
+		}
+
+		@Override
+		public void setMediaPlayer(MediaPlayerControl playerControl) {
+			super.setMediaPlayer(playerControl);
+			this.playerControl = playerControl;
+		}
+
+		@Override
+		public boolean dispatchKeyEvent(KeyEvent event) {
+			int keyCode = event.getKeyCode();
+			if (playerControl.canSeekForward() && (keyCode == KeyEvent.KEYCODE_MEDIA_FAST_FORWARD
+			  || keyCode == KeyEvent.KEYCODE_DPAD_RIGHT)) {
+				if (event.getAction() == KeyEvent.ACTION_DOWN) {
+					playerControl.seekTo(playerControl.getCurrentPosition() + 15000); // milliseconds
+					show();
+				}
+				return true;
+			}
+			else if (playerControl.canSeekBackward() && (keyCode == KeyEvent.KEYCODE_MEDIA_REWIND
+			  || keyCode == KeyEvent.KEYCODE_DPAD_LEFT)) {
+				if (event.getAction() == KeyEvent.ACTION_DOWN) {
+					playerControl.seekTo(playerControl.getCurrentPosition() - 5000); // milliseconds
+					show();
+				}
+				return true;
+			}
+			return super.dispatchKeyEvent(event);
+		}
+	}
 }

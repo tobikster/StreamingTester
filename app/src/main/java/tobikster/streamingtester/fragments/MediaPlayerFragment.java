@@ -21,10 +21,18 @@ import android.widget.MediaController;
 
 import java.io.IOException;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import tobikster.streamingtester.R;
 import tobikster.streamingtester.model.VideoUri;
 
-public class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPreparedListener, SurfaceHolder.Callback, MediaController.MediaPlayerControl, MediaPlayer.OnBufferingUpdateListener, MediaPlayer.OnInfoListener, MediaPlayer.OnVideoSizeChangedListener, MediaPlayer.OnErrorListener {
+public class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPreparedListener,
+                                                             SurfaceHolder.Callback,
+                                                             MediaController.MediaPlayerControl,
+                                                             MediaPlayer.OnBufferingUpdateListener,
+                                                             MediaPlayer.OnInfoListener,
+                                                             MediaPlayer.OnVideoSizeChangedListener,
+                                                             MediaPlayer.OnErrorListener {
 
 	public static final String ARG_VIDEO_NAME = "video_name";
 	public static final String ARG_VIDEO_URI = "video_url";
@@ -34,8 +42,9 @@ public class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPrepa
 	VideoUri mVideoUri;
 	int mBufferPercentage;
 	boolean mMediaPlayerPrepared;
-	private View mRootView;
-	private SurfaceView mSurfaceView;
+
+	@BindView(R.id.surface_view)
+	SurfaceView mSurfaceView;
 	private MediaPlayer mMediaPlayer;
 	private MediaController mMediaController;
 
@@ -60,7 +69,7 @@ public class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPrepa
 		setHasOptionsMenu(true);
 
 		Bundle args = getArguments();
-		if(args != null) {
+		if (args != null) {
 			final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
 			final String mediaServerAddress = preferences.getString(getString(R.string.pref_media_server_address),
 			                                                        getString(R.string.pref_default_media_server_address));
@@ -68,12 +77,12 @@ public class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPrepa
 			                                                     getString(R.string.pref_default_media_server_port));
 
 			String videoName = args.getString(ARG_VIDEO_NAME, null);
-			String videoUri = String.format("http://%s:%s/%s",
-			                                mediaServerAddress,
-			                                mediaServerPort,
-			                                args.getString(ARG_VIDEO_URI, null));
+			Uri videoUri = new Uri.Builder().scheme("http")
+			                                .encodedAuthority(mediaServerAddress + ":" + mediaServerPort)
+			                                .appendEncodedPath(args.getString(ARG_VIDEO_URI))
+			                                .build();
 			boolean videoIsRemote = args.getBoolean(ARG_VIDEO_REMOTE, true);
-			mVideoUri = new VideoUri(videoName, videoUri, videoIsRemote);
+			mVideoUri = new VideoUri(videoName, videoUri.toString(), videoIsRemote);
 		}
 
 		mMediaPlayer = new MediaPlayer();
@@ -83,44 +92,43 @@ public class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPrepa
 		mMediaPlayer.setOnErrorListener(this);
 
 		try {
-			if(mVideoUri != null) {
+			if (mVideoUri != null) {
 				Uri fileUri = Uri.parse(mVideoUri.getUri());
 				mMediaPlayer.setDataSource(getActivity(), fileUri);
 				mMediaPlayer.prepareAsync();
 			}
 		}
-		catch(IOException e) {
+		catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		return inflater.inflate(R.layout.fragment_media_player, container, false);
+		View root = inflater.inflate(R.layout.fragment_media_player, container, false);
+		ButterKnife.bind(this, root);
+		return root;
 	}
 
 	@Override
-	public void onViewCreated(View view, Bundle savedInstanceState) {
+	public void onViewCreated(final View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
-		mRootView = view.findViewById(R.id.root);
-		mRootView.setOnTouchListener(new View.OnTouchListener() {
+		view.setOnTouchListener(new View.OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
-				switch(event.getAction()) {
+				switch (event.getAction()) {
 					case MotionEvent.ACTION_DOWN:
 						toggleControlsVisibility();
 						break;
 
 					case MotionEvent.ACTION_UP:
-						mRootView.performClick();
+						view.performClick();
 						break;
 				}
 				return true;
 			}
 		});
-
-		mSurfaceView = (SurfaceView) (view.findViewById(R.id.surface_view));
 
 		SurfaceHolder surfaceHolder = mSurfaceView.getHolder();
 		surfaceHolder.addCallback(this);
@@ -139,7 +147,7 @@ public class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPrepa
 	}
 
 	private void toggleControlsVisibility() {
-		if(mMediaController.isShowing()) {
+		if (mMediaController.isShowing()) {
 			mMediaController.hide();
 		}
 		else {
@@ -173,7 +181,7 @@ public class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPrepa
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		boolean consume_event;
-		switch(item.getItemId()) {
+		switch (item.getItemId()) {
 			case R.id.action_show_media_info_dialog:
 				showMediaInfoDialog();
 				consume_event = true;
@@ -192,9 +200,9 @@ public class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPrepa
 	}
 
 	private void showMediaInfoDialog() {
-		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-			for(MediaPlayer.TrackInfo trackInfo : mMediaPlayer.getTrackInfo()) {
-				switch(trackInfo.getTrackType()) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+			for (MediaPlayer.TrackInfo trackInfo : mMediaPlayer.getTrackInfo()) {
+				switch (trackInfo.getTrackType()) {
 					case MediaPlayer.TrackInfo.MEDIA_TRACK_TYPE_VIDEO:
 						Log.d(TAG, String.format("Video format: %s", trackInfo.getFormat().toString()));
 						break;
@@ -221,7 +229,7 @@ public class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPrepa
 		float hr = boxHeight / videoHeight;
 		float ar = videoWidth / videoHeight;
 
-		if(wr > hr) {
+		if (wr > hr) {
 			width = (int) (boxHeight * ar);
 		}
 		else {
@@ -311,7 +319,7 @@ public class MediaPlayerFragment extends Fragment implements MediaPlayer.OnPrepa
 
 	@Override
 	public boolean onInfo(MediaPlayer mp, int what, int extra) {
-		switch(what) {
+		switch (what) {
 			case MediaPlayer.MEDIA_INFO_UNKNOWN:
 				break;
 			case MediaPlayer.MEDIA_INFO_VIDEO_TRACK_LAGGING:

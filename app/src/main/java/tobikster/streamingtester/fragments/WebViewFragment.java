@@ -16,6 +16,7 @@ import android.webkit.WebView;
 import android.widget.Toast;
 
 import tobikster.streamingtester.R;
+import tobikster.streamingtester.utils.Samples;
 
 
 public class WebViewFragment extends Fragment {
@@ -72,29 +73,19 @@ public class WebViewFragment extends Fragment {
 		                                                     getString(R.string.pref_default_media_server_port));
 
 		switch(mStreamType) {
-			case ExoPlayerFragment.TYPE_DASH:
+			case Samples.TYPE_DASH:
 				Log.d(TAG, "onViewCreated: loading dash page");
 				Uri uri = new Uri.Builder().scheme("http")
-				                           .encodedAuthority(String.format("%s:%s",
-				                                                           mediaServerAddress,
-				                                                           mediaServerPort))
+				                           .encodedAuthority(mediaServerAddress + ":" + mediaServerPort)
 				                           .encodedPath(INDEX_DASH_URL)
 				                           .appendQueryParameter("url", mContentUrl)
 				                           .appendQueryParameter("type", Integer.toString(mStreamType))
 				                           .build();
-//				final String url = String.format("http://%s:%s/%s?url=/%s&type=%s",
-//				                                 mediaServerAddress,
-//				                                 mediaServerPort,
-//				                                 INDEX_DASH_URL,
-//				                                 mContentUrl,
-//				                                 mStreamType);
-//				Log.d(TAG, String.format("onViewCreated: url: %s", url));
-//				mWebView.loadUrl(url);
 				Log.d(TAG, String.format("onViewCreated: loading url: %s", uri));
 				mWebView.loadUrl(uri.toString());
 				break;
-			case ExoPlayerFragment.TYPE_HLS:
-			case ExoPlayerFragment.TYPE_OTHER:
+			case Samples.TYPE_HLS:
+			case Samples.TYPE_OTHER:
 				Log.d(TAG, "onViewCreated: loading hls or other page");
 				mWebView.loadUrl("file:///android_asset/www/index.html?type=" + mStreamType + "&url=" + mContentUrl);
 				break;
