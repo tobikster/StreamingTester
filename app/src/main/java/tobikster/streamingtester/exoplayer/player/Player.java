@@ -361,6 +361,10 @@ public class Player implements ExoPlayer.Listener,
 
 	@Override
 	public void onPlayerStateChanged(boolean playWhenReady, int state) {
+		if(isLoopModeEnabled() && ExoPlayer.STATE_ENDED == state) {
+			seekTo(0);
+			setPlayWhenReady(true);
+		}
 		maybeReportPlayerState();
 	}
 
