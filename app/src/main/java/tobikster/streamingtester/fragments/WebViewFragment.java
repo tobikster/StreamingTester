@@ -20,13 +20,12 @@ import tobikster.streamingtester.utils.Samples;
 
 
 public class WebViewFragment extends Fragment {
-	@SuppressWarnings("unused")
-	private static final String TAG = WebViewFragment.class.getSimpleName();
+	@SuppressWarnings("unused") private static final String TAG = WebViewFragment.class.getSimpleName();
 
 	private static final String ARG_URL = "url";
 	private static final String ARG_STREAM_TYPE = "stream_type";
 
-	private static final String INDEX_DASH_URL = "html/index_dash.html";
+	private static final String INDEX_DASH_URL = "html/streaming_tester/index_dash.html";
 
 	private WebView mWebView;
 
@@ -46,7 +45,7 @@ public class WebViewFragment extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Bundle args = getArguments();
-		if(args != null) {
+		if (args != null) {
 			mContentUrl = args.getString(ARG_URL, "");
 			mStreamType = args.getInt(ARG_STREAM_TYPE);
 		}
@@ -66,29 +65,33 @@ public class WebViewFragment extends Fragment {
 		mWebView.getSettings().setJavaScriptEnabled(true);
 		mWebView.addJavascriptInterface(new VideoJavaScriptInterface(), "Android");
 
-		final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
+		final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(
+				getActivity().getApplicationContext());
 		final String mediaServerAddress = preferences.getString(getString(R.string.pref_media_server_address),
 		                                                        getString(R.string.pref_default_media_server_address));
 		final String mediaServerPort = preferences.getString(getString(R.string.pref_media_server_port),
 		                                                     getString(R.string.pref_default_media_server_port));
 
-		switch(mStreamType) {
-			case Samples.TYPE_DASH:
+		switch (mStreamType) {
+			case Samples.TYPE_DASH: {
 				Log.d(TAG, "onViewCreated: loading dash page");
 				Uri uri = new Uri.Builder().scheme("http")
 				                           .encodedAuthority(mediaServerAddress + ":" + mediaServerPort)
 				                           .encodedPath(INDEX_DASH_URL)
-				                           .appendQueryParameter("url", mContentUrl)
-				                           .appendQueryParameter("type", Integer.toString(mStreamType))
+				                           .appendQueryParameter("url", "/" + mContentUrl)
+				                           .appendQueryParameter("type",
+				                                                 Integer.toString(mStreamType))
 				                           .build();
 				Log.d(TAG, String.format("onViewCreated: loading url: %s", uri));
 				mWebView.loadUrl(uri.toString());
 				break;
+			}
 			case Samples.TYPE_HLS:
-			case Samples.TYPE_OTHER:
+			case Samples.TYPE_OTHER: {
 				Log.d(TAG, "onViewCreated: loading hls or other page");
-				mWebView.loadUrl("file:///android_asset/www/index.html?type=" + mStreamType + "&url=" + mContentUrl);
+				mWebView.loadUrl("file:///android_asset/www/index.html?type=" + mStreamType + "&url=http://10.0.0.2:8081/" + mContentUrl);
 				break;
+			}
 		}
 
 	}
